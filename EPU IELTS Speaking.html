@@ -626,6 +626,131 @@ body > nav button.on { background: color-mix(in srgb,var(--pr) 17%,transparent);
   background: linear-gradient(145deg, rgba(255,255,255,.34), rgba(255,255,255,.13));
   box-shadow: inset 0 1px 0 rgba(255,255,255,.42), 0 4px 14px rgba(4,18,42,.12);
 }
+.head-actions button.head-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 43px;
+  padding: 8px 10px;
+  white-space: nowrap;
+  font-size: 12px;
+}
+.head-actions .head-link svg { width: 17px; height: 17px; }
+.head-actions .head-link[aria-current] { border-color: var(--pr); background: var(--cd); color: var(--pr); }
+.library-intro {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 14px;
+  border-left: 4px solid var(--pr);
+}
+.library-intro h1 { font-size: clamp(24px, 3.4vw, 36px); }
+.library-intro-content { flex: 1 1 270px; }
+.library-control { display: grid; justify-items: start; gap: 6px; }
+.library-control small { color: var(--mu); min-height: 1.3em; }
+.library-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.library-grid > .empty-state { grid-column: 1 / -1; }
+.library-grid > .library-card { display: flex; flex-direction: column; gap: 9px; margin: 0; }
+.library-card h2 { font-size: clamp(17px, 2.5vw, 22px); }
+.library-card .library-copy { margin: 0 0 7px; line-height: 1.65; }
+.library-card-meta { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; color: var(--mu); font-size: .82em; }
+.library-card-meta span { color: var(--pr); font-weight: 760; }
+.library-card .library-card-actions { flex-wrap: wrap; margin-top: auto; }
+.library-speech-status:not(:empty) { flex-basis: 100%; }
+.library-credit { margin-top: 12px; }
+@media (max-width: 650px) {
+  .head-actions .theme-toggle > span { display: none; }
+  .head-actions button.theme-toggle { justify-content: center; min-width: 43px; }
+}
+@media (max-width: 520px) {
+  .library-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 445px) {
+  .head-actions { gap: 4px; }
+  .head-actions button.head-link { padding-inline: 7px; }
+  .head-actions .head-link svg { display: none; }
+  .brand-kicker { display: none; }
+}
+
+.review-switch { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.review-switch button[aria-pressed="true"] { border-color: var(--action); background: var(--action); color: var(--on); }
+.review-layout { display: grid; grid-template: "category timer" auto "materials timer" 1fr / minmax(0, 1fr) minmax(255px, .52fr); column-gap: 16px; align-items: start; }
+#review-category-content { grid-area: category; min-width: 0; }
+#review-category-content > .c:first-child, .review-part-list > .c:first-child { margin-top: 0; }
+.review-materials { grid-area: materials; margin-top: 0; }
+.review-timer-jump { display: none; }
+.review-part h2 { margin-top: 7px; }
+.review-item-list { margin: 14px 0 0; padding: 0; list-style: none; }
+.review-item { padding: 13px 0 4px; border-top: 1px solid var(--bd); overflow-wrap: anywhere; }
+.review-item p { margin: 2px 0; font-size: .9em; }
+.review-item-status { display: block; margin: 5px 0; }
+.review-item-status:empty, .review-layout form [role="status"]:empty { display: none; }
+.review-link { display: inline-flex; align-items: center; min-height: 43px; padding: 0 6px; font-size: 14px; font-weight: 690; }
+.review-prompt { white-space: pre-wrap; }
+
+.review-timer-card { grid-area: timer; position: sticky; top: calc(83px + var(--inset-top)); margin-top: 0; overflow: hidden; }
+#review-timer-heading { scroll-margin-top: calc(83px + var(--inset-top)); }
+.review-timer-card > .eyebrow { margin-top: 0; }
+.review-timer-body { display: flex; align-items: center; gap: 14px; margin-top: 16px; }
+.review-level { margin: 0; color: var(--mu); font-weight: 750; font-size: .86em; }
+.review-clock { font-size: clamp(29px, 4vw, 39px); font-weight: 790; line-height: 1.16; letter-spacing: -.045em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.review-progress { display: block; width: 100%; height: 8px; margin-top: 14px; appearance: none; border: 0; border-radius: 99px; background: var(--sf); overflow: hidden; accent-color: var(--action); }
+.review-progress::-webkit-progress-bar { background: var(--sf); }
+.review-progress::-webkit-progress-value { border-radius: 99px; background: var(--action); }
+.review-progress::-moz-progress-bar { border-radius: 99px; background: var(--action); }
+.review-pace { display: block; margin-top: 13px; }
+#review-timer-notice:empty { margin: 0; }
+.review-crystal { position: relative; display: grid; place-items: center; flex: 0 0 76px; height: 76px; isolation: isolate; }
+.review-orbit, .review-gem { position: absolute; display: block; }
+.review-orbit { width: 67px; height: 67px; border: 1px dashed hsl(var(--review-hue) 65% 57% / .72); border-radius: 50%; background: hsl(var(--review-hue) 78% 59% / .13); }
+.review-gem {
+ width: 47px; height: 47px;
+ background: linear-gradient(135deg, hsl(var(--review-hue) 83% 81%), hsl(var(--review-hue) 76% 55%) 55%, hsl(var(--review-hue) 63% 37%));
+ clip-path: polygon(50% 0, 89% 24%, 100% 58%, 50% 100%, 0 58%, 11% 24%);
+}
+.review-crystal[data-pattern="1"] .review-gem { clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+.review-crystal[data-pattern="2"] .review-gem { clip-path: polygon(25% 3%, 75% 3%, 100% 50%, 75% 97%, 25% 97%, 0 50%); }
+.review-crystal[data-pattern="3"] .review-gem { clip-path: polygon(50% 0, 61% 36%, 100% 50%, 61% 64%, 50% 100%, 39% 64%, 0 50%, 39% 36%); }
+.review-crystal.is-running[data-pattern="0"] .review-gem { animation: review-breathe 2.7s ease-in-out infinite; }
+.review-crystal.is-running[data-pattern="1"] .review-gem { animation: review-spin 5.2s linear infinite; }
+.review-crystal.is-running[data-pattern="2"] .review-gem { animation: review-float 2.9s ease-in-out infinite; }
+.review-crystal.is-running[data-pattern="3"] .review-gem { animation: review-flare 2s ease-in-out infinite; }
+.review-crystal.is-finished .review-gem { opacity: 0; animation: review-break .65s ease-out both; }
+.review-crystal.is-finished .review-orbit { display: grid; place-items: center; border-style: solid; }
+.review-crystal.is-finished .review-orbit::after { content: "✓"; color: var(--positive); font-size: 26px; font-weight: 800; animation: review-reveal .25s .5s ease-out both; }
+.review-shard { position: absolute; width: 9px; height: 12px; background: hsl(var(--review-hue) 78% 62%); clip-path: polygon(50% 0, 100% 100%, 0 82%); opacity: 0; animation: review-shatter .86s ease-out both; }
+.review-crystal[data-pattern="1"] .review-shard { animation-name: review-spiral; }
+.review-crystal[data-pattern="2"] .review-shard { animation-name: review-drift; }
+.review-crystal[data-pattern="3"] .review-shard { animation-name: review-burst; }
+.review-reward, .review-pinned { margin-top: 15px; padding: 13px; border: 1px solid var(--bd); border-radius: 13px; background: var(--positive-bg); color: var(--positive); }
+.review-reward { animation: review-reveal .45s .22s ease-out both; }
+.review-pinned { display: flex; align-items: center; gap: 13px; margin-bottom: 14px; }
+.review-pinned > span { font-size: 30px; }
+.review-pinned p { margin: 1px 0; }
+.review-award-list { margin-block: 5px 12px; }
+.review-award-list li { padding-block: 4px; }
+@keyframes review-breathe { 0%, 100% { transform: scale(.93); } 50% { transform: scale(1.14); } }
+@keyframes review-spin { to { transform: rotate(360deg); } }
+@keyframes review-float { 0%, 100% { transform: translateY(5px) rotate(-9deg); } 50% { transform: translateY(-6px) rotate(9deg); } }
+@keyframes review-flare { 0%, 100% { transform: scale(.9) rotate(-10deg); opacity: .75; } 50% { transform: scale(1.17) rotate(14deg); opacity: 1; } }
+@keyframes review-break { from { opacity: 1; transform: scale(1); } 35% { opacity: 1; transform: scale(1.18); } to { opacity: 0; transform: scale(.45); } }
+@keyframes review-shatter { from { transform: scale(.35); opacity: 0; } 22% { opacity: 1; } to { transform: translate(var(--x), var(--y)) rotate(var(--angle)); opacity: 0; } }
+@keyframes review-spiral { from { transform: rotate(0) scale(.4); opacity: 0; } 25% { opacity: 1; } to { transform: rotate(125deg) translate(var(--x), var(--y)) rotate(var(--angle)); opacity: 0; } }
+@keyframes review-drift { from { transform: scale(.4); opacity: 0; } 25% { opacity: 1; } to { transform: translate(var(--x), calc(var(--y) - 25px)) rotate(var(--angle)); opacity: 0; } }
+@keyframes review-burst { from { transform: scale(.4); opacity: 0; } 34% { transform: translate(var(--x), var(--y)) scale(1.25); opacity: 1; } to { transform: translate(var(--x), var(--y)) scale(.15); opacity: 0; } }
+@keyframes review-reveal { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 700px) {
+ .review-layout { grid-template: "category" auto "timer" auto "materials" auto / minmax(0, 1fr); }
+ .review-timer-card { position: static; }
+ .review-timer-jump { display: inline-block; margin-bottom: 10px; font-size: 13px; }
+ .review-switch { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 8px; }
+ .review-switch button { padding-inline: 5px; font-size: clamp(11px, 3.55vw, 14px); }
+}
+@media (prefers-reduced-motion: reduce) {
+ .review-crystal .review-gem, .review-crystal .review-orbit::after, .review-shard, .review-reward { animation: none !important; }
+}
 </style>
 <script type="application/json" id="offline-dictionary-meta">{"shards":["_","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"],"count":195393,"bilingual":119032}</script>
 <script type="text/plain" id="offline-dictionary-_">
@@ -735,7 +860,7 @@ H4sIAAAAAAACCuy97Y8kx3kn+K+E64u6geo2SS12sdOfhkNZpCRSPJHW3o6gBaIyoyqDnRmRjIisnurF
     <img src="data:image/jpeg;base64,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" alt="" width="43" height="43">
     <div><span class="brand-name">Đại học Điện Lực</span><span class="brand-kicker">Phòng luyện IELTS Speaking</span></div>
   </div>
-  <div class="head-actions"><button type="button" class="theme-toggle" id="theme" onclick="toggleTheme()">Giao diện sáng/tối</button></div>
+  <div class="head-actions"><button type="button" class="g head-link" data-head-route="library" onclick="go('library')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10m-10 4h4m-4 4h4m3-4h3v4h-3z"/></svg><span>Thư viện</span></button><button type="button" class="g head-link" data-head-route="review" onclick="go('review')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4H6a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-3"/><rect x="9" y="2" width="6" height="4" rx="1"/><path d="m8 13 3 3 5-6"/></svg><span>Ôn Thi</span></button><button type="button" class="theme-toggle" id="theme" onclick="toggleTheme()">Giao diện sáng/tối</button></div>
 </header>
 <main id="m" tabindex="-1"></main>
 <nav id="n" aria-label="Điều hướng chính"></nav>
@@ -1526,6 +1651,8 @@ const bars=m=>K.map(([key,label])=>{
 }).join('');
 
 const V={
+ library:libraryPage,
+ review:reviewPage,
  home:()=>{
   const m=band();
   return `<section class="hero">${heroMotif}<div class="hero-copy">
@@ -1557,6 +1684,7 @@ const V={
  pro:()=>`${pageIntro('HỒ SƠ','Hồ sơ của bạn','Cập nhật thông tin cá nhân và xem cách ứng dụng xử lý dữ liệu.')}
  <form class="c" onsubmit="event.preventDefault();sp()"><h2>Thông tin cá nhân</h2><div class="field-grid">${[['n','Họ và tên'],['s','Trường học'],['m','Ngành học'],['k','Lớp học']].map(([key,label])=>`<label>${label}<input id="f${key}" value="${esc(st.p[key])}"${key==='s'?' placeholder="Đại học Điện Lực"':''}></label>`).join('')}</div><button type="submit">Lưu hồ sơ</button> <small id="fok" role="status"></small></form>
  ${cloudPanel()}
+ ${reviewAchievements()}
  <article class="c"><h2>Lịch sử luyện tập</h2><p id="saved-history-count">${historyCount()}</p><button class="g" id="export-history" onclick="exportHistory()"${st.h.length?'':' disabled'}>Xuất lịch sử CSV</button></article>
  <div class="profile-grid"><article class="c"><h2>Ủng hộ tác giả</h2><p>Nếu ứng dụng hữu ích với bạn, bạn có thể ủng hộ tác giả qua mã QR MoMo.</p><img class="qr" src="${QR}" alt="Mã QR MoMo – NGUYEN DUC TAI"></article>
  <div><article class="c"><h2>Hỗ trợ và góp ý</h2><details><summary>Viết góp ý</summary><p><a href="mailto:${MAIL}">${MAIL}</a></p><label for="fb">Nội dung góp ý</label><textarea id="fb" rows="4" placeholder="Bạn muốn cải thiện điều gì?"></textarea><button onclick="feedback()">${MAIL?'Mở ứng dụng email':'Sao chép góp ý'}</button><p id="fb-status" role="status"></p></details></article>
@@ -1860,8 +1988,8 @@ function releaseWaveform(capture) {
   capture.audioContext = null;
 }
 
-function cancel() {
-  stopPronunciation();
+function cancel(keepPronunciation=false) {
+  if(!keepPronunciation)stopPronunciation();
   if(S)S.pronDraft=null;
   clearPrep();
   cancelTranscription();
@@ -2101,7 +2229,7 @@ function showAfter(blob, transcript = '', message = '') {
   </div>`;
   $('#tx').value = transcript;
   if(S){
-    S.pronDraft=lb?{x:S.it[S.i],text:transcript.trim()}:null;
+    S.pronDraft=lb?{x:S.it[S.i],text:transcript.trim(),blob:lb}:null;
     if(S.pronDraft)after.insertAdjacentHTML('beforeend',whisperPanel(S.pronDraft)+(S.mode==='exam'?'':pronunciationPanel(S.pronDraft)));
   }
   setRecordingUi('ready', message || (lb
@@ -2410,12 +2538,12 @@ function sess(){
  const ti=TP.findIndex(([name])=>name===x.t);
  return `<article class="c practice-card">
  <div class="session-meta"><span class="part-index">PART 0${x.p} · CÂU ${S.i+1}/${S.it.length}</span>
- <span class="topic-badge topic-${ti}">${icon(TOPIC_ICONS[ti],'topic-icon')} ${x.t}</span></div>
- <h1 lang="en">${x.q}</h1>
+ ${x.forecast?'<span class="topic-badge">Forecast · '+esc(x.t)+'</span>':`<span class="topic-badge topic-${ti}">${icon(TOPIC_ICONS[ti],'topic-icon')} ${x.t}</span>`}</div>
+ <h1 lang="en"${x.forecast?' class="review-prompt"':''}>${esc(x.q)}</h1>
  ${S.retake?'<aside class="retake-note" aria-live="polite"><p>Bạn đang thu lại câu này. Sau khi chấm, kết quả mới sẽ thay cho kết quả cũ.</p><button type="button" class="g" onclick="restorePreviousAnswer()">← Quay lại kết quả trước</button></aside>':''}
  ${S.result?'':`${x.p===2?'<button class="g" id="prep" onclick="prep()">Chuẩn bị 60 giây</button>':''}
  ${recordingMarkup()}`}
- <div class="study-tools">${aid(x)}</div><div id="after"></div>
+ <div class="study-tools">${x.forecast?reviewForecastAid(x):aid(x)}</div><div id="after"></div>
  <section id="evaluation">${S.result?resultHTML(S.result):''}</section></article>
  <button class="g w" onclick="leavePractice()">Thoát bài luyện</button>`;
 }
@@ -2460,8 +2588,9 @@ function ev(){
  }
  const confirmed=$('#pron-confirm')?.checked;
  const previous=S.retake;
- const blob=lb,result={x,s,text:input.value.trim(),m:null,state:blob?'pending':'no-recording',pron:S.pronDraft?.pron,whisper:S.pronDraft?.whisper,duration:dur};
- stopPronunciation();cancelTranscription();S.pronDraft=null;$('#free-pron')?.remove();$('#ai-whisper-container')?.remove();
+ const blob=lb,result={x,s,blob,text:input.value.trim(),m:null,state:blob?'pending':'no-recording',pron:S.pronDraft?.pron,whisper:S.pronDraft?.whisper,duration:dur};
+ if(activePronunciation&&activePronunciation.result===S.pronDraft)activePronunciation.result=result;
+ cancelTranscription();S.pronDraft=null;$('#free-pron')?.remove();$('#ai-whisper-container')?.remove();
  S.result=result;
  const resultIndex=previous?S.res.indexOf(previous.s):-1;
  if(resultIndex>=0)S.res[resultIndex]=s;else S.res.push(s);
@@ -2473,11 +2602,11 @@ function ev(){
  if(historyIndex>=0)st.h[historyIndex]=result.history;else st.h.push(result.history);
  sv();
  if(blob){
-  result.pron??={reference:result.text,heard:null};
+  result.pron??={reference:result.text};
   if(!result.pron.mode)result.pron.mode='self';
   if(result.pron.mode==='self'&&!result.pron.reference)result.pron.reference=result.text;
  }
- if(confirmed&&result.pron?.assessment?.reference!==result.text)delete result.pron.assessment;
+ if(blob&&confirmed&&result.pron.assessment?.reference!==result.text)delete result.pron.assessment;
  applyPronunciationBand(result);
  input.readOnly=true;
  const confirmation=$('#pron-confirm');
@@ -2489,10 +2618,7 @@ function ev(){
  $('#result-title')?.focus({preventScroll:true});
  $('#result-title')?.scrollIntoView({block:'nearest'});
  void diagnose(result,blob);
- if(blob&&confirmed&&!result.pron.assessment){
-  result.pron.mode='self';result.pron.reference=result.text;
-  void measurePronunciation();
- }
+ if(blob&&confirmed&&!result.pron.assessment)measureConfirmedPronunciation(result);
 }
 
 const VOICE_STATE={
@@ -2565,9 +2691,9 @@ Tóm tắt bài nói, nhận xét theo từng tiêu chí, chỉ ra những lỗi
  }
 }
 
-function stopPracticeMedia(){
+function stopPracticeMedia(keepPronunciation=false){
  abortExam();
- cancel();
+ cancel(keepPronunciation);
  stopAnalysis();
  window.speechSynthesis?.cancel();
 }
@@ -2651,8 +2777,9 @@ function animateBands(root){
  });
 }
 function go(t,lesson){
- if(!TABS.some(([id])=>id===t)||(t===tab&&!lesson))return;
- stopPracticeMedia();tab=t;openView();
+ if(!Object.hasOwn(V,t)||(t===tab&&!lesson))return;
+ if(tab==='library')libraryLeave();
+ stopPracticeMedia(Boolean(S?.result));tab=t;openView();
  if(lesson){
   const panel=$('#lesson-part-'+lesson);
   if(panel){panel.open=true;panel.querySelector('summary').focus({preventScroll:true});panel.scrollIntoView({block:'start'})}
@@ -2666,6 +2793,12 @@ function render(enter=false){
  const main=$('#m');
  main.classList.toggle('route-enter',enter);
  main.innerHTML=V[tab]();
+ if(tab==='library')void libraryRefresh();
+ if(tab==='review')mountReviewPage();
+ document.querySelectorAll('[data-head-route]').forEach(button=>{
+  if(button.dataset.headRoute===tab)button.setAttribute('aria-current','page');
+  else button.removeAttribute('aria-current');
+ });
  if(tab==='voc')vl();
  if(enter){
   const cards=main.querySelectorAll(':scope > *, :scope > .part-grid > *, :scope > .home-overview > *, :scope > .vocab-grid > *, :scope > .profile-grid > *');
@@ -2681,6 +2814,7 @@ function render(enter=false){
 }
 themeMedia.addEventListener?.('change',updateTheme);
 window.addEventListener('pagehide',()=>{
+ libraryLeave();
  abortExam();
  stopPronunciation();
  stopAnalysis();
@@ -2717,14 +2851,23 @@ function acousticPhones(segments){
     return (allophones[normalized]||normalized).split(' ').map(ipa=>({...segment,ipa}));
   });
 }
-function soundMatch(expected,heard,left,right){
-  if(expected.ipa===heard.ipa||expected.glide===heard.ipa)return true;
-  const {ipa,weak}=expected,a=heard.ipa;
-  if((ipa==='ɑ'||ipa==='ɔ')&&a==='ɒ')return true;
-  if((ipa==='ʌ'||weak&&ipa==='ɪ')&&a==='ə')return true;
-  if(ipa==='ə'&&(a==='ʌ'||a==='ɪ'&&weak))return true;
-  if((ipa==='t'||ipa==='d')&&a==='ɾ'&&VOWEL_SOUNDS.has(left)&&VOWEL_SOUNDS.has(right))return true;
-  return ipa==='t'&&a==='ʔ'&&VOWEL_SOUNDS.has(left)&&!VOWEL_SOUNDS.has(right);
+const NEAR_VOWELS=['i ɪ','ɛ e æ','a ɑ ɒ ɔ','ʊ u','ʌ ə ɐ'].map(group=>new Set(group.split(' ')));
+const NEAR_CONSONANTS=['p b','t d','k ɡ','f v','θ ð','s z','ʃ ʒ','tʃ dʒ'];
+function soundCredit(expected,heard,left,right){
+  const {ipa,weak,glide}=expected,actual=heard.ipa;
+  const same=ipa===actual||glide===actual||
+    ((ipa==='ɑ'||ipa==='ɔ')&&actual==='ɒ')||
+    ((ipa==='ʌ'||weak&&ipa==='ɪ')&&actual==='ə')||
+    (ipa==='ə'&&(actual==='ʌ'||actual==='ɪ'&&weak))||
+    ((ipa==='t'||ipa==='d')&&actual==='ɾ'&&VOWEL_SOUNDS.has(left)&&VOWEL_SOUNDS.has(right))||
+    (ipa==='t'&&actual==='ʔ'&&VOWEL_SOUNDS.has(left)&&!VOWEL_SOUNDS.has(right));
+  if(same)return .78+.22*heard.evidence;
+  // Recognizer uncertainty and close alternatives earn partial credit.
+  const nearVowel=NEAR_VOWELS.some(group=>group.has(ipa)&&group.has(actual));
+  const nearConsonant=NEAR_CONSONANTS.includes(ipa+' '+actual)||NEAR_CONSONANTS.includes(actual+' '+ipa);
+  if(nearVowel)return .55;
+  if(nearConsonant)return .32;
+  return 0;
 }
 
 // Align the acoustic phone sequence in order, with alternate dictionary
@@ -2772,8 +2915,8 @@ function alignPronunciation(words,heard){
         for(const edge of node.edges){
           const previous=rows[edge];
           if(j){
-            const match=heard[j-1].evidence>=.45&&soundMatch(node.phone,heard[j-1],node.left,node.right);
-            const trial=previous[j-1]+(match?0:1.04);
+            const credit=soundCredit(node.phone,heard[j-1],node.left,node.right);
+            const trial=previous[j-1]+1.08*(1-credit);
             if(trial<cost){cost=trial;back=edge*count+j-1}
           }
           const trial=previous[j]+.91;
@@ -2791,18 +2934,22 @@ function alignPronunciation(words,heard){
     if(prev===i)extras++;
     else if(!node.unknown){
       const actual=position<j?heard[j-1]:null;
-      const match=actual&&actual.evidence>=.45&&soundMatch(node.phone,actual,node.left,node.right);
-      feedback[node.word].sounds.unshift({expected:node.phone.ipa,actual,match,final:node.final&&FINAL_SOUNDS.has(node.phone.ipa)});
+      const credit=actual?soundCredit(node.phone,actual,node.left,node.right):0;
+      const match=credit>=.78;
+      feedback[node.word].sounds.unshift({expected:node.phone.ipa,actual,credit,match,final:node.final&&FINAL_SOUNDS.has(node.phone.ipa)});
     }
     i=prev;j=position;
   }
   extras+=j;
   const assessed=feedback.flatMap(item=>item.sounds), finals=assessed.filter(s=>s.final);
   const hits=assessed.filter(s=>s.match).length, finalHits=finals.filter(s=>s.match).length;
-  return {feedback,assessed:assessed.length,hits,extras,finals:finals.length,finalHits,
+  const credit=assessed.reduce((sum,sound)=>sum+sound.credit,0);
+  const finalCredit=finals.reduce((sum,sound)=>sum+sound.credit,0);
+  const aligned=assessed.filter(sound=>sound.actual);
+  return {feedback,assessed:assessed.length,hits,credit,extras,finals:finals.length,finalHits,finalCredit,
     coverage:words.filter(word=>word.variants.length).length/words.length,
-    confidence:assessed.length?Math.round(assessed.reduce((sum,sound)=>sum+(sound.actual?.evidence||0),0)/assessed.length*100):0,
-    percent:assessed.length?Math.round(hits/(assessed.length+extras)*100):null};
+    confidence:aligned.length?Math.round(aligned.reduce((sum,sound)=>sum+sound.actual.evidence,0)/aligned.length*100):0,
+    percent:assessed.length?Math.round(credit/(assessed.length+.2*extras)*100):null};
 }
 
 async function embeddedPhoneBlob(id,signal){
@@ -2870,7 +3017,7 @@ async function extractPronunciation(blob,signal){
       url=URL.createObjectURL(new Blob([$('#phone-worker').textContent],{type:'text/javascript'}));
       worker=new Worker(url);
       signal.addEventListener('abort',abort,{once:true});
-      timer=setTimeout(()=>finish(Error('timeout')),45000);
+      timer=setTimeout(()=>finish(Error('timeout')),90000);
       worker.onerror=()=>finish(Error('worker'));
       worker.onmessageerror=()=>finish(Error('worker'));
       worker.onmessage=({data})=>data.error?finish(Error(data.error)):finish(null,data.phones);
@@ -2886,44 +3033,58 @@ function pronunciationWords(tokens,dictionary){
  });
 }
 function samplePronunciation(x){
+  if(x.forecast)return '';
   const sample=EX[x.t]?.[x.p];
   return (x.p===2?sample:sample?.[x.k])||'';
 }
 const pronunciationTarget=()=>S?.result||S?.pronDraft;
 function resetPronunciationConfirmation(){const checkbox=$('#pron-confirm');if(checkbox)checkbox.checked=false}
 function pronunciationPanel(result){
-  const available=Boolean(lb||result.pron?.heard?.length);
+  const available=Boolean(result.blob||result.pron?.heard?.length);
+  const busy=result.pron?.busy;
   return '<section id="free-pron" class="pron-panel"><h3>Pronunciation · Phát âm từ bản ghi</h3>'+
     '<p><small>Xác nhận câu bạn định nói để đối chiếu âm vị và âm cuối từ bản ghi.</small></p>'+
-    '<div class="row"><button class="g" id="pron-self" onclick="runFreePronunciationCheck(false)"'+(available?'':' disabled')+'>Soi âm cuối bài vừa nói</button>'+
-    '<button class="g" id="pron-sample" onclick="runFreePronunciationCheck(true)"'+(available&&samplePronunciation(result.x)?'':' disabled')+'>Đối chiếu với Sample Answer</button></div>'+
+    '<div class="row"><button type="button" class="g" id="pron-self" onclick="runFreePronunciationCheck(false)"'+(available&&!busy?'':' disabled')+'>Soi âm cuối bài vừa nói</button>'+
+    '<button type="button" class="g" id="pron-sample" onclick="runFreePronunciationCheck(true)"'+(available&&!busy&&samplePronunciation(result.x)?'':' disabled')+'>Đối chiếu với Sample Answer</button></div>'+
     (available?'':'<p class="mu"><small>Cần một bản ghi để đối chiếu âm vị.</small></p>')+
     '<div id="pron-options">'+pronunciationOptions(result)+'</div></section>';
 }
 function pronunciationOptions(result){
   const state=result.pron;
-  if(!state||!state.mode)return '';
+  if(!state?.mode)return '';
   const sample=state.mode==='sample';
+  const reference=sample?samplePronunciation(result.x):state.reference;
+  const check=state.checks?.[state.mode];
+  const current=!state.busy&&check?.reference===reference.trim()?check:null;
+  const placeholder=state.busy?'Đang chấm…':current?'Chưa đủ dữ liệu':'Chưa chấm';
+  const canMeasure=Boolean(result.blob||state.heard?.length);
   return '<div class="pron-options"><h4>'+(sample?'Đọc theo câu trả lời mẫu':'Xác nhận câu bạn định nói')+'</h4>'+
     '<p class="mu"><small>'+(sample?'Dùng bản ghi bạn đã đọc theo đoạn mẫu dưới đây. Nếu bản ghi là bài tự nói, chọn “Soi âm cuối bài vừa nói”.':
     'Sửa ô dưới đây theo đúng từ bạn định phát âm, kể cả khi máy đã chép thành từ khác.')+'</small></p>'+
     '<label for="pron-reference">'+(sample?'Sample Answer':'Câu bạn định nói')+'</label>'+
-    '<textarea id="pron-reference" lang="en" rows="4" maxlength="3600" '+(sample?'readonly':state.busy?'disabled':'oninput="updatePronunciationReference(this.value)"')+'>'+esc(sample?samplePronunciation(result.x):state.reference)+'</textarea>'+
-    '<div class="row"><button onclick="measurePronunciation()"'+(state.busy?' disabled':'')+'>'+(state.busy?'Đang đối chiếu âm vị…':'Chấm bản ghi với câu này')+'</button>'+
-    (sample?'<button class="g" onclick="say(samplePronunciation(pronunciationTarget().x),.88)">Nghe đoạn mẫu</button>':'')+'</div>'+
-    '<p class="mu" id="pron-status" role="status">'+esc(state.note||'')+'</p>'+
-    (state.report?pronunciationReport(state.report,state.band,state.mode):'')+'</div>';
+    '<textarea id="pron-reference" lang="en" rows="4" maxlength="3600" '+(sample||state.busy?'readonly':'oninput="updatePronunciationReference(this.value)"')+'>'+esc(reference)+'</textarea>'+
+    '<div class="row"><button type="button" onclick="measurePronunciation()"'+(state.busy||!canMeasure?' disabled':'')+'>'+(state.busy?'Đang đối chiếu âm vị…':'Chấm bản ghi với câu này')+'</button>'+
+    (sample?'<button type="button" class="g" onclick="say(samplePronunciation(pronunciationTarget().x),.88)">Nghe đoạn mẫu</button>':'')+'</div>'+
+    '<p class="mu" id="pron-status" role="status">'+esc(state.note||current?.note||'')+'</p>'+
+    '<div id="pron-report-slot">'+pronunciationReport(current?.report,current?.grade,state.mode,placeholder)+'</div></div>';
 }
 function updatePronunciationReference(value){
   const state=pronunciationTarget()?.pron;
-  if(!state)return;
+  if(!state||state.busy)return;
   state.reference=value;
-  state.report=null;
-  $('#pron-result')?.remove();
+  state.note='';
+  const saved=state.checks?.self;
+  const current=saved?.reference===value.trim()?saved:null;
+  $('#pron-status').textContent=current?.note||'';
+  $('#pron-report-slot').innerHTML=pronunciationReport(current?.report,current?.grade,'self',current?'Chưa đủ dữ liệu':'Chưa chấm');
 }
 function refreshPronunciation(result){
   const target=$('#pron-options');
-  if(tab==='prac'&&pronunciationTarget()===result&&target)target.innerHTML=pronunciationOptions(result);
+  if(tab!=='prac'||pronunciationTarget()!==result||!target)return;
+  const available=Boolean(result.blob||result.pron?.heard?.length)&&!result.pron?.busy;
+  $('#pron-self').disabled=!available;
+  $('#pron-sample').disabled=!available||!samplePronunciation(result.x);
+  target.innerHTML=pronunciationOptions(result);
 }
 function stopPronunciation(){
   if(!activePronunciation)return;
@@ -2931,87 +3092,110 @@ function stopPronunciation(){
   activePronunciation=null;
   controller.abort();
   result.pron.busy=false;
-  result.pron.note='Đã dừng đối chiếu.';
+  result.pron.note='Đã dừng đối chiếu. Bấm chấm lại để tiếp tục.';
+  result.pron.pendingSelf=false;
 }
 function runFreePronunciationCheck(useSample){
   const result=pronunciationTarget();
-  if(!result||(!lb&&!result.pron?.heard?.length))return;
-  stopPronunciation();
-  const state=result.pron??={reference:$('#tx')?.value.trim()||result.text,heard:null};
-  state.mode=useSample?'sample':'self';state.report=null;state.note='';
+  if(!result||result.pron?.busy||(!result.blob&&!result.pron?.heard?.length))return;
+  const state=result.pron??={reference:$('#tx')?.value.trim()||result.text||''};
+  if(!useSample&&!state.reference)state.reference=$('#tx')?.value.trim()||result.text||'';
+  state.mode=useSample?'sample':'self';
+  state.note='';
   refreshPronunciation(result);
   $('#pron-reference')?.focus({preventScroll:true});
 }
+function measureConfirmedPronunciation(result){
+  const state=result.pron;
+  if(state.busy){
+    state.pendingSelf=state.mode!=='self'||state.reference.trim()!==result.text;
+    return;
+  }
+  state.mode='self';
+  state.reference=result.text;
+  void measurePronunciation();
+}
 async function measurePronunciation(){
   const result=pronunciationTarget(),state=result?.pron;
-  if(!state?.mode||state.busy||(!lb&&!state.heard?.length))return;
-  const reference=state.mode==='sample'?samplePronunciation(result.x):state.reference;
+  if(!state?.mode||state.busy||(!result.blob&&!state.heard?.length))return;
+  const mode=state.mode,reference=(mode==='sample'?samplePronunciation(result.x):state.reference).trim();
   const tokens=reference.match(WORD_PATTERN)||[];
   if(!tokens.length||tokens.length>260){
     state.note=tokens.length?'Hãy giới hạn văn bản tham chiếu ở 260 từ.':'Hãy nhập từ hoặc câu tiếng Anh bạn định nói.';
-    refreshPronunciation(result);return;
+    refreshPronunciation(result);
+    return;
   }
-  const controller=new AbortController(),blob=lb;
+  const controller=new AbortController();
   activePronunciation={controller,result};
-  state.busy=true;state.note='Đang phân tích bản ghi trên thiết bị…';state.report=null;
+  state.busy=true;
+  state.note='Đang phân tích bản ghi trên thiết bị…';
   refreshPronunciation(result);
   try{
     if(typeof DecompressionStream!=='function')throw Error('unsupported');
-    const [dictionary,heard]=await Promise.all([phoneDictionary(),state.heard||extractPronunciation(blob,controller.signal)]);
+    const [dictionary,heard]=await Promise.all([phoneDictionary(),state.heard||extractPronunciation(result.blob,controller.signal)]);
     if(controller.signal.aborted)return;
-    state.heard=heard;
-    if(heard.length<2){state.note='Chưa phát hiện đủ âm vị rõ trong bản ghi. Hãy ghi gần micro hơn.';return}
-    const words=pronunciationWords(tokens,dictionary);
-    if(state.mode!=='sample'&&state.reference!==reference){
-      state.note='Văn bản tham chiếu đã thay đổi. Hãy bấm chấm lại.';return;
-    }
-    const report=alignPronunciation(words,heard);
-    if(!report.assessed||report.coverage<.65){
-      state.note='Từ điển thiếu quá nhiều từ trong văn bản tham chiếu. Hãy thử một đoạn tiếng Anh ngắn hơn.';return;
-    }
-    if(state.mode==='sample'&&(report.percent<45||heard.length<report.assessed*.55)){
-      state.note='Bản ghi và đoạn mẫu chưa khớp đủ để chấm. Hãy ghi một lượt đọc đúng đoạn mẫu.';return;
-    }
-    state.report=report;
-    state.band=assessmentBand(report,heard);
-    state.note=state.band==null?'Chưa đủ âm vị rõ hoặc độ dài bản ghi chưa khớp câu tham chiếu. Hãy kiểm tra câu và thu lại một đoạn dài, rõ hơn.':'';
-    if(state.mode==='self'&&state.band!=null){
-      state.assessment={band:state.band,reference};
-      applyPronunciationBand(result);
+    if(heard.length)state.heard=heard;
+    const report=heard.length?alignPronunciation(pronunciationWords(tokens,dictionary),heard):null;
+    const grade=report?assessmentBand(report,heard,mode==='sample'):null;
+    let note='';
+    if(!heard.length)note='Chưa nghe đủ giọng nói. Hãy thu lại gần micro hơn.';
+    else if(report.coverage<.55)note='Từ điển thiếu nhiều từ trong câu này. Hãy thử một câu tiếng Anh ngắn hơn.';
+    else if(!grade)note=mode==='sample'?'Bản ghi chưa khớp đủ với đoạn mẫu. Hãy thu một lượt đọc đoạn mẫu.':'Chưa đủ âm rõ để chấm. Kiểm tra câu tham chiếu rồi thử ghi lại.';
+    else if(grade.limited)note=mode==='sample'?'Đây là ước tính từ đoạn ngắn hoặc âm thanh chưa rõ.':
+      'Đây là ước tính từ đoạn ngắn hoặc âm thanh chưa rõ. Thử thêm một câu rõ hơn để đủ dữ liệu tính điểm tổng.';
+    (state.checks??={})[mode]={reference,report,grade,note};
+    state.note=note;
+    if(mode==='self'){
+      const owner=activePronunciation.result;
+      if(!state.pendingSelf){
+        state.assessment=grade&&!grade.limited?{band:grade.band,reference}:null;
+        applyPronunciationBand(owner);
+      }
     }
   }catch(error){
     if(controller.signal.aborted)return;
     state.note=error.message==='long'?'Hãy dùng bản ghi tối đa 3 phút.':error.message==='unsupported'?
-      'Trình duyệt này chưa hỗ trợ bộ đối chiếu âm vị. Hãy mở bằng trình duyệt cập nhật.':'Chưa đối chiếu được âm vị từ bản ghi này.';
+      'Trình duyệt này chưa hỗ trợ bộ đối chiếu âm vị. Hãy mở bằng trình duyệt cập nhật.':error.message==='timeout'?
+      'Phân tích mất nhiều thời gian. Hãy thử lại với bản ghi ngắn hơn.':'Chưa đối chiếu được âm vị từ bản ghi này. Bạn có thể bấm chấm lại.';
+    if(state.checks?.[mode]?.reference!==reference)(state.checks??={})[mode]={reference,note:state.note};
   }finally{
     if(activePronunciation?.controller===controller){
+      const owner=activePronunciation.result;
       activePronunciation=null;
-      state.busy=false;refreshPronunciation(result);
+      state.busy=false;
+      if(state.pendingSelf&&pronunciationTarget()===owner){
+        state.pendingSelf=false;
+        measureConfirmedPronunciation(owner);
+      }else{
+        refreshPronunciation(owner);
+      }
     }
   }
 }
-function pronunciationReport(report,band,mode){
-  const items=report.feedback.map((word,i)=>{
-    const changed=word.sounds.filter(s=>!s.match);
-    const finals=changed.filter(s=>s.final);
+function pronunciationReport(report,grade,mode,placeholder){
+  const items=(report?.feedback||[]).map((word,i)=>{
+    const changed=word.sounds.filter(sound=>!sound.match);
+    const finals=changed.filter(sound=>sound.final);
     const focus=finals.length?finals:changed;
     const explanation=word.unknown?'Thiếu mục từ':!changed.length?'Khớp mẫu':focus.slice(0,3).map(sound=>{
-      if(sound.actual?.evidence>=.45)return 'Mẫu /'+sound.expected+'/ · nghe gần /'+sound.actual.ipa+'/';
+      if(sound.actual?.evidence>=.38)return 'Mẫu /'+sound.expected+'/ · nghe gần /'+sound.actual.ipa+'/';
       return 'Chưa nghe rõ /'+sound.expected+'/';
     }).join(' · ');
-    return '<button class="g pron-word '+(word.unknown?'pron-unknown':changed.length?'pron-review':'pron-match')+
+    return '<button type="button" class="g pron-word '+(word.unknown?'pron-unknown':changed.length?'pron-review':'pron-match')+
       '" onclick="sayPronunciationWord('+i+')"><strong lang="en">'+esc(word.text)+'</strong><small>'+esc(explanation)+'</small></button>';
   }).join('');
-  return '<div id="pron-result"><div class="pron-metrics">'+(band==null?'':'<div><small>'+(mode==='sample'?'Điểm đọc theo mẫu':'Điểm Pronunciation')+'</small><strong>'+band.toFixed(1)+'/9</strong></div>')+
-    '<div><small>Khớp âm vị tin cậy</small><strong>'+report.percent+'%</strong></div>'+
-    '<div><small>Tín hiệu âm vị rõ</small><strong>'+report.confidence+'%</strong></div>'+
-    '<div><small>Âm cuối khớp mẫu</small><strong>'+report.finalHits+'/'+report.finals+'</strong></div></div>'+
-    '<p><small>'+report.hits+'/'+report.assessed+' âm vị đủ tin cậy và khớp câu tham chiếu. Bấm vào từ để nghe phát âm mẫu.</small></p>'+
-    '<div class="pron-words">'+items+'</div><p class="pron-advice">'+esc(pronunciationAdvice(report))+'</p>'+
-    '<p class="mu"><small>'+ (mode==='sample'?'Điểm đọc theo mẫu dùng để luyện đọc riêng. ':band==null?'':'Điểm luyện tập này được cộng vào Pronunciation khi chấm câu trả lời. ')+'Nối âm, giọng vùng miền và tiếng ồn có thể ảnh hưởng kết quả.</small></p></div>';
+  const label=mode==='sample'?'Điểm đọc theo mẫu':'Điểm Pronunciation';
+  const number=grade?'<strong>'+grade.band.toFixed(1)+'/9</strong>':'<small>'+placeholder+'</small>';
+  return '<div id="pron-result"><div class="pron-metrics"><div><small>'+label+'</small>'+number+'</div>'+
+    '<div><small>Âm khớp / gần mẫu</small><strong>'+(report?.percent==null?'—':report.percent+'%')+'</strong></div>'+
+    '<div><small>Tín hiệu âm vị rõ</small><strong>'+(report?.assessed?report.confidence+'%':'—')+'</strong></div>'+
+    '<div><small>Âm cuối khớp mẫu</small><strong>'+(report?.finals?report.finalHits+'/'+report.finals:'—')+'</strong></div></div>'+
+    (items?'<p><small>Bấm vào từ để nghe phát âm mẫu. Nối âm, giọng vùng miền và tiếng ồn có thể ảnh hưởng kết quả.</small></p>'+
+    '<div class="pron-words">'+items+'</div><p class="pron-advice">'+esc(pronunciationAdvice(report))+'</p>':'')+'</div>';
 }
 function sayPronunciationWord(index){
-  const word=pronunciationTarget()?.pron?.report?.feedback[index]?.text;
+  const state=pronunciationTarget()?.pron;
+  const word=state?.checks?.[state.mode]?.report?.feedback[index]?.text;
   if(word)say(word,.85);
 }
 const audioBand = record => record.pronBasis === 'acoustic-v1' && Number.isFinite(record.p) ? record.p : null;
@@ -3020,25 +3204,39 @@ const practiceBand = record => {
   return criteria.length ? half(avg(criteria)) : null;
 };
 
-function assessmentBand(report, heard) {
-  if (report.assessed < 14 || report.coverage < .7 || report.confidence < 38) return null;
-  if (heard.length < report.assessed * .48 || heard.length > report.assessed * 1.75) return null;
-  if (heard.filter(phone => phone.evidence >= .45).length < Math.max(8, heard.length * .4)) return null;
-  const soundAccuracy = report.hits / (report.assessed + report.extras);
-  const accuracy = report.finals >= 3 ? soundAccuracy * .85 + report.finalHits / report.finals * .15 : soundAccuracy;
-  return half(Math.max(1, 9 * accuracy ** 1.45));
+function assessmentBand(report,heard,sample=false){
+  if(report.assessed<4||report.coverage<.55)return null;
+  const overlap=report.credit/report.assessed;
+  const ratio=heard.length/report.assessed;
+  if(overlap<(sample ? .4 : .24)||ratio<.34||ratio>2.5)return null;
+  if(heard.filter(phone=>phone.evidence>=.25).length<Math.max(2,heard.length*.2))return null;
+  const accuracy=report.credit/(report.assessed+.2*report.extras);
+  const weighted=report.finals>=3?accuracy*.9+(report.finalCredit/report.finals)*.1:accuracy;
+  // The model estimates sounds, so report a practice grade on a gentler scale.
+  const band=half(2.5+6.5*weighted);
+  const limited=report.assessed<12||report.coverage<.7||report.confidence<32||ratio<.48||ratio>1.85;
+  return {band,limited};
 }
 
 function applyPronunciationBand(result) {
-  if (!result.s || result.pron?.assessment?.band == null) return;
-  result.s.pronBasis = 'acoustic-v1';
-  result.s.p = result.pron.assessment.band;
-  result.s.o = practiceBand(result.s);
-  Object.assign(result.history, {p:result.s.p, o:result.s.o, pronBasis:result.s.pronBasis, updated:Date.now()});
+  if(!result.s)return;
+  const band=result.pron?.assessment?.band??null;
+  if(band===audioBand(result.s))return;
+  result.s.p=band;
+  result.history.p=band;
+  if(band==null){
+    delete result.s.pronBasis;
+    delete result.history.pronBasis;
+  }else{
+    result.s.pronBasis='acoustic-v1';
+    result.history.pronBasis='acoustic-v1';
+  }
+  result.s.o=practiceBand(result.s);
+  Object.assign(result.history,{o:result.s.o,updated:Date.now()});
   sv();
-  const target = $('#result-scores');
-  if (target && S?.result === result) {
-    target.innerHTML = scoreOverview(result);
+  const target=$('#result-scores');
+  if(target&&S?.result===result){
+    target.innerHTML=scoreOverview(result);
     animateBands(target);
   }
 }
@@ -3051,8 +3249,8 @@ function scoreOverview({s}) {
 }
 
 function pronunciationAdvice(report) {
-  const targets = report.feedback.flatMap(word => word.sounds.filter(sound => !sound.match).map(sound => ({word:word.text,...sound})));
-  if (!targets.length) return 'Nghe lại cả câu và luyện nối các cụm từ để giữ nhịp nói tự nhiên.';
+  const targets = report.feedback.flatMap(word => word.sounds.filter(sound => !sound.match&&sound.actual?.evidence>=.38).map(sound => ({word:word.text,...sound})));
+  if(!targets.length)return 'Nghe lại cả câu ở tốc độ tự nhiên và chú ý những từ máy đánh dấu chưa nghe rõ.';
   const finals = targets.filter(sound => sound.final);
   const focus = finals.length ? finals : targets;
   const counts = new Map();
@@ -3565,7 +3763,8 @@ function submitExam(){
  }
  const blob=lb,confirmed=$('#pron-confirm')?.checked,prior=exam.pronDraft?.pron;
  const p=prior?.assessment?.reference===answer?prior.assessment.band:null;
- exam.pending={turn:{part:x.p,question:x.q,answer,wpm:estimate.r},estimate,p,pronNote:p!=null&&prior.report?pronunciationAdvice(prior.report):''};
+ const report=prior?.checks?.self?.report;
+ exam.pending={turn:{part:x.p,question:x.q,answer,wpm:estimate.r},estimate,p,pronNote:p!=null&&report?pronunciationAdvice(report):''};
  cancel();openView();void advanceExam(exam,blob,confirmed,prior?.heard);
 }
 function resumeExam(){
@@ -3640,8 +3839,8 @@ async function advanceExam(exam,blob,confirmed,heard){
       const [dictionary,phones]=await Promise.all([phoneDictionary(),heard||extractPronunciation(blob,signal)]);
       signal.throwIfAborted();
       const report=alignPronunciation(pronunciationWords(tokens,dictionary),phones);
-      pending.p=assessmentBand(report,phones);
-      if(pending.p!=null)pending.pronNote=pronunciationAdvice(report);
+      const grade=assessmentBand(report,phones);
+      if(grade&&!grade.limited){pending.p=grade.band;pending.pronNote=pronunciationAdvice(report)}
      }
     }catch{}
    }
@@ -3698,6 +3897,652 @@ function examSummary(exam){
  ${points('Luyện phát âm',notes.slice(0,3))}${points('Điểm mạnh',result.strengths)}${points('Luyện gì tiếp theo',result.actions)}
  <p class="mu"><small>Điểm dùng để theo dõi việc luyện tập.</small></p></article><button class="w" onclick="leavePractice()">Hoàn tất</button>`;
 }
+
+const librarySource = 'https://en.wikipedia.org/wiki/Portal:Current_events';
+const libraryLicense = 'https://creativecommons.org/licenses/by-sa/4.0/';
+const libraryCacheKey = 'epu-world-library-v1';
+const libraryInterval = 10 * 60_000;
+const libraryDate = new Intl.DateTimeFormat('vi-VN', { dateStyle: 'medium', timeZone: 'UTC' });
+const libraryClock = new Intl.DateTimeFormat('vi-VN', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Asia/Ho_Chi_Minh' });
+const libraryCount = text => (text.match(/[\p{L}\p{N}]+(?:(?:[’'-]|(?<=\p{N})[.,](?=\p{N}))[\p{L}\p{N}]+)*/gu) || []).length;
+const libraryClean = text => text.replace(/\s+/g, ' ').trim();
+
+function libraryReadCache() {
+ try {
+  const cached = JSON.parse(localStorage.getItem(libraryCacheKey) || 'null');
+  if (!Number.isFinite(cached?.checked) || cached.checked < 0 || cached.checked > Date.now() || !Array.isArray(cached.items)) return null;
+  const items = cached.items.filter(item => typeof item?.body === 'string' && typeof item.topic === 'string' &&
+   /^\d{4}-\d\d-\d\d$/.test(item.day) && Number.isFinite(Date.parse(item.day))).slice(0, 24);
+  return items.length ? { checked: cached.checked, items } : null;
+ } catch { return null; }
+}
+
+let librarySnapshot = libraryReadCache();
+let libraryPending = null, libraryError = '', libraryAttempted = 0, libraryUtterance = null;
+let libraryDisplayedItems = null, libraryTimer;
+
+function libraryParse(html) {
+ const template = document.createElement('template');
+ template.innerHTML = html;
+ const days = Array.from(template.content.querySelectorAll('.current-events-main')).map(node => ({
+  node, day: node.querySelector('.dtstart')?.textContent.trim()
+ })).filter(({day}) => /^\d{4}-\d\d-\d\d$/.test(day) && Number.isFinite(Date.parse(day)))
+   .sort((a, b) => b.day.localeCompare(a.day));
+ const items = [], seen = new Set();
+ for (const {node, day} of days) {
+  const content = node.querySelector('.current-events-content');
+  if (!content) continue;
+  let topic = 'World news';
+  for (const block of content.children) {
+   if (block.matches('p') && block.querySelector('b')) topic = libraryClean(block.textContent);
+   if (!block.matches('ul')) continue;
+   for (const bullet of block.querySelectorAll('li')) {
+    if (bullet.querySelector('ul, ol')) continue;
+    const copy = bullet.cloneNode(true);
+    copy.querySelectorAll('sup, .reference, .noprint').forEach(el => el.remove());
+    copy.querySelectorAll('a.external').forEach(link => {
+     if (link.textContent.trim().startsWith('(')) link.remove();
+    });
+    const body = libraryClean(copy.textContent);
+    const count = libraryCount(body);
+    if (count < 20 || count > 180 || seen.has(body)) continue;
+    seen.add(body);
+    items.push({ day, topic, body });
+    if (items.length === 24) return items;
+   }
+  }
+ }
+ return items;
+}
+
+function libraryItemSource(day) {
+ const englishDate = new Intl.DateTimeFormat('en-US', {
+  year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC'
+ }).formatToParts(new Date(day));
+ const values = Object.fromEntries(englishDate.map(({type, value}) => [type, value]));
+ return librarySource + '/' + values.year + '_' + values.month + '_' + values.day;
+}
+
+function libraryPage() {
+ libraryDisplayedItems = null;
+ return `<section class="c library-intro">
+  <div class="library-intro-content"><p class="eyebrow">THƯ VIỆN · WORLD NEWS</p><h1>Tin thế giới, bài đọc ngắn</h1>
+  <p>Luyện đọc thành tiếng với các mẩu tin tiếng Anh từ Wikipedia Current Events.</p></div>
+  <div class="library-control"><button class="g" type="button" id="library-refresh" onclick="void libraryRefresh(true)">Cập nhật tin</button>
+  <small id="library-status" role="status"></small></div>
+ </section>
+ <div id="library-list" class="library-grid"></div>
+ <p class="library-credit mu"><small>Đoạn trích đã lược liên kết và chú thích. Nguồn <a href="${librarySource}" target="_blank" rel="noopener noreferrer">Wikipedia Current Events</a> · <a href="${libraryLicense}" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a>. Kiểm tra tin mới mỗi 10 phút khi mở Thư viện.</small></p>`;
+}
+
+function libraryRender() {
+ const list = $('#library-list');
+ if (!list) return;
+ const status = $('#library-status'), button = $('#library-refresh');
+ const checked = librarySnapshot ? 'Lần cập nhật gần nhất ' + libraryClock.format(librarySnapshot.checked) + '.' : '';
+ button.disabled = Boolean(libraryPending);
+ const message = libraryPending ? 'Đang kiểm tra tin mới…' : libraryError ? libraryError + (checked ? ' ' + checked : '') : checked;
+ if (status.textContent !== message) status.textContent = message;
+ const items = librarySnapshot?.items;
+ if (!items) {
+  list.innerHTML = '<p class="c empty-state">' + (libraryError ? 'Chưa có bài đọc đã lưu. Kết nối Internet và bấm Cập nhật tin để thử lại.' : 'Đang tải các đoạn đọc mới…') + '</p>';
+  return;
+ }
+ if (libraryUtterance || libraryDisplayedItems === items) return;
+ libraryDisplayedItems = items;
+ list.innerHTML = items.map(item => `<article class="c library-card">
+  <div class="library-card-meta"><time datetime="${item.day}">${libraryDate.format(new Date(item.day))}</time><span>${libraryCount(item.body)} words</span></div>
+  <h2 lang="en">${esc(item.topic)}</h2><p class="library-copy" lang="en">${esc(item.body)}</p>
+  <div class="row library-card-actions"><button class="g library-listen" type="button" onclick="libraryReadAloud(this)">Read aloud</button>
+  <a href="${libraryItemSource(item.day)}" target="_blank" rel="noopener noreferrer">Nguồn bài đọc</a>
+  <small class="library-speech-status" role="status"></small></div>
+ </article>`).join('');
+}
+
+async function libraryRefresh(force = false) {
+ if (libraryPending) { libraryRender(); return; }
+ if (!force && Date.now() < libraryNextCheck()) {
+  libraryRender();
+  librarySchedule();
+  return;
+ }
+ clearTimeout(libraryTimer);
+ libraryAttempted = Date.now();
+ libraryError = '';
+ const controller = new AbortController();
+ const timeout = setTimeout(() => controller.abort(), 12_000);
+ const params = new URLSearchParams({
+  action: 'parse', page: 'Portal:Current events', prop: 'text', format: 'json', formatversion: '2', origin: '*'
+ });
+ libraryPending = controller;
+ libraryRender();
+ try {
+  const response = await fetch('https://en.wikipedia.org/w/api.php?' + params, {
+   signal: controller.signal, cache: 'no-cache', credentials: 'omit'
+  });
+  if (!response.ok) throw new Error('News unavailable');
+  const payload = await response.json();
+  const items = libraryParse(payload.parse?.text || '');
+  if (!items.length) throw new Error('No news passages');
+  const previousItems = librarySnapshot?.items;
+  librarySnapshot = { checked: Date.now(), items: JSON.stringify(items) === JSON.stringify(previousItems) ? previousItems : items };
+  try { localStorage.setItem(libraryCacheKey, JSON.stringify(librarySnapshot)); } catch {}
+ } catch {
+  libraryError = 'Tạm thời chưa lấy được tin mới.';
+ } finally {
+  clearTimeout(timeout);
+  libraryPending = null;
+  libraryRender();
+  librarySchedule();
+ }
+}
+
+function libraryStopSpeech() {
+ if (!libraryUtterance) return;
+ const { button } = libraryUtterance;
+ libraryUtterance = null;
+ button.textContent = 'Read aloud';
+ window.speechSynthesis?.cancel();
+}
+
+function libraryReadAloud(button) {
+ const message = button.parentElement.querySelector('.library-speech-status');
+ message.textContent = '';
+ const wasPlaying = libraryUtterance?.button === button;
+ libraryStopSpeech();
+ if (wasPlaying) { libraryRender(); return; }
+ if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) {
+  message.textContent = 'Trình duyệt này chưa hỗ trợ đọc thành tiếng.';
+  return;
+ }
+ window.speechSynthesis.cancel();
+ const text = button.closest('.library-card').querySelector('.library-copy').textContent;
+ const speech = new SpeechSynthesisUtterance(text);
+ speech.lang = 'en-US';
+ speech.rate = .9;
+ libraryUtterance = { button, speech };
+ button.textContent = 'Dừng đọc';
+ function done(error) {
+  if (libraryUtterance?.speech !== speech) return;
+  libraryUtterance = null;
+  button.textContent = 'Read aloud';
+  if (error) message.textContent = 'Chưa phát được giọng đọc tiếng Anh.';
+  else libraryRender();
+ }
+ speech.onend = () => done(false);
+ speech.onerror = () => done(true);
+ try { window.speechSynthesis.speak(speech); } catch { done(true); }
+}
+
+function libraryRefreshIfVisible() {
+ clearTimeout(libraryTimer);
+ if (tab === 'library' && !document.hidden) void libraryRefresh();
+}
+
+function libraryNextCheck() {
+ return Math.max(libraryAttempted, librarySnapshot?.checked || 0) + libraryInterval;
+}
+
+function librarySchedule() {
+ clearTimeout(libraryTimer);
+ if (tab === 'library' && !document.hidden) {
+  libraryTimer = setTimeout(libraryRefreshIfVisible, Math.max(50, libraryNextCheck() - Date.now()));
+ }
+}
+
+function libraryLeave() {
+ clearTimeout(libraryTimer);
+ libraryStopSpeech();
+}
+
+document.addEventListener('visibilitychange', libraryRefreshIfVisible);
+window.addEventListener('pageshow', libraryRefreshIfVisible);
+window.addEventListener('online', () => { if (tab === 'library') void libraryRefresh(true); });
+
+// Ôn thi: đề tự tạo, tài liệu cá nhân và chuỗi tập trung.
+const REVIEW_TIMER_KEY = 'epu-review-timer-v1';
+const REVIEW_FIRST_MINUTES = 5;
+const REVIEW_STEP_MINUTES = 5;
+const REVIEW_FILE_LIMIT = 15 * 1024 * 1024;
+const REVIEW_PARTS = [
+ {name:'Phỏng vấn ngắn', description:'Trả lời trực tiếp, thêm lý do và một ví dụ ngắn.'},
+ {name:'Thẻ đề', description:'Chuẩn bị ý trong 1 phút rồi nói liên tục 1–2 phút.'},
+ {name:'Thảo luận', description:'Nêu quan điểm, giải thích và minh họa bằng ví dụ.'}
+];
+let reviewCategory = 'familiar';
+let reviewEditing = null;
+let reviewDb;
+let reviewItems;
+let reviewItemsError = '';
+let reviewTimerState = {awards:[], session:null};
+let reviewTimerWake;
+let reviewTimerWarning = '';
+
+function reviewPage(){
+ return `${pageIntro('ÔN THI','Ôn thi IELTS Speaking','Luyện các dạng đề quen thuộc, tự soạn forecast và dành từng phiên tập trung cho việc ôn thi.')}
+ <div class="review-switch" role="group" aria-label="Chọn nội dung ôn thi">
+   <button type="button" class="g" aria-controls="review-category-content" data-review-category="familiar" aria-pressed="${reviewCategory==='familiar'}" onclick="switchReviewCategory('familiar')">Dạng bài quen thuộc</button>
+   <button type="button" class="g" aria-controls="review-category-content" data-review-category="forecast" aria-pressed="${reviewCategory==='forecast'}" onclick="switchReviewCategory('forecast')">Luyện đề thi forecast</button>
+ </div>
+ <a class="review-timer-jump" href="#review-timer-heading">Đến đồng hồ ôn thi ↓</a>
+ <div class="review-layout">
+   <section id="review-category-content">${reviewCategoryContent()}</section>
+   <aside class="c review-timer-card" aria-labelledby="review-timer-heading">
+     <p class="eyebrow">CHUỖI TẬP TRUNG</p><h2 id="review-timer-heading">Thời gian ôn thi</h2>
+     <div id="review-timer"></div><p class="mu" id="review-timer-notice" role="status"></p>
+   </aside>
+   <section class="c review-materials" aria-labelledby="review-materials-title">
+       <h2 id="review-materials-title">Tài liệu bên ngoài</h2>
+       <p class="mu">Lưu liên kết hoặc đính kèm một tệp tối đa 15 MB. Tài liệu được lưu trên trình duyệt này.</p>
+       <form onsubmit="void saveReviewMaterial(event)">
+         <label>Tên tài liệu<input name="title" required maxlength="120" placeholder="Ví dụ: Ghi chú ôn Speaking tuần này"></label>
+         <label>Liên kết tài liệu<input name="url" type="url" maxlength="2000" placeholder="https://..."></label>
+         <label>Tệp đính kèm<input name="file" type="file"></label>
+         <div class="row"><button type="submit">Lưu tài liệu</button></div>
+         <p class="mu" role="status"></p>
+       </form>
+       <div id="review-material-list">${reviewItemList('material')}</div>
+   </section>
+ </div>`;
+}
+
+function switchReviewCategory(category){
+ if(reviewCategory===category)return;
+ reviewCategory=category;
+ $('#review-category-content').innerHTML=reviewCategoryContent();
+ document.querySelectorAll('[data-review-category]').forEach(button=>{
+   button.setAttribute('aria-pressed',String(button.dataset.reviewCategory===category));
+ });
+}
+
+function reviewCategoryContent(){
+ if(reviewCategory==='forecast'){
+   return `<section class="c" aria-labelledby="review-forecast-title">
+     <h2 id="review-forecast-title">Luyện đề thi forecast</h2>
+     <p class="mu">Tự nhập câu hỏi rồi mở đề để luyện nói và chấm bản ghi bằng công cụ có sẵn.</p>
+     <div id="review-forecast-editor">${reviewForecastForm()}</div>
+     <div id="review-forecast-list">${reviewItemList('forecast')}</div>
+   </section>`;
+ }
+ return `<div class="review-part-list">${REVIEW_PARTS.map((part,index)=>{
+   const number=index+1;
+   return `<article class="c review-part">
+     <span class="part-index">PART ${number}</span><h2>${part.name}</h2><p>${part.description}</p>
+     <div class="row"><button type="button" onclick="start([${number}])">Luyện Part ${number}</button>
+     <button type="button" class="g" onclick="go('les',${number})">Xem cách làm</button></div>
+   </article>`;
+ }).join('')}</div>`;
+}
+
+function reviewForecastForm(){
+ const item=reviewItems?.find(entry=>entry.id===reviewEditing);
+ const prompts=part=>item?.prompts.filter(question=>question.p===part).map(question=>question.q).join('\n')||'';
+ return `<form onsubmit="void saveReviewForecast(event)">
+   <label>Tên đề<input name="title" required maxlength="100" value="${esc(item?.title)}" placeholder="Ví dụ: Forecast tháng 11"></label>
+   <div class="field-grid">
+     <label>Câu hỏi Part 1 <small>(mỗi dòng một câu)</small><textarea name="part1" rows="3" maxlength="5000" lang="en">${esc(prompts(1))}</textarea></label>
+     <label>Câu hỏi Part 3 <small>(mỗi dòng một câu)</small><textarea name="part3" rows="3" maxlength="5000" lang="en">${esc(prompts(3))}</textarea></label>
+   </div>
+   <label>Thẻ đề Part 2 <small>(có thể xuống dòng)</small><textarea name="part2" rows="4" maxlength="5000" lang="en">${esc(prompts(2))}</textarea></label>
+   <div class="row"><button type="submit">${item?'Lưu thay đổi':'Lưu đề forecast'}</button>
+   ${item?'<button type="button" class="g" onclick="editReviewForecast(null)">Hủy sửa</button>':''}</div>
+   <p class="mu" role="status"></p>
+ </form>`;
+}
+
+function reviewLink(value){
+ if(!value)return '';
+ try{
+   const url=new URL(value);
+   return ['http:','https:'].includes(url.protocol)&&!url.username&&!url.password?url.href:'';
+ }catch{return ''}
+}
+
+function reviewItemList(type){
+ if(reviewItemsError)return `<p class="mu" role="status">${reviewItemsError}</p>`;
+ if(!reviewItems)return '<p class="mu" role="status">Đang mở nội dung đã lưu…</p>';
+ const items=reviewItems.filter(item=>item.type===type);
+ if(!items.length)return `<p class="mu">${type==='forecast'?'Bạn chưa lưu đề forecast.':'Bạn chưa lưu tài liệu.'}</p>`;
+ return `<ul class="review-item-list">${items.map(item=>{
+   const id=esc(item.id);
+   const link=type==='material'&&reviewLink(item.url);
+   const parts=type==='forecast'?[...new Set(item.prompts.map(prompt=>prompt.p))].map(part=>'Part '+part).join(' · '):'';
+   const file=type==='material'&&item.file;
+   return `<li class="review-item">
+     <div><strong>${esc(item.title)}</strong>
+       ${parts?`<p class="mu">${parts} · ${item.prompts.length} câu</p>`:''}
+       ${file?`<p class="mu">${esc(file.name||'Tệp đính kèm')}</p>`:''}
+     </div>
+     <div class="row">
+       ${type==='forecast'?`<button type="button" data-review-id="${id}" onclick="startReviewForecast(this.dataset.reviewId)">Luyện đề</button>
+       <button type="button" class="g" data-review-id="${id}" onclick="editReviewForecast(this.dataset.reviewId)">Sửa</button>`:''}
+       ${link?`<a class="review-link" href="${esc(link)}" target="_blank" rel="noopener noreferrer">Mở liên kết ↗</a>`:''}
+       ${file?`<button type="button" class="g" data-review-id="${id}" onclick="downloadReviewMaterial(this.dataset.reviewId)">Tải tệp</button>`:''}
+       <button type="button" class="g" data-review-id="${id}" onclick="void deleteReviewItem(this)">Xóa</button>
+     </div><small class="review-item-status" role="status"></small>
+   </li>`;
+ }).join('')}</ul>`;
+}
+
+function updateReviewItemLists(){
+ for(const type of ['forecast','material']){
+   const list=$('#review-'+type+'-list');
+   if(list)list.innerHTML=reviewItemList(type);
+ }
+}
+
+function openReviewDb(){
+ reviewDb??=new Promise((resolve,reject)=>{
+   const request=indexedDB.open('epu-review',1);
+   request.onupgradeneeded=()=>request.result.createObjectStore('items',{keyPath:'id'});
+   request.onerror=()=>reject(request.error);
+   request.onsuccess=()=>{
+     const db=request.result;
+     db.onversionchange=()=>{db.close();reviewDb=null};
+     resolve(db);
+   };
+ }).catch(error=>{reviewDb=null;throw error});
+ return reviewDb;
+}
+
+async function reviewItemRequest(mode, action){
+ const db=await openReviewDb();
+ return new Promise((resolve,reject)=>{
+   const tx=db.transaction('items',mode);
+   const request=action(tx.objectStore('items'));
+   tx.oncomplete=()=>resolve(request.result);
+   tx.onabort=tx.onerror=()=>reject(tx.error||request.error);
+ });
+}
+
+async function loadReviewItems(){
+ try{
+   reviewItems=await reviewItemRequest('readonly',store=>store.getAll());
+   reviewItems.sort((a,b)=>b.updated-a.updated);
+   if(!reviewItems.some(item=>item.id===reviewEditing))reviewEditing=null;
+   reviewItemsError='';
+ }catch{
+   reviewItemsError='Không mở được kho tài liệu trên trình duyệt này.';
+ }
+ updateReviewItemLists();
+}
+
+async function saveReviewItem(form,item){
+ const status=form.querySelector('[role="status"]');
+ const button=form.querySelector('button[type="submit"]');
+ button.disabled=true;
+ status.textContent='Đang lưu…';
+ try{
+   await reviewItemRequest('readwrite',store=>store.put(item));
+   await loadReviewItems();
+   return true;
+ }catch{
+   status.textContent='Không lưu được. Hãy kiểm tra dung lượng hoặc quyền lưu dữ liệu của trình duyệt.';
+   return false;
+ }finally{button.disabled=false}
+}
+
+async function saveReviewForecast(event){
+ event.preventDefault();
+ const form=event.currentTarget;
+ const data=new FormData(form);
+ const title=data.get('title').trim();
+ const prompts=[1,2,3].flatMap(p=>{
+   const text=data.get('part'+p).trim();
+   if(!text)return [];
+   return (p===2?[text]:text.split(/\r?\n/).map(line=>line.trim()).filter(Boolean)).map(q=>({p,q}));
+ });
+ const status=form.querySelector('[role="status"]');
+ if(!title||!prompts.length){
+   status.textContent='Hãy nhập tên đề và ít nhất một câu hỏi.';
+   return;
+ }
+ const id=reviewEditing||newId();
+ if(await saveReviewItem(form,{id,type:'forecast',title,prompts,updated:Date.now()})){
+   reviewEditing=null;
+   if(form.isConnected){
+     editReviewForecast(null,false);
+     $('#review-forecast-editor [role="status"]').textContent='Đã lưu đề forecast.';
+   }
+ }
+}
+
+function editReviewForecast(id,focus=true){
+ reviewEditing=id;
+ const editor=$('#review-forecast-editor');
+ if(!editor)return;
+ editor.innerHTML=reviewForecastForm();
+ if(focus)editor.querySelector('input').focus();
+}
+
+function startReviewForecast(id){
+ const item=reviewItems?.find(entry=>entry.id===id&&entry.type==='forecast');
+ if(!item?.prompts.length)return;
+ stopPracticeMedia();
+ S={it:item.prompts.map(({p,q},k)=>({p,q,k,t:item.title,forecast:true})),i:0,res:[],result:null};
+ tab='prac';openView();
+}
+
+function reviewForecastAid(question){
+ const index=question.p-1;
+ return `<details><summary>Gợi ý trả lời</summary><p>${HF[index]}</p></details>
+ <details><summary>Ngữ pháp gợi ý</summary><p>${GR[index]}</p></details>`;
+}
+
+async function saveReviewMaterial(event){
+ event.preventDefault();
+ const form=event.currentTarget;
+ const data=new FormData(form);
+ const title=data.get('title').trim();
+ const rawUrl=data.get('url').trim();
+ const url=reviewLink(rawUrl);
+ const attachment=data.get('file');
+ const file=attachment?.name?attachment:null;
+ const status=form.querySelector('[role="status"]');
+ if(rawUrl&&!url){
+   status.textContent='Hãy nhập liên kết bắt đầu bằng https:// hoặc http://.';
+   return;
+ }
+ if(!title||(!url&&!file)){
+   status.textContent='Hãy nhập tên và thêm liên kết hoặc chọn một tệp.';
+   return;
+ }
+ if(file?.size>REVIEW_FILE_LIMIT){
+   status.textContent='Hãy chọn tệp tối đa 15 MB hoặc lưu liên kết đến tệp.';
+   return;
+ }
+ if(await saveReviewItem(form,{id:newId(),type:'material',title,url,file,updated:Date.now()})){
+   form.reset();
+   status.textContent='Đã lưu tài liệu.';
+ }
+}
+
+function downloadReviewMaterial(id){
+ const item=reviewItems?.find(entry=>entry.id===id&&entry.type==='material');
+ if(!item?.file)return;
+ const link=document.createElement('a');
+ link.href=URL.createObjectURL(item.file);
+ link.download=item.file.name||'tai-lieu';
+ document.body.append(link);
+ link.click();
+ link.remove();
+ const url=link.href;
+ setTimeout(()=>URL.revokeObjectURL(url),30000);
+}
+
+async function deleteReviewItem(button){
+ const id=button.dataset.reviewId;
+ const item=reviewItems?.find(entry=>entry.id===id);
+ if(!item||!window.confirm('Xóa “'+item.title+'” khỏi Ôn Thi?'))return;
+ button.disabled=true;
+ try{
+   await reviewItemRequest('readwrite',store=>store.delete(id));
+   if(reviewEditing===id)editReviewForecast(null,false);
+   await loadReviewItems();
+ }catch{
+   button.closest('.review-item').querySelector('[role="status"]').textContent='Chưa xóa được. Hãy thử lại.';
+ }finally{button.disabled=false}
+}
+
+function reviewMinutes(level){
+ return REVIEW_FIRST_MINUTES+(level-1)*REVIEW_STEP_MINUTES;
+}
+
+function readReviewTimer(){
+ if(reviewTimerWarning)return reviewTimerState;
+ try{
+   const value=localStorage.getItem(REVIEW_TIMER_KEY);
+   if(value!==null){
+     const data=JSON.parse(value);
+     if(Array.isArray(data?.awards))reviewTimerState=data;
+   }else reviewTimerState={awards:[],session:null};
+ }catch{}
+ return reviewTimerState;
+}
+
+function writeReviewTimer(state){
+ reviewTimerState=state;
+ try{
+   localStorage.setItem(REVIEW_TIMER_KEY,JSON.stringify(state));
+   reviewTimerWarning='';
+ }catch{
+   reviewTimerWarning='Trình duyệt không lưu được tiến độ. Hãy giữ trang mở để tiếp tục phiên này.';
+ }
+}
+
+function changeReviewTimer(action,requestedLevel){
+ const state=readReviewTimer();
+ const now=Date.now();
+ let {session,awards}=state;
+ const level=awards.length+1;
+ if(session?.endAt&&session.endAt<=now){
+   awards=[...awards,{level,minutes:reviewMinutes(level),earnedAt:session.endAt}];
+   session=null;
+ }else if(level===requestedLevel){
+   if(action==='start'&&!session)session={endAt:now+reviewMinutes(level)*60000};
+   if(action==='pause'&&session?.endAt)session={remaining:session.endAt-now};
+   if(action==='resume'&&session?.remaining)session={endAt:now+session.remaining};
+   if(action==='reset')session=null;
+ }
+ if(awards!==state.awards||session!==state.session)writeReviewTimer({awards,session});
+ return reviewTimerState;
+}
+
+function reviewCrystal(level,running,finished){
+ const pattern=(level-1)%4;
+ const hue=(220+(level-1)*47)%360;
+ const shards=[[-56,-36],[-14,-66],[40,-49],[65,-8],[47,46],[0,63],[-42,43],[-61,3]];
+ return `<div class="review-crystal ${running?'is-running':''} ${finished?'is-finished':''}" data-pattern="${pattern}" style="--review-hue:${hue}" aria-hidden="true">
+   <span class="review-orbit"></span><span class="review-gem"></span>
+   ${finished?shards.map(([x,y],index)=>`<span class="review-shard" style="--x:${x}px;--y:${y}px;--angle:${index*41}deg"></span>`).join(''):''}
+ </div>`;
+}
+
+function reviewTimerMarkup({awards,session}){
+ const level=awards.length+1;
+ const minutes=reviewMinutes(level);
+ const award=awards.at(-1);
+ const finished=!session&&Boolean(award);
+ const running=Boolean(session?.endAt);
+ const mode=running?'pause':session?'resume':'start';
+ const label={pause:'Tạm dừng',resume:'Tiếp tục',start:'Bắt đầu'}[mode];
+ return `<div class="review-timer-body">
+   ${reviewCrystal(finished?award.level:level,running,finished)}
+   <div><p class="review-level">Cấp ${level} · ${minutes} phút</p>
+   <div id="review-clock" class="review-clock" role="timer" aria-live="off"></div></div>
+ </div>
+ <progress id="review-progress" class="review-progress" max="${minutes*60}" value="0" aria-label="Tiến độ phiên tập trung"></progress>
+ <div class="row"><button type="button" data-review-action="${mode}" onclick="void refreshReviewTimer('${mode}',${level})">${label}</button>
+ ${session?'<button type="button" class="g" data-review-action="reset" onclick="void refreshReviewTimer(\'reset\','+level+')">Đặt lại</button>':''}</div>
+ ${finished?`<div class="review-reward"><strong>Đã mở khóa Cấp ${award.level}</strong>
+   <p>Hoàn thành ${award.minutes} phút tập trung. Thành tựu đã ghim vào hồ sơ.</p>
+   <button type="button" class="g" onclick="go('pro')">Xem thành tựu</button></div>`:''}
+ <small class="review-pace">Mỗi cấp tăng thêm ${REVIEW_STEP_MINUTES} phút. Bạn có thể chuyển mục trong khi đồng hồ chạy.</small>`;
+}
+
+function paintReviewTimer(state){
+ const timer=$('#review-timer');
+ const {session,awards}=state;
+ if(timer){
+   const level=awards.length+1;
+   const total=reviewMinutes(level)*60;
+   const mode=session?.endAt?'running':session?'paused':'idle';
+   const signature=level+':'+mode;
+   if(timer.dataset.signature!==signature){
+     const prior=timer.dataset.signature;
+     const focused=timer.contains(document.activeElement);
+     timer.dataset.signature=signature;
+     timer.innerHTML=reviewTimerMarkup(state);
+     if(focused)timer.querySelector('[data-review-action]').focus({preventScroll:true});
+     const notice=$('#review-timer-notice');
+     if(prior&&prior.split(':')[0]!==String(level)){
+       notice.textContent='Đã ghim thành tựu Cấp '+(level-1)+' vào hồ sơ.';
+     }else if(prior){
+       notice.textContent={running:'Đồng hồ đang chạy.',paused:'Đã tạm dừng phiên ôn.',idle:'Đã đặt lại đồng hồ.'}[mode];
+     }
+   }
+   if(reviewTimerWarning)$('#review-timer-notice').textContent=reviewTimerWarning;
+   const remaining=session?.endAt?session.endAt-Date.now():session?.remaining??total*1000;
+   const seconds=Math.max(0,Math.min(total,Math.ceil(remaining/1000)));
+   const clock=$('#review-clock');
+   const display=mmss(seconds);
+   if(clock.textContent!==display)clock.textContent=display;
+   $('#review-progress').value=total-seconds;
+ }
+ const profile=$('#review-profile-awards');
+ if(profile&&profile.dataset.level!==String(awards.length)){
+   profile.dataset.level=awards.length;
+   profile.innerHTML=reviewAchievementContent(awards);
+ }
+}
+
+async function refreshReviewTimer(action,requestedLevel){
+ const run=()=>changeReviewTimer(action,requestedLevel);
+ const current=readReviewTimer();
+ const shouldChange=Boolean(action)||(current.session?.endAt&&current.session.endAt<=Date.now());
+ let state=current;
+ if(shouldChange){
+   try{
+     state=navigator.locks?await navigator.locks.request(REVIEW_TIMER_KEY,run):run();
+   }catch{state=run()}
+ }
+ paintReviewTimer(state);
+ clearTimeout(reviewTimerWake);
+ if(state.session?.endAt){
+   const remaining=Math.max(0,state.session.endAt-Date.now());
+   const showClock=Boolean($('#review-timer'))&&!document.hidden;
+   const delay=showClock?remaining%1000||1000:remaining;
+   reviewTimerWake=setTimeout(refreshReviewTimer,Math.min(2147483647,remaining,delay)+15);
+ }
+}
+
+function reviewAchievementContent(awards){
+ if(!awards.length)return '<p class="mu">Hoàn thành phiên tập trung đầu tiên trong Ôn Thi để nhận thành tựu.</p>';
+ const latest=awards.at(-1);
+ const date=award=>new Date(award.earnedAt).toLocaleDateString('vi-VN',{timeZone:STUDY_ZONE});
+ return `<div class="review-pinned">
+   <span aria-hidden="true">✦</span><div><small>ĐÃ GHIM · CẤP ${latest.level}</small>
+   <p><strong>${latest.minutes} phút tập trung</strong></p><small>${date(latest)}</small></div>
+ </div>
+ ${awards.length>1?`<details><summary>Xem ${awards.length-1} thành tựu trước</summary>
+   <ol class="review-award-list">${awards.slice(0,-1).reverse().map(award=>`<li><strong>Cấp ${award.level}</strong> · ${award.minutes} phút · ${date(award)}</li>`).join('')}</ol></details>`:''}`;
+}
+
+function reviewAchievements(){
+ const {awards}=readReviewTimer();
+ return `<article class="c"><h2>Thành tựu học tập</h2><div id="review-profile-awards" data-level="${awards.length}">${reviewAchievementContent(awards)}</div></article>`;
+}
+
+function mountReviewPage(){
+ void refreshReviewTimer();
+ void loadReviewItems();
+}
+
+window.addEventListener('storage',event=>{
+ if(event.key===REVIEW_TIMER_KEY||event.key===null)void refreshReviewTimer();
+});
+window.addEventListener('pageshow',()=>void refreshReviewTimer());
+document.addEventListener('visibilitychange',()=>void refreshReviewTimer());
 
 function historyCount(){return st.h.length+' lượt chấm đã lưu.'}
 ensureProgressIds(true);
