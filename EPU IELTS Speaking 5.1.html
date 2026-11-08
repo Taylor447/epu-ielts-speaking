@@ -608,6 +608,24 @@ body > nav button.on { background: color-mix(in srgb,var(--pr) 17%,transparent);
 .retake-note p { flex: 1 1 220px; margin: 0; }
 @media (max-width: 480px) { .retake-note > button { width: 100%; } }
 
+/* Liquid glass navigation */
+#n {
+  border-color: rgba(255,255,255,.32);
+  background: linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.06) 46%, rgba(255,255,255,.13));
+  box-shadow: 0 18px 38px rgba(3,12,30,.38), inset 0 1px 0 rgba(255,255,255,.30), inset 0 -1px 0 rgba(255,255,255,.08);
+  backdrop-filter: blur(24px) saturate(1.65);
+  -webkit-backdrop-filter: blur(24px) saturate(1.65);
+}
+[data-theme="light"] #n {
+  border-color: rgba(255,255,255,.72);
+  background: linear-gradient(135deg, rgba(255,255,255,.78), rgba(255,255,255,.48) 47%, rgba(255,255,255,.64));
+}
+#n button.on,
+#n button[aria-current="page"] {
+  border-color: rgba(255,255,255,.40);
+  background: linear-gradient(145deg, rgba(255,255,255,.34), rgba(255,255,255,.13));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.42), 0 4px 14px rgba(4,18,42,.12);
+}
 </style>
 <script type="application/json" id="offline-dictionary-meta">{"shards":["_","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"],"count":195393,"bilingual":119032}</script>
 <script type="text/plain" id="offline-dictionary-_">
@@ -1542,7 +1560,7 @@ const V={
  <article class="c"><h2>Lịch sử luyện tập</h2><p id="saved-history-count">${historyCount()}</p><button class="g" id="export-history" onclick="exportHistory()"${st.h.length?'':' disabled'}>Xuất lịch sử CSV</button></article>
  <div class="profile-grid"><article class="c"><h2>Ủng hộ tác giả</h2><p>Nếu ứng dụng hữu ích với bạn, bạn có thể ủng hộ tác giả qua mã QR MoMo.</p><img class="qr" src="${QR}" alt="Mã QR MoMo – NGUYEN DUC TAI"></article>
  <div><article class="c"><h2>Hỗ trợ và góp ý</h2><details><summary>Viết góp ý</summary><p><a href="mailto:${MAIL}">${MAIL}</a></p><label for="fb">Nội dung góp ý</label><textarea id="fb" rows="4" placeholder="Bạn muốn cải thiện điều gì?"></textarea><button onclick="feedback()">${MAIL?'Mở ứng dụng email':'Sao chép góp ý'}</button><p id="fb-status" role="status"></p></details></article>
- <article class="c"><h2>Điều khoản và quyền riêng tư</h2><details><summary>Chính sách quyền riêng tư</summary><p>Hồ sơ được lưu trong trình duyệt. Khi bật đồng bộ trên bản web, lịch sử điểm, mục tiêu và từ đã lưu được đồng bộ theo tài khoản.</p><p>Bản ghi âm được giữ tạm trong phiên luyện. Whisper và bộ phân tích âm vị xử lý bản ghi trên thiết bị. Khi trình duyệt thiếu hỗ trợ Whisper, bạn có thể nhập lời thủ công.</p><p>Chế độ Giám khảo AI với OpenAI gửi câu trả lời bằng văn bản và số đo nhịp nói khi bạn nộp. Chế độ trên thiết bị xử lý tại chỗ.</p></details><details><summary>Điều khoản sử dụng</summary><p>Ứng dụng dùng để luyện tập. Điểm tự động là số ước tính. Kết quả IELTS chính thức do đơn vị tổ chức thi công bố. Ứng dụng không liên kết với IELTS, British Council, IDP hoặc Cambridge.</p></details></article></div></div>`
+ <article class="c"><h2>Điều khoản và quyền riêng tư</h2><details><summary>Chính sách quyền riêng tư</summary><p>Hồ sơ được lưu trong trình duyệt. Khi bật đồng bộ trên bản web, lịch sử điểm, mục tiêu và từ đã lưu được đồng bộ theo tài khoản.</p><p>Bản ghi âm được giữ tạm trong phiên luyện. Whisper và bộ phân tích âm vị xử lý bản ghi trên thiết bị. Khi trình duyệt thiếu hỗ trợ Whisper, bạn có thể nhập lời thủ công.</p></details><details><summary>Điều khoản sử dụng</summary><p>Ứng dụng dùng để luyện tập. Điểm tự động là số ước tính. Kết quả IELTS chính thức do đơn vị tổ chức thi công bố. Ứng dụng không liên kết với IELTS, British Council, IDP hoặc Cambridge.</p></details></article></div></div>`
 };
 
 function freq(){
