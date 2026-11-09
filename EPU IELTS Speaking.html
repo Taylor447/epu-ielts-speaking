@@ -4296,7 +4296,12 @@ const PATH_LESSON_RULES={
   contextGroups:[/\b(?:help|classmate|study|assignment|example)\b/],
   pronunciationReference:'Could you pick it up for me? Please take it out. Turn it off after class.',
   challenge:'Say all three linked phrases smoothly, then explain in your own words how you would ask a classmate for help with a study task. Include one concrete example.'},
- 2:{part:1,minSeconds:30,minVoiced:15,minWords:12,minUnique:8,tryMinWords:10,minTryUnique:7,minGroups:4,groups:[/\bbecause\b/,/\balthough\b/,/\b(?:usually|every day|often|study|work)\b/,/\b(?:yesterday|last week|last weekend|visited|worked|went|did)\b/],challenge:'Describe a real routine and a recent event. Use present and past tense, and include both “because” and “although” in meaningful sentences.'},
+ 2:{part:1,minSeconds:30,minVoiced:15,minWords:12,minUnique:8,tryMinWords:10,minTryUnique:7,minGroups:4,
+  groups:[/\bbecause\b/,/\balthough\b/,/\b(?:usually|every day|often|study|work)\b/,/\b(?:yesterday|last week|last weekend|visited|worked|went|did)\b/],
+  groupLabels:['because','although','thói quen ở hiện tại','việc đã làm trong quá khứ'],
+  tryGroups:[/\b(?:usually|every day|often|study|work)\b/,/\b(?:yesterday|last week|last weekend|visited|worked|went|did)\b/],
+  tryGroupLabels:['thói quen/hiện tại','sự việc gần đây/quá khứ'],minTryGroups:2,
+  challenge:'Describe a real routine and a recent event. Use present and past tense, and include both “because” and “although” in meaningful sentences.'},
  3:{part:1,minSeconds:30,minVoiced:15,minWords:12,minUnique:8,tryMinWords:10,minTryUnique:7,minGroups:3,groups:[/\b(?:yes|no|i do|i don't|i like|i enjoy)\b/,/\bbecause\b/,/\bfor example\b|\bfor instance\b/],challenge:'Answer the question directly, give a reason with “because”, and add one specific example. Do not repeat the same sentence to fill the time.'},
  4:{part:2,minSeconds:90,minVoiced:60,minWords:150,minUnique:45,tryMinWords:80,minTryUnique:25,minGroups:3,groups:[/\b(?:place|park|beach|city|museum|mountain|village|building)\b/,/\b(?:visited|visit|went|travelled|traveled)\b/,/\b(?:summer|weekend|year|when|last)\b/,/\b(?:family|friend|people|with)\b/,/\b(?:felt|feeling|memorable|because|enjoyed)\b/],challenge:'Speak for at least 90 seconds about a place you visited. Cover where it was, when and with whom you went, what you did there, and why it was memorable. Use details rather than repeating phrases.'},
  5:{part:3,minSeconds:30,minVoiced:15,minWords:12,minUnique:8,tryMinWords:12,minTryUnique:8,minGroups:3,groups:[/\b(?:think|believe|should|important|point)\b/,/\bbecause\b|\bsince\b/,/\bfor example\b|\bfor instance\b/,/\btherefore\b|\bas a result\b|\boverall\b/],challenge:'Give a clear point, explain why, add a specific example, and link back to the question. Include at least three of those four PEEL steps.'},
@@ -4322,19 +4327,22 @@ function pathEvidence(id,text,stage='challenge'){
  const uniqueRatio=contentWords.length?contentUnique.size/contentWords.length:0;
  const minWords=stage==='try'?rule.tryMinWords||8:rule.minWords||12;
  const minUnique=stage==='try'?rule.minTryUnique||6:rule.minUnique||8;
- const hits=(rule.groups||[]).filter(pattern=>pattern.test(line)).length;
- const required=stage==='try'?Math.min(rule.minGroups||1,Math.max(1,(rule.groups||[]).length)):rule.minGroups||1;
+ const groups=stage==='try'&&rule.tryGroups?rule.tryGroups:rule.groups||[];
+ const labels=stage==='try'&&rule.tryGroupLabels?rule.tryGroupLabels:rule.groupLabels||[];
+ const matches=groups.map(pattern=>pattern.test(line)),hits=matches.filter(Boolean).length;
+ const required=stage==='try'?(rule.minTryGroups??Math.min(rule.minGroups||1,Math.max(1,groups.length))):rule.minGroups||1;
+ const missingLabels=labels.filter((_,index)=>!matches[index]);
  const contextHits=(rule.contextGroups||[]).filter(pattern=>pattern.test(line)).length,contextRequired=rule.contextGroups?.length?1:0;
  const minRatio=stage==='try'?.3:.4,tooRepetitive=stage==='challenge'&&uniqueRatio<minRatio;
  const passed=words.length>=minWords&&contentUnique.size>=minUnique&&unique.size>=minUnique&&hits>=required&&contextHits>=contextRequired&&!tooRepetitive&&!(stage==='challenge'&&rule.forbidden?.test(line));
- return {passed,words:words.length,unique:contentUnique.size,hits,required,contextHits,contextRequired,uniqueRatio,minRatio,tooRepetitive,minWords,minUnique,forbidden:stage==='challenge'&&Boolean(rule.forbidden?.test(line))};
+ return {passed,words:words.length,unique:contentUnique.size,hits,required,missingLabels,contextHits,contextRequired,uniqueRatio,minRatio,tooRepetitive,minWords,minUnique,forbidden:stage==='challenge'&&Boolean(rule.forbidden?.test(line))};
 }
 function pathEvidenceText(evidence,stage='challenge'){
  if(evidence.forbidden)return 'Bản chép có từ cần tránh trong nhiệm vụ. Hãy thu lại và mô tả bằng cách khác.';
  const missing=[];
  if(evidence.words<evidence.minWords)missing.push('cần ít nhất '+evidence.minWords+' từ (hiện có '+evidence.words+')');
  if(evidence.unique<evidence.minUnique)missing.push('cần '+evidence.minUnique+' từ khác nhau có nội dung (hiện có '+evidence.unique+')');
- if(evidence.hits<evidence.required)missing.push('thiếu '+(evidence.required-evidence.hits)+' ý/từ khóa của bài');
+ if(evidence.hits<evidence.required)missing.push(evidence.missingLabels?.length?'thiếu tiêu chí: '+evidence.missingLabels.join(', '):'thiếu '+(evidence.required-evidence.hits)+' ý/từ khóa của bài');
  if(evidence.contextHits<evidence.contextRequired)missing.push('hãy thêm câu giải thích hoặc ví dụ liên quan đến bài');
  if(evidence.tooRepetitive)missing.push('bản chép lặp từ nhiều; hãy giải thích bằng câu mới');
  return missing.length?'Chưa đạt: '+missing.join('; ')+'.':'Đã thấy đủ số từ và nội dung mục tiêu.';
