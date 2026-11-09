@@ -1,0 +1,27 @@
+{
+  "name": "EPU IELTS Speaking",
+  "short_name": "EPU Speaking",
+  "id": "./EPU%20IELTS%20Speaking.html",
+  "start_url": "./EPU%20IELTS%20Speaking.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#10213f",
+  "theme_color": "#10213f",
+  "lang": "vi",
+  "description": "Ứng dụng luyện IELTS Speaking của Đại học Điện Lực.",
+  "icons": [
+    {
+      "src": "./assets/pwa/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/pwa/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

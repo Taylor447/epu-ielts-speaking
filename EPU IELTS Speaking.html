@@ -14,6 +14,11 @@
 <meta property="og:url" content="https://taylor447.github.io/epu-ielts-speaking/EPU%20IELTS%20Speaking.html">
 <meta property="og:image" content="https://taylor447.github.io/epu-ielts-speaking/assets/share-preview.png">
 <link rel="canonical" href="https://taylor447.github.io/epu-ielts-speaking/EPU%20IELTS%20Speaking.html">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./assets/pwa/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="EPU IELTS">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>IELTS Speaking EPU | Luyện nói và phát âm tiếng Anh</title>
 <script>
 (() => {
@@ -801,6 +806,8 @@ body > nav button.on { background: color-mix(in srgb,var(--pr) 17%,transparent);
 .minimal-pair-row .row { gap: 6px; }
 .quick-xp { padding: 10px 12px; border-radius: 10px; background: var(--sf); color: var(--positive); font-weight: 700; }
 
+.pwa-install-box { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 12px 0; }
+.pwa-install-box small { flex-basis: 100%; color: var(--mu); }
 .model-progress { display: block; width: 100%; height: 8px; margin: 8px 0; accent-color: var(--action); }
 .model-first-use { display: block; color: var(--mu); margin: 6px 0 10px; }
 .exam-full-note { padding: 10px 12px; border: 1px solid var(--bd); border-radius: 10px; background: var(--sf); }
@@ -1807,6 +1814,7 @@ const V={
   <div class="hero-actions"><button onclick="go('prac')">Bắt đầu luyện ${icon('arrow')}</button><button class="g" onclick="go('les')">Xem bài học</button></div></div>
   <div class="hero-score"><small>ĐIỂM ƯỚC TÍNH</small><div class="big">${bandNumber(m?.o)}</div><small>${m?'Trung bình '+m.n+' lượt gần nhất'+(m.legacy?' · dữ liệu theo nguồn điểm trước':''):'Chấm một câu để xem điểm'}</small></div></section>
   ${pathContinueButton()}
+  <div class="pwa-install-box"><button type="button" class="g" id="pwa-install" onclick="addToHomeScreen()">${pwaButtonLabel()}</button><small id="pwa-status" role="status">${pwaStatusMessage()}</small></div>
   <button class="w quick-entry" type="button" onclick="startQuick()">Nói nhanh 60 giây · một câu ngẫu nhiên</button>
   ${gameHome()}
   ${progressHome(m)}
@@ -2934,13 +2942,50 @@ async function feedback(){
 }
 
 const TABS=[['home','Trang chủ'],['prac','Luyện tập'],['les','Bài học'],['col','Bộ sưu tập'],['voc','Từ vựng'],['pro','Hồ sơ']];
-async function registerOfflineCache(){
- if(!('serviceWorker' in navigator)||!isSecureContext)return;
- try{
-  await navigator.serviceWorker.register(new URL('./service-worker.js',location.href),{scope:new URL('./',location.href).pathname});
- }catch{}
+let installPromptEvent=null;
+let pwaOfflineReady=false;
+let pwaOfflineError='';
+let pwaInstalled=false;
+const isStandalonePwa=()=>pwaInstalled||!!(globalThis.matchMedia?.('(display-mode: standalone)').matches||navigator.standalone===true);
+const isIosDevice=()=>/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const isSafariDesktop=()=>/safari/i.test(navigator.userAgent)&&!/chrome|chromium|crios|edg|opr|firefox/i.test(navigator.userAgent)&&!isIosDevice();
+function pwaButtonLabel(){return isStandalonePwa()?'Đã cài đặt':installPromptEvent?'Cài ứng dụng':'Thêm vào màn hình chính'}
+function pwaStatusMessage(){
+ if(isStandalonePwa())return 'Ứng dụng đã được cài trên thiết bị.';
+ if(location.protocol==='file:'||globalThis.isSecureContext!==true)return 'Cài PWA cần mở trang bằng link HTTPS. Tệp offline vẫn dùng như trang web bình thường.';
+ if(installPromptEvent)return 'Trang đã sẵn sàng cài. Tải lại khi có mạng để lưu bản ngoại tuyến.';
+ if(pwaOfflineError)return pwaOfflineError;
+ if(isIosDevice())return 'Mở menu Chia sẻ → Thêm vào Màn hình chính; tải lại khi có mạng để lưu bản ngoại tuyến.';
+ if(isSafariDesktop())return 'Trong Safari trên macOS mới, chọn File → Add to Dock để cài; mở lại khi có mạng để lưu bản ngoại tuyến.';
+ if(/firefox|fxios/i.test(navigator.userAgent))return 'Firefox chưa hỗ trợ cài PWA bằng nút này. Hãy mở bằng Chrome, Edge, Brave hoặc Safari tương thích. Tải lại khi có mạng để lưu ngoại tuyến.';
+ if(pwaOfflineReady)return 'Đã bật PWA. Tải lại trang khi có mạng để lưu bản ứng dụng dùng ngoại tuyến; nếu chưa thấy lời mời, mở menu trình duyệt → Cài đặt ứng dụng.';
+ return 'Đang kiểm tra khả năng cài đặt và lưu ngoại tuyến…';
 }
-window.addEventListener('load',registerOfflineCache,{once:true});
+function syncPwaUI(){const button=$('#pwa-install'),status=$('#pwa-status');if(button){button.textContent=pwaButtonLabel();button.setAttribute('aria-label',pwaButtonLabel())}if(status)status.textContent=pwaStatusMessage()}
+window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();installPromptEvent=event;syncPwaUI()});
+window.addEventListener('appinstalled',()=>{pwaInstalled=true;installPromptEvent=null;syncPwaUI()});
+async function addToHomeScreen(){
+ const status=$('#pwa-status'),button=$('#pwa-install');if(!status)return;
+ if(isStandalonePwa()){status.textContent='Ứng dụng đã được cài trên thiết bị.';return}
+ if(installPromptEvent){
+  const promptEvent=installPromptEvent;installPromptEvent=null;
+  if(button)button.disabled=true;
+  status.textContent='Đang mở lời mời cài đặt…';
+  try{await promptEvent.prompt();const choice=await promptEvent.userChoice;status.textContent=choice?.outcome==='accepted'?'Đã cài ứng dụng. Bạn có thể mở từ màn hình chính.':'Bạn chưa cài ứng dụng. Có thể thử lại trong menu trình duyệt.'}
+  catch{status.textContent='Không mở được lời mời. Hãy dùng menu trình duyệt → Cài đặt ứng dụng.'}
+  finally{if(button){button.disabled=false;button.textContent=pwaButtonLabel()}}
+  return;
+ }
+ status.textContent=pwaStatusMessage();
+}
+async function registerPwa(){
+ if(location.protocol==='file:'||globalThis.isSecureContext!==true){syncPwaUI();return}
+ if(!('serviceWorker' in navigator)){pwaOfflineError='Trình duyệt này không hỗ trợ lưu ngoại tuyến.';syncPwaUI();return}
+ try{await navigator.serviceWorker.register(new URL('./service-worker.js',location.href),{scope:new URL('./',location.href).pathname});pwaOfflineReady=true}
+ catch{pwaOfflineError='Chưa bật được lưu ngoại tuyến. Hãy tải lại trang HTTPS.'}
+ syncPwaUI();
+}
+window.addEventListener('load',registerPwa,{once:true});
 const themeMedia=matchMedia('(prefers-color-scheme: dark)');
 const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)');
 function updateTheme(){
