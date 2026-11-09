@@ -806,8 +806,6 @@ body > nav button.on { background: color-mix(in srgb,var(--pr) 17%,transparent);
 .minimal-pair-row .row { gap: 6px; }
 .quick-xp { padding: 10px 12px; border-radius: 10px; background: var(--sf); color: var(--positive); font-weight: 700; }
 
-.pwa-install-box { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 12px 0; }
-.pwa-install-box small { flex-basis: 100%; color: var(--mu); }
 .model-progress { display: block; width: 100%; height: 8px; margin: 8px 0; accent-color: var(--action); }
 .model-first-use { display: block; color: var(--mu); margin: 6px 0 10px; }
 .exam-full-note { padding: 10px 12px; border: 1px solid var(--bd); border-radius: 10px; background: var(--sf); }
@@ -1814,7 +1812,6 @@ const V={
   <div class="hero-actions"><button onclick="go('prac')">Bắt đầu luyện ${icon('arrow')}</button><button class="g" onclick="go('les')">Xem bài học</button></div></div>
   <div class="hero-score"><small>ĐIỂM ƯỚC TÍNH</small><div class="big">${bandNumber(m?.o)}</div><small>${m?'Trung bình '+m.n+' lượt gần nhất'+(m.legacy?' · dữ liệu theo nguồn điểm trước':''):'Chấm một câu để xem điểm'}</small></div></section>
   ${pathContinueButton()}
-  <div class="pwa-install-box"><button type="button" class="g" id="pwa-install" onclick="addToHomeScreen()">Thêm vào màn hình chính</button><small id="pwa-status" role="status">Đang kiểm tra khả năng cài đặt…</small></div>
   <button class="w quick-entry" type="button" onclick="startQuick()">Nói nhanh 60 giây · một câu ngẫu nhiên</button>
   ${gameHome()}
   ${progressHome(m)}
@@ -2942,26 +2939,11 @@ async function feedback(){
 }
 
 const TABS=[['home','Trang chủ'],['prac','Luyện tập'],['les','Bài học'],['col','Bộ sưu tập'],['voc','Từ vựng'],['pro','Hồ sơ']];
-// PWA install prompt.
-let installPromptEvent=null;
-window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();installPromptEvent=event;const button=$('#pwa-install'),status=$('#pwa-status');if(button)button.textContent='Cài ứng dụng';if(status)status.textContent='PWA sẵn sàng cài đặt trên thiết bị này.'});
-window.addEventListener('appinstalled',()=>{installPromptEvent=null;const status=$('#pwa-status');if(status)status.textContent='Đã thêm ứng dụng vào màn hình chính.'});
-async function addToHomeScreen(){
- const status=$('#pwa-status');if(!status)return;
- if(installPromptEvent){const prompt=installPromptEvent;installPromptEvent=null;await prompt.prompt();const choice=await prompt.userChoice;status.textContent=choice?.outcome==='accepted'?'Đã thêm ứng dụng.':'Bạn có thể cài ứng dụng sau.';return}
- if(globalThis.matchMedia?.('(display-mode: standalone)').matches||navigator.standalone){status.textContent='Ứng dụng đã ở trên màn hình chính.';return}
- const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
- status.textContent=location.protocol==='file:'?'Tệp offline không tự cài thành PWA; hãy mở trang HTTPS.':ios?'Trên iPhone/iPad: mở Chia sẻ rồi chọn Thêm vào Màn hình chính.':'Mở menu trình duyệt và chọn Cài đặt ứng dụng nếu lời mời chưa hiện.';
-}
 async function registerPwa(){
- const status=$('#pwa-status');
- if(!('serviceWorker' in navigator)||!isSecureContext){if(status)status.textContent='Cài PWA cần HTTPS và trình duyệt hỗ trợ service worker.';return}
+ if(!('serviceWorker' in navigator)||!isSecureContext)return;
  try{
   await navigator.serviceWorker.register(new URL('./service-worker.js',location.href),{scope:new URL('./',location.href).pathname});
-  if(status&&!installPromptEvent)status.textContent='PWA đã sẵn sàng. Trên iPhone/iPad, dùng Chia sẻ → Thêm vào Màn hình chính.';
- }catch{
-  if(status)status.textContent='Chưa đăng ký được chế độ ngoại tuyến. Hãy tải lại trang HTTPS.';
- }
+ }catch{}
 }
 window.addEventListener('load',registerPwa,{once:true});
 const themeMedia=matchMedia('(prefers-color-scheme: dark)');
