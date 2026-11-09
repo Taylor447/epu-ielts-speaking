@@ -12,13 +12,8 @@
 <meta property="og:title" content="IELTS Speaking EPU | Luyện nói và phát âm tiếng Anh">
 <meta property="og:description" content="Luyện IELTS Speaking Part 1, 2, 3 cùng EPU qua bài học, ghi âm, từ vựng và phản hồi phát âm.">
 <meta property="og:url" content="https://taylor447.github.io/epu-ielts-speaking/EPU%20IELTS%20Speaking.html">
-<meta property="og:image" content="https://taylor447.github.io/epu-ielts-speaking/assets/pwa/icon-512.png">
+<meta property="og:image" content="https://taylor447.github.io/epu-ielts-speaking/assets/share-preview.png">
 <link rel="canonical" href="https://taylor447.github.io/epu-ielts-speaking/EPU%20IELTS%20Speaking.html">
-<link rel="manifest" href="./manifest.webmanifest">
-<link rel="apple-touch-icon" href="./assets/pwa/icon-192.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="EPU IELTS">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>IELTS Speaking EPU | Luyện nói và phát âm tiếng Anh</title>
 <script>
 (() => {
@@ -2939,13 +2934,13 @@ async function feedback(){
 }
 
 const TABS=[['home','Trang chủ'],['prac','Luyện tập'],['les','Bài học'],['col','Bộ sưu tập'],['voc','Từ vựng'],['pro','Hồ sơ']];
-async function registerPwa(){
+async function registerOfflineCache(){
  if(!('serviceWorker' in navigator)||!isSecureContext)return;
  try{
   await navigator.serviceWorker.register(new URL('./service-worker.js',location.href),{scope:new URL('./',location.href).pathname});
  }catch{}
 }
-window.addEventListener('load',registerPwa,{once:true});
+window.addEventListener('load',registerOfflineCache,{once:true});
 const themeMedia=matchMedia('(prefers-color-scheme: dark)');
 const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)');
 function updateTheme(){
