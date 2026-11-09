@@ -2981,7 +2981,7 @@ async function addToHomeScreen(){
 async function registerPwa(){
  if(location.protocol==='file:'||globalThis.isSecureContext!==true){syncPwaUI();return}
  if(!('serviceWorker' in navigator)){pwaOfflineError='Trình duyệt này không hỗ trợ lưu ngoại tuyến.';syncPwaUI();return}
- try{await navigator.serviceWorker.register(new URL('./service-worker.js',location.href),{scope:new URL('./',location.href).pathname});pwaOfflineReady=true}
+ try{const workerUrl=new URL('./service-worker.js',location.href);workerUrl.searchParams.set('v','2');await navigator.serviceWorker.register(workerUrl,{scope:new URL('./',location.href).pathname,updateViaCache:'none'});pwaOfflineReady=true}
  catch{pwaOfflineError='Chưa bật được lưu ngoại tuyến. Hãy tải lại trang HTTPS.'}
  syncPwaUI();
 }
