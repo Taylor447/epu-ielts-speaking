@@ -2827,14 +2827,14 @@ function sess(){
  if(!x)return summary();
  const ti=TP.findIndex(([name])=>name===x.t);
  return `<article class="c practice-card">
- <div class="session-meta"><span class="part-index">${x.pathChallenge?'THỬ THÁCH 30 GIÂY':x.pairPractice?'LUYỆN CẶP ÂM':S.mode==='quick'?'NÓI NHANH 60 GIÂY':'PART 0'+x.p+' · CÂU '+(S.i+1)+'/'+S.it.length}</span>
+  <div class="session-meta"><span class="part-index">${x.pathChallenge?(x.p===2?'THỬ THÁCH PART 2':'THỬ THÁCH 30 GIÂY THEO BÀI'):x.pairPractice?'LUYỆN CẶP ÂM':S.mode==='quick'?'NÓI NHANH 60 GIÂY':'PART 0'+x.p+' · CÂU '+(S.i+1)+'/'+S.it.length}</span>
  ${x.pathChallenge||x.pairPractice?'<span class="topic-badge">'+esc(x.t)+'</span>':x.forecast?'<span class="topic-badge">Forecast · '+esc(x.t)+'</span>':`<span class="topic-badge topic-${ti}">${icon(TOPIC_ICONS[ti]||'study','topic-icon')} ${esc(x.t)}</span>`}</div>
  <h1 lang="en"${x.forecast?' class="review-prompt"':''}>${esc(x.q)}</h1>
  ${S.mode==='quick'?'<p class="quick-timer" id="quick-timer" role="status" aria-live="polite">Đang mở micro…</p>':''}
  ${S.retake?'<aside class="retake-note" aria-live="polite"><p>Bạn đang thu lại câu này. Sau khi chấm, kết quả mới sẽ thay cho kết quả cũ.</p><button type="button" class="g" onclick="restorePreviousAnswer()">← Quay lại kết quả trước</button></aside>':''}
  ${S.result?'':`${x.p===2?'<button class="g" id="prep" onclick="prep()">Chuẩn bị 60 giây</button>':''}
  ${recordingMarkup()}`}
- <div class="study-tools">${x.pathChallenge?'<p class="mu">Ghi âm ít nhất 30 giây. Hãy nói rõ và kiểm tra bản chép lời trước khi chấm.</p>':x.pairPractice?'<p class="mu">Ghi âm khi đọc các cặp từ; bản chép lời và phần phân tích âm thanh sẽ giúp bạn tự đối chiếu cách phát âm.</p>':x.forecast?reviewForecastAid(x):aid(x)}</div><div id="after"></div>
+  <div class="study-tools">${x.pathChallenge?'<p class="mu">Ghi âm ít nhất '+pathRule(S.pathLesson).minSeconds+' giây (ít nhất '+pathRule(S.pathLesson).minVoiced+' giây có giọng nói rõ). Hãy làm đúng nhiệm vụ bài học; bản chép lời và, nếu có, phép đối chiếu pronunciation sẽ được kiểm tra trước khi mở chặng.</p>':x.pairPractice?'<p class="mu">Ghi âm khi đọc các cặp từ; bản chép lời và phần phân tích âm thanh sẽ giúp bạn tự đối chiếu cách phát âm.</p>':x.forecast?reviewForecastAid(x):aid(x)}</div><div id="after"></div>
  <section id="evaluation">${S.result?resultHTML(S.result):''}</section></article>
  <button class="g w" onclick="leavePractice()">Thoát bài luyện</button>`;
 }
@@ -2874,8 +2874,9 @@ function restorePreviousAnswer(){
 function ev(){
  const input=$('#tx'),out=$('#evaluation'),x=S?.it[S.i];
  if(!input||!out||!x||S.result)return;
- if((S.mode==='baseline'||S.mode==='lesson')&&(!lb||dur<30)){
-  out.innerHTML='<p role="alert">Hãy ghi âm ít nhất 30 giây trước khi chấm.</p>';return;
+  const pathMinimum=S.mode==='lesson'?pathRule(S.pathLesson).minSeconds:30;
+  if((S.mode==='baseline'||S.mode==='lesson')&&(!lb||dur<pathMinimum)){
+   out.innerHTML='<p role="alert">Hãy ghi âm ít nhất '+pathMinimum+' giây cho thử thách này trước khi chấm.</p>';return;
  }
  const s=score(input.value,x.p,lb?dur:0);
  if(!s){
@@ -2887,6 +2888,7 @@ function ev(){
  const previous=S.retake;
  const blob=lb,result={x,s,blob,text:input.value.trim(),m:null,state:blob?'pending':'no-recording',pron:S.pronDraft?.pron,whisper:S.pronDraft?.whisper,duration:dur,
   pathMode:['baseline','lesson'].includes(S.mode)?S.mode:null,pathLesson:S.pathLesson,quickMode:S.mode==='quick',pairPractice:x.pairPractice===true};
+  if(result.pathMode==='lesson'&&pathRule(result.pathLesson).pronunciationReference)result.pronunciationReference=pathRule(result.pathLesson).pronunciationReference;
  if(activePronunciation&&activePronunciation.result===S.pronDraft)activePronunciation.result=result;
  cancelTranscription();S.pronDraft=null;$('#free-pron')?.remove();$('#ai-whisper-container')?.remove();
  S.result=result;
@@ -2905,11 +2907,12 @@ function ev(){
  gamePractice(result,Date.now(),gameBefore);
  sv();
  if(blob){
-  result.pron??={reference:result.text};
+   result.pron??={reference:result.pronunciationReference||result.text};
+   if(result.pronunciationReference)result.pron.reference=result.pronunciationReference;
   if(!result.pron.mode)result.pron.mode='self';
   if(result.pron.mode==='self'&&!result.pron.reference)result.pron.reference=result.text;
  }
- if(blob&&result.pron.assessment?.reference!==result.text)delete result.pron.assessment;
+  if(blob&&result.pron.assessment?.reference!==result.pron.reference)delete result.pron.assessment;
  applyPronunciationBand(result);
  input.readOnly=true;
  const confirmation=$('#pron-confirm');
@@ -2924,7 +2927,7 @@ function ev(){
  if(result.comparison.celebrate){result.celebrated=true;celebrateResult()}
  void loadWordSuggestions(result);
  void diagnose(result,blob,previous);
- if(blob&&!result.pron.assessment)measureConfirmedPronunciation(result);
+  if(blob&&(!result.pron.assessment||result.pathMode==='lesson'&&result.pronunciationReference&&!result.pron.checks?.self))measureConfirmedPronunciation(result);
 }
 
 const VOICE_STATE={
@@ -2969,9 +2972,8 @@ async function diagnose(result,blob,previous){
     if(gameAdd({id:'speed_'+result.history.id,type:'speed',at:submittedAt,seconds:result.duration}))result.quickXp=Math.max(0,gameTotal()-beforeXp);
    }
   }
-  if(result.pathMode)recordPathChallenge(result);
+   if(result.pathMode){recordPathChallenge(result);updatePathChallengeStatus(result)}
   if(tab==='prac'&&S?.result===result){
-   if(result.pathMode){const status=$('#path-result-status'),button=$('#path-result-done');if(status)status.textContent=result.pathComplete?result.pathMessage:'Cần bản ghi từ 30 giây, ít nhất 15 giây có giọng nói được phát hiện và 12 từ tiếng Anh gồm 6 từ khác nhau.';if(button)button.disabled=!result.pathComplete}
    $('#vx').innerHTML=voiceResult(result);
    $('#learning-result').innerHTML=learningResultMarkup(result);
    const quickReward=$('#quick-reward');if(quickReward)quickReward.textContent=quickRewardText(result);
@@ -3445,11 +3447,12 @@ function runFreePronunciationCheck(useSample){
 function measureConfirmedPronunciation(result){
   const state=result.pron;
   if(state.busy){
-    state.pendingSelf=state.mode!=='self'||state.reference.trim()!==result.text;
+    const reference=result.pronunciationReference||result.text;
+    state.pendingSelf=state.mode!=='self'||state.reference.trim()!==reference;
     return;
   }
   state.mode='self';
-  state.reference=result.text;
+  state.reference=result.pronunciationReference||result.text;
   void measurePronunciation();
 }
 async function measurePronunciation(){
@@ -3505,6 +3508,10 @@ async function measurePronunciation(){
         measureConfirmedPronunciation(owner);
       }else{
         refreshPronunciation(owner);
+         if(owner.pathMode==='lesson'){
+          recordPathChallenge(owner);
+          updatePathChallengeStatus(owner);
+         }
       }
     }
   }
@@ -4263,21 +4270,76 @@ function gameProfile(){
 
 // Nội dung ví dụ và câu hỏi cho từng bài trong LS.
 const PATH_LESSONS=[
- {id:0,week:1,example:'I worked with my friends and we finished the project.',question:'What did you do with your friends recently?'},
- {id:13,week:1,example:'“ship” and “chip” have different first sounds. In phoTOgraphy, the stress moves to the second syllable.',question:'Which English sound contrast is difficult for you, and how can you practise it?'},
- {id:1,week:1,example:'Could you pick it up for me?',question:'What do you usually do when you need help?'},
+ {id:0,week:1,example:'Keep the final sound clear: rice /s/ – rise /z/, seat /t/ – seed /d/, coat /t/ – code /d/, bat /t/ – bad /d/. Then use one word in a sentence: “I checked the code and took my seat.”',question:'Read rice/rise, seat/seed, coat/code and bat/bad. Which final sounds change? Then make one sentence with a pair word.'},
+ {id:13,week:1,example:'“bat” ends in /t/; “bad” ends in /d/. “thin/then” contrasts /θ/ and /ð/, “ship/chip” contrasts /ʃ/ and /tʃ/, and the stress changes in PHOtograph/phoTOgraphy.',question:'Practise one pair for each contrast: bat/bad, thin/then, ship/chip and photograph/photography. Which sound or stressed syllable changes?'},
+ {id:1,week:1,example:'Link the words across boundaries: “Could‿you pick‿it‿up for me?” Say it smoothly, then try “Please‿take‿it‿out” and “Turn‿it‿off after class.”',question:'Practise “Could you pick it up for me?”, “Please take it out” and “Turn it off after class”. Then explain how you would ask a classmate for help.'},
  {id:3,week:1,example:'Yes, I do. I enjoy reading because it helps me relax. For example, I read before bed.',question:'Do you enjoy reading? Why?'},
- {id:4,week:2,example:'I would like to describe a place I visited last summer. It was memorable because I went with my family.',question:'Describe a place you enjoyed visiting and say why.'},
+ {id:4,week:2,example:'I would like to describe a place I visited last summer, which was a small coastal town called Quy Nhon. I went there with my family for three days. It is in central Vietnam, and we travelled there by train because we wanted to enjoy the scenery. During the day, we walked along the beach, tried local seafood and visited a quiet fishing village nearby. One evening, we watched the sunset from a hill overlooking the sea. The place was special because it felt peaceful, even though it was a popular holiday destination. I remember the sound of the waves and the fresh air most clearly. I felt relaxed and closer to my family because we spent time together without rushing. I would happily return there, perhaps during the winter, when it is less crowded. That trip remains one of my favourite memories.',question:'Describe a place you enjoyed visiting and say why.'},
  {id:2,week:2,example:'I usually study at home, but last weekend I visited a friend and we worked together.',question:'Describe something you usually do and something you did recently.'},
  {id:8,week:2,example:'To be honest, I prefer the bus because it is affordable. For example, I use it to travel to university.',question:'How do you usually travel to school or work?'},
  {id:5,week:3,example:'Public parks are important because they give people space to relax. For example, families can exercise together.',question:'Why are public parks useful for communities?'},
  {id:6,week:3,example:'Public transport is convenient, and it can help reduce pollution in busy cities.',question:'How can people reduce pollution in their city?'},
  {id:9,week:3,example:'It is a small machine that keeps food cold. I mean, it is a refrigerator.',question:'Describe an object without saying its name.'},
  {id:10,week:3,example:'In my spare time, I enjoy listening to music. It plays an important role in helping me relax.',question:'What do you like doing in your spare time?'},
- {id:7,week:4,example:'I enjoy working in a team because we can share ideas and learn from one another.',question:'Do you prefer working alone or in a team? Why?'},
- {id:11,week:4,example:'I prefer studying with friends because we can explain difficult ideas to one another.',question:'How do you prefer to study? Give a reason.'},
+ {id:7,week:4,example:'Fluency: I speak without long pauses. Lexical Resource: I use precise words. Grammar: I vary sentence forms accurately. Pronunciation: my words are easy to understand.',question:'Choose two IELTS Speaking criteria, explain what each measures and give one example of how you can improve them.'},
+ {id:11,week:4,example:'A Band 6 speaker can explain ideas with some hesitation and errors. A Band 7 speaker develops ideas more fluently, uses flexible vocabulary and makes fewer errors.',question:'Compare Band 6 and Band 7 speaking. Give two specific differences and one practice goal.'},
  {id:12,week:4,example:'I practise speaking every day and listen to my recordings to notice what I can improve.',question:'How will you practise speaking over the next month?'}
 ];
+const PATH_LESSON_RULES={
+ 0:{part:1,minSeconds:30,minVoiced:15,minWords:12,minUnique:8,tryMinWords:8,minTryUnique:6,minGroups:8,
+  groups:[/\brice\b/,/\brise\b/,/\bseat\b/,/\bseed\b/,/\bcoat\b/,/\bcode\b/,/\bbat\b/,/\bbad\b/],
+  contextGroups:[/\b(?:sound|sounds|final|ends|checked|because)\b/],
+  pronunciationReference:'rice rise seat seed coat code bat bad I checked the code and took my seat',
+  challenge:'Read all four pairs clearly, pause briefly between them, then say the example sentence. Repeat the pairs as needed to practise the final /s/, /z/, /t/ and /d/ sounds.'},
+ 1:{part:1,minSeconds:30,minVoiced:15,minWords:12,minUnique:8,tryMinWords:8,minTryUnique:6,minGroups:3,
+  groups:[/\bpick\s+it\s+up\b/,/\btake\s+it\s+out\b/,/\bturn\s+it\s+off\b/],
+  contextGroups:[/\b(?:help|classmate|study|assignment|example)\b/],
+  pronunciationReference:'Could you pick it up for me? Please take it out. Turn it off after class.',
+  challenge:'Say all three linked phrases smoothly, then explain in your own words how you would ask a classmate for help with a study task. Include one concrete example.'},
+ 2:{part:1,minSeconds:30,minVoiced:15,minWords:12,minUnique:8,tryMinWords:10,minTryUnique:7,minGroups:4,groups:[/\bbecause\b/,/\balthough\b/,/\b(?:usually|every day|often|study|work)\b/,/\b(?:yesterday|last week|last weekend|visited|worked|went|did)\b/],challenge:'Describe a real routine and a recent event. Use present and past tense, and include both “because” and “although” in meaningful sentences.'},
+ 3:{part:1,minSeconds:30,minVoiced:15,minWords:12,minUnique:8,tryMinWords:10,minTryUnique:7,minGroups:3,groups:[/\b(?:yes|no|i do|i don't|i like|i enjoy)\b/,/\bbecause\b/,/\bfor example\b|\bfor instance\b/],challenge:'Answer the question directly, give a reason with “because”, and add one specific example. Do not repeat the same sentence to fill the time.'},
+ 4:{part:2,minSeconds:90,minVoiced:60,minWords:150,minUnique:45,tryMinWords:80,minTryUnique:25,minGroups:3,groups:[/\b(?:place|park|beach|city|museum|mountain|village|building)\b/,/\b(?:visited|visit|went|travelled|traveled)\b/,/\b(?:summer|weekend|year|when|last)\b/,/\b(?:family|friend|people|with)\b/,/\b(?:felt|feeling|memorable|because|enjoyed)\b/],challenge:'Speak for at least 90 seconds about a place you visited. Cover where it was, when and with whom you went, what you did there, and why it was memorable. Use details rather than repeating phrases.'},
+ 5:{part:3,minSeconds:30,minVoiced:15,minWords:12,minUnique:8,tryMinWords:12,minTryUnique:8,minGroups:3,groups:[/\b(?:think|believe|should|important|point)\b/,/\bbecause\b|\bsince\b/,/\bfor example\b|\bfor instance\b/,/\btherefore\b|\bas a result\b|\boverall\b/],challenge:'Give a clear point, explain why, add a specific example, and link back to the question. Include at least three of those four PEEL steps.'},
+ 6:{part:3,minSeconds:30,minVoiced:15,minWords:12,minUnique:8,tryMinWords:10,minTryUnique:7,minGroups:2,groups:[/\bsustainable\b|\bpollution\b|\beco[- ]friendly\b|\brenewable energy\b|\bpublic transport\b|\breduce waste\b/,/\b(?:because|so|therefore|help|reduce|improve)\b/],challenge:'Explain one way to reduce pollution in a city. Use at least one topic word such as “sustainable”, “renewable energy” or “public transport”, then explain the effect.'},
+ 7:{part:3,minSeconds:30,minVoiced:15,minWords:12,minUnique:8,tryMinWords:10,minTryUnique:7,minGroups:2,groups:[/\bfluency\b|\bcoherence\b/,/\blexical\b|\bvocabulary\b/,/\bgrammar\b|\bgrammatical\b/,/\bpronunciation\b/],challenge:'Explain at least two IELTS criteria and give one practical action for improving each. Use the criterion names in your explanation.'},
+  8:{part:1,minSeconds:30,minVoiced:15,minWords:12,minUnique:8,tryMinWords:10,minTryUnique:7,minGroups:2,groups:[/\bbecause\b/,/\bhowever\b/,/\bfor example\b|\bfor instance\b/,/\bas a result\b/,/\balthough\b/,/\bon the other hand\b/],contextGroups:[/\b(?:bus|train|bicycle|bike|car|walk|transport|school|work|university)\b/],challenge:'Answer how you travel to school or work. Use two different linking phrases in full sentences, and explain your choice with a real detail.'},
+ 9:{part:1,minSeconds:30,minVoiced:15,minWords:12,minUnique:8,tryMinWords:10,minTryUnique:7,minGroups:2,groups:[/\b(?:machine|appliance|device|object)\b/,/\b(?:keeps|keep|kept) (?:the )?food cold\b|\bcold food\b/],forbidden:/\b(?:fridge|refrigerator)\b/,challenge:'Describe a machine or appliance that keeps food cold without saying its name. Explain what it does and when someone might use it; avoid the words “fridge” and “refrigerator”.'},
+ 10:{part:1,minSeconds:30,minVoiced:15,minWords:12,minUnique:8,tryMinWords:10,minTryUnique:7,minGroups:2,groups:[/\bmake progress\b|\btake advantage of\b|\bplay a role in\b|\bheavy workload\b|\braise awareness\b/,/\b(?:spare time|free time|hobby|relax|enjoy)\b/],challenge:'Talk about something you do in your spare time. Use one collocation from the lesson in a complete sentence and explain why that activity matters to you.'},
+ 11:{part:3,minSeconds:30,minVoiced:15,minWords:12,minUnique:8,tryMinWords:12,minTryUnique:8,minGroups:2,groups:[/\b(?:hesitat|pause|fluently|fluent)\w*\b/,/\b(?:flexible|precise|collocation|vocabulary)\b/,/\b(?:complex|accurate|accuracy|error)\w*\b/,/\b(?:repeat|repetition|natural)\w*\b/],challenge:'Compare Band 6 with Band 7 by naming at least two differences from the lesson. Finish with one specific practice goal; do not claim that one answer guarantees a band.'},
+ 12:{part:1,minSeconds:30,minVoiced:15,minWords:12,minUnique:8,tryMinWords:10,minTryUnique:7,minGroups:2,groups:[/\b(?:next week|this week|tomorrow|every day|daily|in a month|over the next month)\b/,/\b(?:practise|practice|record|listen|review|repeat|study)\b/],challenge:'Describe a realistic plan for the next month. Mention when you will practise and at least two actions, such as recording yourself and reviewing a recurring error.'},
+ 13:{part:1,minSeconds:30,minVoiced:15,minWords:12,minUnique:8,tryMinWords:10,minTryUnique:7,minGroups:8,
+  groups:[/\bbat\b/,/\bbad\b/,/\bthin\b/,/\bthen\b/,/\bship\b/,/\bchip\b/,/\bphotograph\b/,/\bphotography\b/],
+  contextGroups:[/\b(?:sound|sounds|stress|stressed|change|changes|voiced|unvoiced|tongue)\b/],
+  pronunciationReference:'bat bad thin then ship chip photograph photography',
+  challenge:'Read these four pairs clearly: bat/bad, thin/then, ship/chip and photograph/photography. Explain which final sound, first sound or stressed syllable changes. Repeat the pairs once, then add one sentence about the sound differences.'}
+};
+function pathRule(itemOrId){const id=typeof itemOrId==='object'?itemOrId?.id:itemOrId;return PATH_LESSON_RULES[id]||{part:1,minSeconds:30,minVoiced:15,minWords:12,minUnique:8,tryMinWords:8,minTryUnique:6,minGroups:1,groups:[]}}
+function pathWordList(text){return String(text||'').toLowerCase().match(/[a-z]+(?:['’][a-z]+)*/g)||[]}
+const PATH_COMMON_WORDS=new Set(('a an the and or but if then so as of to in on at by for from with is are was were am be been being it its this that these those i me my we us our you your he she they them their who what when where why how do does did have has had can could will would should may might must not no yes very more most some any each every much many also really just than there here because while although after before during into out up down off over under again own all only one two first last next same different').split(/\s+/));
+function pathEvidence(id,text,stage='challenge'){
+ const rule=pathRule(id),line=String(text||'').toLowerCase().replace(/[’]/g,"'");
+ const words=pathWordList(line),unique=new Set(words),contentWords=words.filter(word=>!PATH_COMMON_WORDS.has(word)),contentUnique=new Set(contentWords);
+ const uniqueRatio=contentWords.length?contentUnique.size/contentWords.length:0;
+ const minWords=stage==='try'?rule.tryMinWords||8:rule.minWords||12;
+ const minUnique=stage==='try'?rule.minTryUnique||6:rule.minUnique||8;
+ const hits=(rule.groups||[]).filter(pattern=>pattern.test(line)).length;
+ const required=stage==='try'?Math.min(rule.minGroups||1,Math.max(1,(rule.groups||[]).length)):rule.minGroups||1;
+ const contextHits=(rule.contextGroups||[]).filter(pattern=>pattern.test(line)).length,contextRequired=rule.contextGroups?.length?1:0;
+ const minRatio=stage==='try'?.3:.4,tooRepetitive=stage==='challenge'&&uniqueRatio<minRatio;
+ const passed=words.length>=minWords&&contentUnique.size>=minUnique&&unique.size>=minUnique&&hits>=required&&contextHits>=contextRequired&&!tooRepetitive&&!(stage==='challenge'&&rule.forbidden?.test(line));
+ return {passed,words:words.length,unique:contentUnique.size,hits,required,contextHits,contextRequired,uniqueRatio,minRatio,tooRepetitive,minWords,minUnique,forbidden:stage==='challenge'&&Boolean(rule.forbidden?.test(line))};
+}
+function pathEvidenceText(evidence,stage='challenge'){
+ if(evidence.forbidden)return 'Bản chép có từ cần tránh trong nhiệm vụ. Hãy thu lại và mô tả bằng cách khác.';
+ const missing=[];
+ if(evidence.words<evidence.minWords)missing.push('cần ít nhất '+evidence.minWords+' từ (hiện có '+evidence.words+')');
+ if(evidence.unique<evidence.minUnique)missing.push('cần '+evidence.minUnique+' từ khác nhau có nội dung (hiện có '+evidence.unique+')');
+ if(evidence.hits<evidence.required)missing.push('thiếu '+(evidence.required-evidence.hits)+' ý/từ khóa của bài');
+ if(evidence.contextHits<evidence.contextRequired)missing.push('hãy thêm câu giải thích hoặc ví dụ liên quan đến bài');
+ if(evidence.tooRepetitive)missing.push('bản chép lặp từ nhiều; hãy giải thích bằng câu mới');
+ return missing.length?'Chưa đạt: '+missing.join('; ')+'.':'Đã thấy đủ số từ và nội dung mục tiêu.';
+}
+let pathTryReview=null;
 const PATH_WEEKS=[
  ['Tuần 1','Luyện phát âm và Part 1 mỗi ngày.'],
  ['Tuần 2','Chuẩn bị ý trong một phút, sau đó tập nói Part 2 trong 1,5–2 phút.'],
@@ -4438,6 +4500,7 @@ function pathLesson(){
  if(!item||!pathAllowed(item.id)){pathView=null;return pathMap()}
  const active=st.learningPath.active,step=active?.id===item.id?active.step:0;
  const [group,title,description]=LS[item.id];
+ const rule=pathRule(item),review=pathTryReview?.id===item.id?pathTryReview:null;
  const heading=`<button type="button" class="g" onclick="showPathMap()">← Bản đồ lộ trình</button><article class="c path-lesson">
   <p class="eyebrow">TUẦN ${item.week} · ${esc(group)} · BƯỚC ${step+1}/3</p><h1>${esc(title)}</h1>
   <progress max="3" value="${step+1}" aria-label="Bước của bài học"></progress>${step===0&&item.id===13?minimalPairMarkup():''}`;
@@ -4445,10 +4508,12 @@ function pathLesson(){
   <div class="row"><button class="g" data-example="${esc(item.example)}" onclick="say(this.dataset.example,.9)">Nghe ví dụ</button>
   <button onclick="advancePathLesson(1)">Tiếp tục</button></div></article>`;
  if(step===1)return heading+`<h2>2. Làm thử một câu</h2><p lang="en">${esc(item.question)}</p>
-  <form onsubmit="submitPathTry(event)"><label>Câu trả lời bằng tiếng Anh<textarea name="answer" lang="en" rows="3" required></textarea></label>
-  <p id="path-try-status" role="status"></p><div class="row"><button type="button" class="g" onclick="advancePathLesson(0)">Quay lại</button><button type="submit">Tiếp tục</button></div></form></article>`;
- return heading+`<h2>3. Thử thách nói 30 giây</h2><p lang="en">${esc(item.question)}</p>
-  <p>Ghi âm ít nhất 30 giây, gồm tối thiểu 15 giây có giọng nói được phát hiện. Kiểm tra bản chép lời có ít nhất 12 từ tiếng Anh, gồm 6 từ khác nhau rồi chấm. Hoàn thành bài để mở chặng tiếp theo và nhận 20 XP một lần.</p>
+  <form onsubmit="submitPathTry(event)"><label>Câu trả lời bằng tiếng Anh<textarea name="answer" lang="en" rows="4" required oninput="invalidatePathTry(this)">${esc(review?.answer||'')}</textarea></label>
+   ${review?pathTryFeedback(review):''}<p id="path-try-edit-status" role="status"></p><p class="mu">Bước này chấm nội dung và ngữ pháp từ câu bạn nhập. Phát âm chỉ được đánh giá từ bản ghi ở thử thách nói.</p>
+   <div class="row"><button type="button" class="g" onclick="advancePathLesson(0)">Quay lại</button><button type="submit">Chấm câu trả lời</button>${review?.passed?'<button id="path-try-next" type="button" onclick="advancePathLesson(2)">Tiếp tục thử thách</button>':''}</div></form></article>`;
+ const challengeTitle=rule.part===2?'3. Thử thách Part 2 · ít nhất 90 giây':'3. Thử thách nói 30 giây theo bài học';
+ return heading+`<h2>${challengeTitle}</h2><p>${esc(rule.challenge||item.question)}</p>
+  <p>Ghi âm theo đúng nhiệm vụ trên. Bài chỉ hoàn thành khi bản ghi đủ thời lượng, có giọng nói rõ và bản chép lời thể hiện các từ hoặc ý mục tiêu. ${rule.pronunciationReference?'Ứng dụng cũng sẽ đối chiếu phát âm với các từ/cụm đang luyện. ':''}Nói lặp một cụm để kéo dài bản ghi sẽ không đạt. Ứng dụng dò từ khóa và cụm mục tiêu; đây là kiểm tra tự động giới hạn, không thay đánh giá ngữ nghĩa của giáo viên. Bài hoàn thành mở chặng tiếp theo và nhận 20 XP một lần.</p>
   <div class="row"><button class="g" onclick="advancePathLesson(1)">Quay lại</button><button onclick="startPathChallenge()">Bắt đầu thử thách</button></div></article>`;
 }
 function pathLessonsPage(){return pathView==null?pathMap():pathLesson()}
@@ -4456,38 +4521,77 @@ function showPathMap(){pathView=null;tab='les';openView()}
 function openPathLesson(id){
  if(!pathAllowed(id))return;
  const active=st.learningPath.active;
- if(!active||active.id!==id)setPathActive(id,0);
+ if(!active||active.id!==id){setPathActive(id,0);pathTryReview=null}
  pathView=id;tab='les';openView();
 }
 function advancePathLesson(step){
- if(pathView==null||![0,1].includes(step))return;
+ const active=st.learningPath.active;
+ if(pathView==null||active?.id!==pathView||![0,1,2].includes(step))return;
+ if(step===0&&active.step!==1)return;
+ if(step===1&&![0,2].includes(active.step))return;
+ if(step===2&&(active.step!==1||pathTryReview?.id!==pathView||!pathTryReview.passed))return;
  setPathActive(pathView,step);openView();
 }
 function submitPathTry(event){
  event.preventDefault();
- const value=event.currentTarget.elements.answer.value;
- if((value.match(/[a-z]+(?:'[a-z]+)*/gi)||[]).length<5){
-  $('#path-try-status').textContent='Hãy viết ít nhất 5 từ tiếng Anh rồi tiếp tục.';return;
- }
- setPathActive(pathView,2);openView();
+ const item=PATH_LESSONS.find(entry=>entry.id===pathView);
+ if(!item||st.learningPath.active?.id!==item.id||st.learningPath.active.step!==1)return;
+ const value=event.currentTarget.elements.answer.value.trim(),rule=pathRule(item),evidence=pathEvidence(item.id,value,'try'),scored=score(value,rule.part,0);
+ const scorePassed=Boolean(scored&&scored.o>=4.5),passed=evidence.passed&&scorePassed;
+ pathTryReview={id:item.id,answer:value,evidence,score:scored,scorePassed,passed};
+ openView();
+}
+function invalidatePathTry(input){
+ if(pathTryReview?.id!==pathView||pathTryReview.answer===input.value.trim())return;
+ pathTryReview=null;
+ $('#path-try-review')?.remove();$('#path-try-next')?.remove();
+ const status=$('#path-try-edit-status');if(status)status.textContent='Câu trả lời đã đổi. Hãy chấm lại để xem đánh giá mới.';
+}
+function pathTryFeedback(review){
+ const scores=review.score?`<p>Điểm ước tính cho văn bản: ${bandRange(review.score.o)} · Lưu loát ${bandNumber(review.score.f)} · Từ vựng ${bandNumber(review.score.l)} · Ngữ pháp ${bandNumber(review.score.g)}.</p>`:'<p>Chưa đủ văn bản để ước tính các tiêu chí.</p>';
+ const content=pathEvidenceText(review.evidence,'try');
+ const feedback=review.passed?'Đạt mục tiêu nội dung của bài. Bạn có thể sang thử thách nói.':[
+  !review.evidence.passed?content:'',!review.scorePassed?'Điểm văn bản hiện dưới ngưỡng luyện tập 4.5. Thử thêm câu trả lời rõ ý với lý do hoặc ví dụ.':''
+ ].filter(Boolean).join(' ');
+ return `<section id="path-try-review" class="path-try-feedback" aria-live="polite"><h3>${review.passed?'Đã chấm · có thể tiếp tục':'Đã chấm · hãy chỉnh câu trả lời'}</h3>${scores}<p>${esc(feedback)}</p><p class="mu">Đây là phản hồi ước tính để luyện tập, không phải điểm IELTS chính thức.</p></section>`;
 }
 function startPathChallenge(){
  const item=PATH_LESSONS.find(entry=>entry.id===pathView);
  if(!item||!pathAllowed(item.id)||st.learningPath.active?.step!==2)return;
+ const rule=pathRule(item);
  stopPracticeMedia();
- S={mode:'lesson',pathLesson:item.id,it:[{p:1,t:'Bài học: '+LS[item.id][1],q:item.question,k:0,pathChallenge:true}],i:0,res:[],result:null};
+ S={mode:'lesson',pathLesson:item.id,it:[{p:rule.part,t:'Bài học: '+LS[item.id][1],q:rule.challenge||item.question,k:0,pathChallenge:true}],i:0,res:[],result:null};
  tab='prac';openView();
 }
 
 function pathResultControls(result){
  if(!result.pathMode)return '<button class="w" onclick="nextCue()">'+(S.i+1<S.it.length?'Câu tiếp theo':'Xem kết quả bài luyện')+' '+icon('arrow')+'</button>';
  const label=result.pathMode==='baseline'?'Xem lộ trình':'Về lộ trình';
- const status=result.pathComplete?result.pathMessage:result.state==='pending'?'Đang kiểm tra giọng nói…':'Cần bản ghi từ 30 giây và ít nhất 15 giây có giọng nói được phát hiện.';
+ const status=result.pathMessage||(result.state==='pending'?'Đang kiểm tra bản ghi…':'Chưa hoàn tất thử thách.');
  return `<p id="path-result-status" role="status">${esc(status)}</p><button class="w" id="path-result-done" onclick="finishPathChallenge()"${result.pathComplete?'':' disabled'}>${label}</button>`;
 }
 
 function recordPathChallenge(result){
- if(!result.pathMode||!result.spoken||result.duration<30||!(result.m?.voicedSeconds>=15))return false;
+ if(!result.pathMode)return false;
+ if(result.pathComplete)return true;
+ if(result.pathMode==='baseline'){
+  if(!result.blob||result.duration<30||!(result.m?.voicedSeconds>=15)){
+   result.pathMessage='Cần bản ghi 30 giây, trong đó tối thiểu 15 giây có giọng nói được phát hiện.';return false;
+  }
+ }else{
+  const item=PATH_LESSONS.find(entry=>entry.id===result.pathLesson);
+  if(!item||!pathAllowed(item.id))return false;
+  const rule=pathRule(item),evidence=pathEvidence(item.id,result.text,'challenge');
+  if(!result.blob||result.duration<rule.minSeconds){result.pathMessage='Cần bản ghi ít nhất '+rule.minSeconds+' giây cho nhiệm vụ này.';return false}
+  if(!(result.m?.voicedSeconds>=rule.minVoiced)){result.pathMessage='Chưa phát hiện đủ giọng nói rõ. Cần tối thiểu '+rule.minVoiced+' giây giọng nói trong bản ghi.';return false}
+  if(!evidence.passed){result.pathMessage=pathEvidenceText(evidence);return false}
+  if(rule.pronunciationReference){
+   const check=result.pron?.checks?.self;
+   if(result.pron?.busy){result.pathMessage='Đang đối chiếu pronunciation với các từ/cụm mục tiêu…';return false}
+   if(check?.reference?.trim()!==rule.pronunciationReference||!check?.grade){result.pathMessage='Chưa có đủ dữ liệu để chấm pronunciation của các từ/cụm mục tiêu. Hãy kiểm tra bản ghi và chấm lại phát âm.';return false}
+   if(check.grade.limited){result.pathMessage='Tín hiệu phát âm chưa đủ rõ để xác nhận mục tiêu. Hãy nói gần micro hơn, đọc rõ các cặp từ/cụm rồi ghi lại.';return false}
+  }
+ }
  st.learningPath=mergeLearningPath(st.learningPath,storedEpu()?.learningPath);
  if(result.pathMode==='baseline'){
   updatePathSetup({done:true,deferred:false,step:2,baseline:{o:result.s.o,f:result.s.f,l:result.s.l,g:result.s.g,at:Date.now()}});
@@ -4512,6 +4616,12 @@ function recordPathChallenge(result){
  }
  result.pathComplete=true;
  return true;
+}
+function updatePathChallengeStatus(result){
+ if(tab!=='prac'||S?.result!==result||!result.pathMode)return;
+ const status=$('#path-result-status'),button=$('#path-result-done');
+ if(status)status.textContent=result.pathMessage||'Chưa hoàn tất thử thách.';
+ if(button)button.disabled=!result.pathComplete;
 }
 
 function finishPathChallenge(){
