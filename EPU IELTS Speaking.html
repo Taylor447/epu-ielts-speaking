@@ -767,6 +767,16 @@ body > nav button.on { background: color-mix(in srgb,var(--pr) 17%,transparent);
 .path-week li.is-locked { opacity: .7; }
 .path-lesson progress { width: 100%; accent-color: var(--pr); }
 .path-lesson blockquote { margin: 12px 0; padding: 12px; border-inline-start: 3px solid var(--pr); background: var(--sf); }
+.path-lesson-intro { font-size: 1.08em; color: var(--mu); }
+.path-study-sections { display: grid; gap: 12px; margin: 18px 0; }
+.path-study-section, .path-lesson-model { padding: 15px; border: 1px solid var(--bd); border-radius: 12px; background: var(--sf); }
+.path-study-section h2, .path-lesson-model h2 { margin: 0 0 8px; font-size: 1.12em; }
+.path-study-section p { margin: 6px 0; }
+.path-study-examples { display: grid; gap: 8px; list-style: none; padding: 0; margin: 12px 0 0; }
+.path-study-examples li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 9px 10px; border: 1px solid var(--bd); border-radius: 9px; }
+.path-study-examples [lang="en"] { font-weight: 650; }
+.path-lesson-model { margin: 14px 0; }
+.path-lesson-model blockquote { line-height: 1.7; }
 @media (max-width: 700px) {
  .review-switch { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 8px; }
  .review-switch button { padding-inline: 5px; font-size: clamp(11px, 3.55vw, 14px); }
@@ -1866,7 +1876,32 @@ function quickRewardText(result){
  if(result.quickChecked)return 'Chưa cộng XP lượt nhanh: cần bản ghi có ít nhất 15 giây giọng nói và câu trả lời có 12 từ.';
  return 'Đang kiểm tra bản ghi để xác nhận XP…';
 }
-const say=(t,rate=1)=>{try{speechSynthesis.cancel();speechSynthesis.speak(Object.assign(new SpeechSynthesisUtterance(t),{lang:'en-US',rate}))}catch(e){}};
+const IPA_SPEECH={
+ s:'unvoiced S sound',z:'voiced Z sound',t:'unvoiced T sound',d:'voiced D sound',
+ 'tʃ':'CH sound as in chip','dʒ':'J sound as in job',θ:'TH sound as in thin',ð:'TH sound as in then',
+ ʃ:'SH sound as in ship',ʒ:'ZH sound',ə:'schwa sound',ɪ:'short I sound','iː':'long E sound',
+ æ:'short A sound',ʌ:'short U sound',ʊ:'short U sound','uː':'long OO sound','ɑː':'long AH sound',
+ 'ɔː':'AW sound','ɜː':'ER sound',ŋ:'NG sound',eɪ:'long A sound',aɪ:'eye sound',aʊ:'ow sound',ɔɪ:'oy sound'
+};
+const IPA_ONSETS=new Set(['thin/θ','then/ð','think/θ','this/ð','ship/ʃ','chip/tʃ','sheep/ʃ','cheap/tʃ']);
+function speechSampleText(value){
+ let text=String(value||'')
+  .replace(/\(danh từ\)/gi,'noun').replace(/\(động từ\)/gi,'verb')
+  .replace(/\bPHOtograph\s*→\s*phoTOgraphy\b/g,'the stress shifts from photograph to photography')
+  .replace(/\bPREsent\s+noun\s*→\s*preSENT\s+verb\b/g,'the stress shifts from PREsent, as a noun, to preSENT, as a verb');
+ text=text.replace(/([A-Za-z]+)\s+\/([^/\s]+)\//g,(match,word,phoneme)=>{
+  const sound=IPA_SPEECH[phoneme];
+  if(!sound)return match;
+  return word+(IPA_ONSETS.has(word.toLowerCase()+'/'+phoneme)?', beginning with the ':', ending in the ')+sound;
+ });
+ text=text.replace(/\/([^/\s]+)\//g,(match,phoneme)=>IPA_SPEECH[phoneme]||('the '+phoneme+' sound'));
+ const stressNotation=/\b(?:PHOtograph|phoTOgraphy|PREsent|preSENT)\b/.test(text);
+ const sequenceNotation=/\b(?:Answer|Point|Explain|Example|Link|When|where|who|what happened|why it mattered)\b/i.test(text);
+ text=text.replace(/→/g,stressNotation?', the stress changes to ':sequenceNotation?', then ':' can be rephrased as ');
+ text=text.replace(/‿/g,' ').replace(/\s+[–—]\s+/g,'; ').replace(/\s*\/\s*/g,', or ');
+ return text.replace(/[()[\\]{}]/g,' ').replace(/\s+([,;:.!?])/g,'$1').replace(/\s+/g,' ').trim();
+}
+const say=(t,rate=1)=>{try{speechSynthesis.cancel();speechSynthesis.speak(Object.assign(new SpeechSynthesisUtterance(speechSampleText(t)),{lang:'en-US',rate}))}catch(e){}};
 function addV(i,ti){const w=VT[TP[ti][0]][i].split('|');if(!st.c.some(x=>x.w==w[0])){st.c.unshift({w:w[0],m:w[1],e:'',k:0});sv()}$('#v'+i).textContent='✓ Đã lưu';$('#v'+i).disabled=true}
 function aid(x){let a=EX[x.t][x.p];if(x.p!=2)a=a[x.k];const ti=TP.findIndex(T=>T[0]==x.t);return `<details><summary>Gợi ý trả lời</summary><p>${HF[x.p-1]}</p><p>${HT[x.t][x.p-1]}</p></details><details><summary>Từ vựng theo chủ đề</summary>${VT[x.t].map((w,i)=>{w=w.split('|');return `<div class='r'><span><b>${w[0]}</b> · ${w[1]}</span><button class='g' id='v${i}' onclick='addV(${i},${ti})'>Lưu</button></div>`}).join('')}</details><details><summary>Ngữ pháp gợi ý</summary><p>${GR[x.p-1]}</p></details><details><summary>Câu trả lời mẫu</summary><p lang="en">${a}</p><button class='g' onclick='say(this.previousElementSibling.textContent)'>🔊 Nghe</button></details>`}
 
@@ -2827,14 +2862,14 @@ function sess(){
  if(!x)return summary();
  const ti=TP.findIndex(([name])=>name===x.t);
  return `<article class="c practice-card">
-  <div class="session-meta"><span class="part-index">${x.pathChallenge?(x.p===2?'THỬ THÁCH PART 2':'THỬ THÁCH 30 GIÂY THEO BÀI'):x.pairPractice?'LUYỆN CẶP ÂM':S.mode==='quick'?'NÓI NHANH 60 GIÂY':'PART 0'+x.p+' · CÂU '+(S.i+1)+'/'+S.it.length}</span>
+  <div class="session-meta"><span class="part-index">${x.pathChallenge?'BÀI NÓI THỬ ĐẦU VÀO':x.pairPractice?'LUYỆN CẶP ÂM':S.mode==='quick'?'NÓI NHANH 60 GIÂY':'PART 0'+x.p+' · CÂU '+(S.i+1)+'/'+S.it.length}</span>
  ${x.pathChallenge||x.pairPractice?'<span class="topic-badge">'+esc(x.t)+'</span>':x.forecast?'<span class="topic-badge">Forecast · '+esc(x.t)+'</span>':`<span class="topic-badge topic-${ti}">${icon(TOPIC_ICONS[ti]||'study','topic-icon')} ${esc(x.t)}</span>`}</div>
  <h1 lang="en"${x.forecast?' class="review-prompt"':''}>${esc(x.q)}</h1>
  ${S.mode==='quick'?'<p class="quick-timer" id="quick-timer" role="status" aria-live="polite">Đang mở micro…</p>':''}
  ${S.retake?'<aside class="retake-note" aria-live="polite"><p>Bạn đang thu lại câu này. Sau khi chấm, kết quả mới sẽ thay cho kết quả cũ.</p><button type="button" class="g" onclick="restorePreviousAnswer()">← Quay lại kết quả trước</button></aside>':''}
  ${S.result?'':`${x.p===2?'<button class="g" id="prep" onclick="prep()">Chuẩn bị 60 giây</button>':''}
  ${recordingMarkup()}`}
-  <div class="study-tools">${x.pathChallenge?'<p class="mu">Ghi âm ít nhất '+pathRule(S.pathLesson).minSeconds+' giây (ít nhất '+pathRule(S.pathLesson).minVoiced+' giây có giọng nói rõ). Hãy làm đúng nhiệm vụ bài học; bản chép lời và, nếu có, phép đối chiếu pronunciation sẽ được kiểm tra trước khi mở chặng.</p>':x.pairPractice?'<p class="mu">Ghi âm khi đọc các cặp từ; bản chép lời và phần phân tích âm thanh sẽ giúp bạn tự đối chiếu cách phát âm.</p>':x.forecast?reviewForecastAid(x):aid(x)}</div><div id="after"></div>
+  <div class="study-tools">${x.pathChallenge?'<p class="mu">Đây là phần nói thử đầu vào, dùng để ước tính mức xuất phát cho lộ trình.</p>':x.pairPractice?'<p class="mu">Ghi âm khi đọc các cặp từ; bản chép lời và phần phân tích âm thanh sẽ giúp bạn tự đối chiếu cách phát âm.</p>':x.forecast?reviewForecastAid(x):aid(x)}</div><div id="after"></div>
  <section id="evaluation">${S.result?resultHTML(S.result):''}</section></article>
  <button class="g w" onclick="leavePractice()">Thoát bài luyện</button>`;
 }
@@ -2874,9 +2909,8 @@ function restorePreviousAnswer(){
 function ev(){
  const input=$('#tx'),out=$('#evaluation'),x=S?.it[S.i];
  if(!input||!out||!x||S.result)return;
-  const pathMinimum=S.mode==='lesson'?pathRule(S.pathLesson).minSeconds:30;
-  if((S.mode==='baseline'||S.mode==='lesson')&&(!lb||dur<pathMinimum)){
-   out.innerHTML='<p role="alert">Hãy ghi âm ít nhất '+pathMinimum+' giây cho thử thách này trước khi chấm.</p>';return;
+  if(S.mode==='baseline'&&(!lb||dur<30)){
+   out.innerHTML='<p role="alert">Hãy ghi âm ít nhất 30 giây trước khi chấm mức xuất phát.</p>';return;
  }
  const s=score(input.value,x.p,lb?dur:0);
  if(!s){
@@ -2887,8 +2921,7 @@ function ev(){
  const confirmed=$('#pron-confirm')?.checked;
  const previous=S.retake;
  const blob=lb,result={x,s,blob,text:input.value.trim(),m:null,state:blob?'pending':'no-recording',pron:S.pronDraft?.pron,whisper:S.pronDraft?.whisper,duration:dur,
-  pathMode:['baseline','lesson'].includes(S.mode)?S.mode:null,pathLesson:S.pathLesson,quickMode:S.mode==='quick',pairPractice:x.pairPractice===true};
-  if(result.pathMode==='lesson'&&pathRule(result.pathLesson).pronunciationReference)result.pronunciationReference=pathRule(result.pathLesson).pronunciationReference;
+   pathMode:S.mode==='baseline'?'baseline':null,quickMode:S.mode==='quick',pairPractice:x.pairPractice===true};
  if(activePronunciation&&activePronunciation.result===S.pronDraft)activePronunciation.result=result;
  cancelTranscription();S.pronDraft=null;$('#free-pron')?.remove();$('#ai-whisper-container')?.remove();
  S.result=result;
@@ -2907,12 +2940,11 @@ function ev(){
  gamePractice(result,Date.now(),gameBefore);
  sv();
  if(blob){
-   result.pron??={reference:result.pronunciationReference||result.text};
-   if(result.pronunciationReference)result.pron.reference=result.pronunciationReference;
+    result.pron??={reference:result.text};
   if(!result.pron.mode)result.pron.mode='self';
   if(result.pron.mode==='self'&&!result.pron.reference)result.pron.reference=result.text;
  }
-  if(blob&&result.pron.assessment?.reference!==result.pron.reference)delete result.pron.assessment;
+  if(blob&&result.pron.assessment?.reference!==result.text)delete result.pron.assessment;
  applyPronunciationBand(result);
  input.readOnly=true;
  const confirmation=$('#pron-confirm');
@@ -3447,12 +3479,11 @@ function runFreePronunciationCheck(useSample){
 function measureConfirmedPronunciation(result){
   const state=result.pron;
   if(state.busy){
-    const reference=result.pronunciationReference||result.text;
-    state.pendingSelf=state.mode!=='self'||state.reference.trim()!==reference;
+    state.pendingSelf=state.mode!=='self'||state.reference.trim()!==result.text;
     return;
   }
   state.mode='self';
-  state.reference=result.pronunciationReference||result.text;
+  state.reference=result.text;
   void measurePronunciation();
 }
 async function measurePronunciation(){
@@ -3508,10 +3539,6 @@ async function measurePronunciation(){
         measureConfirmedPronunciation(owner);
       }else{
         refreshPronunciation(owner);
-         if(owner.pathMode==='lesson'){
-          recordPathChallenge(owner);
-          updatePathChallengeStatus(owner);
-         }
       }
     }
   }
@@ -4270,21 +4297,115 @@ function gameProfile(){
 
 // Nội dung ví dụ và câu hỏi cho từng bài trong LS.
 const PATH_LESSONS=[
- {id:0,week:1,example:'Keep the final sound clear: rice /s/ – rise /z/, seat /t/ – seed /d/, coat /t/ – code /d/, bat /t/ – bad /d/. Then use one word in a sentence: “I checked the code and took my seat.”',question:'Read rice/rise, seat/seed, coat/code and bat/bad. Which final sounds change? Then make one sentence with a pair word.'},
- {id:13,week:1,example:'“bat” ends in /t/; “bad” ends in /d/. “thin/then” contrasts /θ/ and /ð/, “ship/chip” contrasts /ʃ/ and /tʃ/, and the stress changes in PHOtograph/phoTOgraphy.',question:'Practise one pair for each contrast: bat/bad, thin/then, ship/chip and photograph/photography. Which sound or stressed syllable changes?'},
- {id:1,week:1,example:'Link the words across boundaries: “Could‿you pick‿it‿up for me?” Say it smoothly, then try “Please‿take‿it‿out” and “Turn‿it‿off after class.”',question:'Practise “Could you pick it up for me?”, “Please take it out” and “Turn it off after class”. Then explain how you would ask a classmate for help.'},
- {id:3,week:1,example:'Yes, I do. I enjoy reading because it helps me relax. For example, I read before bed.',question:'Do you enjoy reading? Why?'},
- {id:4,week:2,example:'I would like to describe a place I visited last summer, which was a small coastal town called Quy Nhon. I went there with my family for three days. It is in central Vietnam, and we travelled there by train because we wanted to enjoy the scenery. During the day, we walked along the beach, tried local seafood and visited a quiet fishing village nearby. One evening, we watched the sunset from a hill overlooking the sea. The place was special because it felt peaceful, even though it was a popular holiday destination. I remember the sound of the waves and the fresh air most clearly. I felt relaxed and closer to my family because we spent time together without rushing. I would happily return there, perhaps during the winter, when it is less crowded. That trip remains one of my favourite memories.',question:'Describe a place you enjoyed visiting and say why.'},
- {id:2,week:2,example:'I usually study at home, but last weekend I visited a friend and we worked together.',question:'Describe something you usually do and something you did recently.'},
- {id:8,week:2,example:'To be honest, I prefer the bus because it is affordable. For example, I use it to travel to university.',question:'How do you usually travel to school or work?'},
- {id:5,week:3,example:'Public parks are important because they give people space to relax. For example, families can exercise together.',question:'Why are public parks useful for communities?'},
- {id:6,week:3,example:'Public transport is convenient, and it can help reduce pollution in busy cities.',question:'How can people reduce pollution in their city?'},
- {id:9,week:3,example:'It is a small machine that keeps food cold. I mean, it is a refrigerator.',question:'Describe an object without saying its name.'},
- {id:10,week:3,example:'In my spare time, I enjoy listening to music. It plays an important role in helping me relax.',question:'What do you like doing in your spare time?'},
- {id:7,week:4,example:'Fluency: I speak without long pauses. Lexical Resource: I use precise words. Grammar: I vary sentence forms accurately. Pronunciation: my words are easy to understand.',question:'Choose two IELTS Speaking criteria, explain what each measures and give one example of how you can improve them.'},
- {id:11,week:4,example:'A Band 6 speaker can explain ideas with some hesitation and errors. A Band 7 speaker develops ideas more fluently, uses flexible vocabulary and makes fewer errors.',question:'Compare Band 6 and Band 7 speaking. Give two specific differences and one practice goal.'},
- {id:12,week:4,example:'I practise speaking every day and listen to my recordings to notice what I can improve.',question:'How will you practise speaking over the next month?'}
+ {id:0,week:1,example:'The final sounds in rice and rise are different: /s/ is unvoiced, while /z/ is voiced. The same contrast appears in seat and seed. I try to keep the last sound clear without adding an extra vowel, because a small sound change can change the word.',question:'Read rice/rise, seat/seed, coat/code and bat/bad. Which final sounds change? Then make one sentence with a pair word.'},
+ {id:13,week:1,example:'In thin, the tongue comes lightly between the teeth and air passes through; in then, the same position is voiced. Ship begins with a continuous /ʃ/, while chip begins with a short /tʃ/. In photography, the main stress moves compared with photograph.',question:'Practise one pair for each contrast: bat/bad, thin/then, ship/chip and photograph/photography. Which sound or stressed syllable changes?'},
+ {id:1,week:1,example:'Could you pick it up for me? I left my notebook in the classroom. Please take it out of the bag and give it to me after the lesson. I connect the final consonant of one word to the next vowel, but keep the important words clear and pause at the end of each thought.',question:'Practise “Could you pick it up for me?”, “Please take it out” and “Turn it off after class”. Then explain how you would ask a classmate for help.'},
+ {id:3,week:1,example:'Yes, I do. I enjoy reading because it helps me slow down after a busy day. For example, I usually read a few pages before bed, especially when I want a quiet break from using my phone.',question:'Do you enjoy reading? Why?'},
+ {id:4,week:2,example:'I would like to talk about Quy Nhon, a coastal city in central Vietnam that I visited with my family last summer. We stayed there for three days and travelled by train, so the journey itself felt like part of the holiday. On the first morning, we walked along the beach while it was still quiet. Later, we tried fresh seafood at a small restaurant near the fishing harbour. One evening stands out in particular: we went to a hill overlooking the sea and watched the sun set behind the boats. The sky changed from orange to purple. We took a few photos, but spent most of the time talking and enjoying the view. What made the trip special was not only the scenery but also its relaxed pace. At home, everyone is usually busy, so having meals together and exploring without a strict schedule helped me feel closer to my parents. I also learned a little about how local families depend on fishing and tourism. If I returned, I would visit in a quieter season and explore nearby villages. Overall, the trip remains memorable because it combined beautiful views with simple, meaningful time with my family.',question:'Describe a place you enjoyed visiting and say why.'},
+ {id:2,week:2,example:'I usually study at home because I can arrange my notes and work in a quiet room. Last weekend, however, I visited a friend and we worked on a group assignment together. We divided the research, compared our ideas and finished earlier than I expected. It was different from my normal routine, but I enjoyed learning with someone else.',question:'Describe something you usually do and something you did recently.'},
+ {id:8,week:2,example:'To be honest, I usually take the bus to university because it is affordable and I do not have to find a place to park. The journey can be slower during rush hour; however, I use that time to listen to English podcasts. For example, I reviewed a short vocabulary list on the way to class yesterday.',question:'How do you usually travel to school or work?'},
+ {id:5,week:3,example:'Public parks are valuable because they give residents a free place to exercise and spend time outdoors. This is especially useful in crowded neighbourhoods where many people live in apartments without gardens. For example, families can walk together after school, while older residents can meet friends in a safe, familiar place. As a result, a well-maintained park can support both physical health and a stronger sense of community.',question:'Why are public parks useful for communities?'},
+ {id:6,week:3,example:'Cities can reduce pollution by making public transport reliable and convenient. If buses arrive regularly and connect residential areas with schools and workplaces, fewer people may feel they need to drive. For example, a student could take a direct bus instead of using a motorbike for every journey. This would not remove all emissions, but it could reduce traffic and improve local air quality over time.',question:'How can people reduce pollution in their city?'},
+ {id:9,week:3,example:'It is a household appliance that keeps food cold so it stays fresh for longer. It usually has shelves inside and a door at the front. People use it every day to store milk, vegetables and leftovers. I mean, it is the large appliance you would normally find in a kitchen.',question:'Describe an object without saying its name.'},
+ {id:10,week:3,example:'In my spare time, I enjoy listening to music, especially when I am travelling or taking a break from studying. It plays an important role in helping me relax because I can focus on a melody instead of thinking about deadlines. I also share playlists with my friends, so this hobby gives us something easy to talk about.',question:'What do you like doing in your spare time?'},
+ {id:7,week:4,example:'Fluency and coherence describe how smoothly and logically I develop ideas. Lexical resource is about choosing a range of accurate words, not just difficult ones. Grammar considers both the structures I can use and how accurately I use them. Pronunciation is successful when listeners can understand me without much effort, even if I have an accent.',question:'Choose two IELTS Speaking criteria, explain what each measures and give one example of how you can improve them.'},
+ {id:11,week:4,example:'A Band 6 speaker can usually discuss a topic at length, although hesitation or errors in complex sentences may sometimes affect the flow. At Band 7, the speaker is more able to sustain a long turn, connect ideas flexibly and use a wider range of vocabulary and structures. The difference is not one impressive phrase: it is the overall consistency of the answer across the test.',question:'Compare Band 6 and Band 7 speaking. Give two specific differences and one practice goal.'},
+ {id:12,week:4,example:'Over the next month, I plan to practise speaking for a short time on most days. I will rotate familiar Part 1 topics, longer Part 2 stories and broader Part 3 opinions. I will keep a short record of recurring vocabulary, grammar and pronunciation issues, then revisit those points each week. This routine is realistic because it leaves room for study and rest.',question:'How will you practise speaking over the next month?'}
 ];
+const PATH_LESSON_CONTENT={
+ 0:{intro:'Bài học này giải thích cách tạo và nhận ra /s/, /z/, /t/, /d/ ở cuối từ, vì sao các âm cuối có thể làm đổi nghĩa, và cách xác định trọng âm trong một số từ nhiều âm tiết. Một thay đổi nhỏ ở âm cuối đôi khi tạo thành một từ hoàn toàn khác; phát âm rõ không đồng nghĩa với thêm âm tiết hay nói thật mạnh.',sections:[
+  ['1. Âm cuối được tạo ở đâu?','/s/ và /z/ là âm xát: luồng hơi đi qua khe hẹp gần răng, tạo tiếng rít. /t/ và /d/ là âm tắc: luồng hơi bị chặn ngắn ở vùng lợi ngay sau răng trên rồi được nhả ra hoặc kết thúc gọn. Cả hai cặp dùng vị trí miệng gần nhau; khác biệt quan trọng là cách luồng hơi hoạt động và dây thanh có rung hay không.',['rice /s/ – rise /z/','seat /t/ – seed /d/']],
+  ['2. /s/ và /z/: cùng vị trí, khác độ rung','Với /s/, cổ họng không rung; với /z/, dây thanh rung. Có thể cảm nhận bằng cách đặt tay nhẹ lên cổ, nhưng không cần siết họng hoặc kéo dài âm quá mức. Khi /s/ hay /z/ nằm cuối từ, giữ tiếng rít đủ rõ để phân biệt từ, rồi chuyển tự nhiên sang âm tiếp theo.',['rice /s/ – rise /z/','The rice is ready.','The sun will rise.']],
+  ['3. /t/ và /d/: chặn hơi, giữ kết thúc gọn','/t/ ở cuối seat và /d/ ở cuối seed có cùng điểm chạm của lưỡi nhưng /d/ có rung. Âm cuối trong tiếng Anh có thể được nhả rất nhẹ; người nghe vẫn cần nhận thấy sự khác nhau. Tránh thêm âm /ə/ sau từ: bat-ờ hoặc bad-ờ sẽ làm xuất hiện thêm một âm tiết và khiến nhịp câu không tự nhiên.',['seat /t/ – seed /d/','coat /t/ – code /d/','bat /t/ – bad /d/']],
+  ['4. Vì sao phải giữ âm cuối?','Các cặp này minh họa sự thay đổi nghĩa: rice là gạo, rise là tăng/lên; seat là chỗ ngồi, seed là hạt giống; coat là áo khoác, code là mã; bat là con dơi hoặc gậy đánh bóng, bad là xấu. Âm cuối cũng xuất hiện trong dấu hiệu ngữ pháp như danh từ số nhiều, động từ ngôi thứ ba và dạng quá khứ, vì vậy bỏ âm có thể làm người nghe khó xác định số lượng hoặc thời điểm.',['The code is on my seat.','A bat flew over the field.','She reads before bed.']],
+  ['5. Độ dài nguyên âm là dấu hiệu phụ','Trong nhiều cặp tiếng Anh, nguyên âm thường dài hơn trước phụ âm hữu thanh như /z/ và /d/; trước /s/ và /t/ nguyên âm thường ngắn hơn. Vì thế rise có thể nghe dài hơn rice, còn seed dài hơn seat. Đây là khuynh hướng giúp phân biệt khi nghe, không phải quy tắc thay thế cho phụ âm cuối; vẫn phải nghe cả âm cuối và ngữ cảnh.',['rice – rise','seat – seed','coat – code']],
+  ['6. Trọng âm từ nhiều âm tiết','Một từ có nhiều âm tiết thường có một âm tiết nổi bật hơn nhờ độ rõ, độ dài và cao độ. Các âm tiết không nhấn nhẹ hơn, đôi khi dùng âm yếu như schwa; vì vậy không nên đọc mọi âm tiết với lực ngang nhau. Vị trí trọng âm có thể đổi khi đổi dạng từ, nên hãy ghi nhớ cả âm thanh và loại từ.',['PHOtograph → phoTOgraphy','PREsent (danh từ) → preSENT (động từ)','a comfortable room']],
+  ['7. Những nhầm lẫn thường gặp','Thêm “ờ” sau phụ âm cuối, bỏ âm cuối vì từ đứng cuối câu, hoặc kéo dài mọi nguyên âm như nhau đều làm thay đổi nhịp và độ rõ. Khi nghe mẫu, chú ý từ kết thúc ở đâu, dây thanh có rung không và âm tiết nào nổi bật; không cần tăng âm lượng để tạo sự khác biệt. Trong lời nói nối liền, âm cuối vẫn phải tồn tại dù có thể chuyển động tác miệng liền với từ sau.',['I like rice, but the price is high.','We need a clean seat near the window.']],
+  ['Ghi nhớ nhanh','Cặp /s/–/z/ và /t/–/d/ khác nhau chủ yếu ở độ rung; phụ âm cuối cần được giữ, không thêm nguyên âm phía sau. Trọng âm làm một âm tiết nổi bật hơn các âm tiết còn lại. Tất cả nhằm giúp người nghe hiểu từ dễ dàng, không yêu cầu bắt chước một accent cụ thể.']]},
+ 13:{intro:'Người học tiếng Việt thường thay một số âm tiếng Anh bằng âm gần giống trong tiếng Việt hoặc làm nhẹ âm cuối. Bài này mô tả vị trí lưỡi, luồng hơi, độ rung và trọng âm để bạn hiểu chính xác điểm khác nhau giữa các cặp âm.',sections:[
+  ['1. /θ/ và /ð/: đầu lưỡi giữa hai hàm răng','Đưa nhẹ đầu lưỡi ra giữa hai hàm răng; không cắn mạnh. Với /θ/ trong thin, chỉ đẩy hơi ra và không rung cổ họng. Với /ð/ trong then, giữ vị trí lưỡi tương tự nhưng bật giọng. Đầu lưỡi phải nhìn thấy hoặc chạm rất nhẹ răng, không lùi hẳn vào trong miệng.',['thin /θ/ – then /ð/','think /θ/ – this /ð/','teeth /θ/ – teethe /ð/']],
+  ['2. /ʃ/ và /tʃ/: luồng hơi liên tục – âm bật','/ʃ/ trong ship là tiếng xát kéo dài, luồng hơi đi liên tục và môi hơi tròn. /tʃ/ trong chip bắt đầu bằng điểm chặn ngắn rồi bật ra; không kéo thành một tiếng /ʃ/ đơn thuần. Hai âm thường phân biệt từ có nghĩa khác nhau.',['ship /ʃ/ – chip /tʃ/','sheep /ʃ/ – cheap /tʃ/','wash – watch']],
+  ['3. Giữ rõ /s/, /z/, /t/, /d/ ở cuối từ','Phụ âm cuối vẫn quan trọng dù đôi khi được phát ra nhẹ hoặc không bật mạnh. /s/ và /t/ không rung; /z/ và /d/ có rung. Không bỏ hẳn âm cuối trong danh từ số nhiều, động từ chia ngôi thứ ba hay dạng quá khứ.',['rice /s/ – rise /z/','seat /t/ – seed /d/','worked /t/ – played /d/']],
+  ['4. Trọng âm và nhịp từ nhiều âm tiết','Âm tiết mang trọng âm cần rõ và nổi bật; các âm tiết không nhấn thường nhẹ hơn. Ví dụ photograph nhấn âm đầu, còn photography nhấn âm thứ hai. Đọc từng âm tiết ngang nhau sẽ khiến từ khó nhận ra dù các phụ âm riêng lẻ tương đối đúng.',['PHOtograph → phoTOgraphy','COMfortable','deVELopment']],
+  ['Ghi nhớ nhanh','Đối chiếu một yếu tố tại một thời điểm: vị trí lưỡi, luồng hơi, độ rung hoặc trọng âm. Việc người nghe hiểu rõ quan trọng hơn việc bắt chước một giọng cụ thể.']]},
+ 1:{intro:'Ngữ điệu giúp người nghe nhận biết bạn đang nhấn ý nào, đang liệt kê hay đã kết thúc suy nghĩ. Nối âm làm các từ liền mạch hơn, nhưng vẫn cần giữ nhịp và độ rõ thay vì đọc thật nhanh.',sections:[
+  ['1. Chia câu thành cụm ý','Một câu dài thường gồm các nhóm từ mang chung một ý. Hãy ngắt nhẹ ở ranh giới mệnh đề hoặc sau một thông tin hoàn chỉnh; tránh dừng giữa cụm danh từ hay giữa trợ động từ và động từ chính. Cách chia cụm hợp lý giúp người nghe theo dõi nội dung mà không cần tăng tốc.',['When I need help / I usually ask a classmate.','Last semester / we worked on a group project.']],
+  ['2. Nhấn từ mang thông tin','Danh từ, động từ chính, tính từ và từ phủ định thường mang trọng tâm. Mạo từ, giới từ và đại từ thường nhẹ hơn khi không có ý đối lập. Khi sửa hoặc so sánh, có thể nhấn từ tạo khác biệt: “the BLUE one, not the black one”.',['I NEED a NEW phone.','I wanted the BLUE one, not the black one.']],
+  ['3. Nối phụ âm cuối với nguyên âm đầu','Khi một từ kết thúc bằng phụ âm và từ kế tiếp bắt đầu bằng nguyên âm, lời nói tự nhiên thường chuyển động tác miệng liền nhau. Ví dụ pick‿it nghe liền mạch hơn một khoảng dừng lớn giữa hai từ; không cần chèn thêm nguyên âm. Việc nối âm không có nghĩa là nuốt mất phụ âm cuối.',['pick‿it‿up','turn‿it‿off','Could‿you‿ask‿her?']],
+  ['4. Ngữ điệu theo mục đích câu','Giọng xuống thường báo hiệu một ý đã hoàn tất hoặc một câu trả lời chắc chắn. Giọng lên có thể dùng khi hỏi lựa chọn, xác nhận hoặc khi ý còn tiếp tục; không phải câu hỏi nào cũng cần lên giọng mạnh. Hãy thay đổi cao độ vừa phải để giọng không đều hoặc có vẻ thiếu tự nhiên.',['I usually take the bus. ↘','Would you prefer tea or coffee? ↗','I enjoy it because it is convenient. ↘']],
+  ['Ghi nhớ nhanh','Ưu tiên cụm ý rõ, nhấn đúng từ quan trọng và nối âm vừa đủ. Tốc độ nói nhanh không tự động làm câu trôi chảy; người nghe vẫn cần nhận ra từng từ và quan hệ giữa các ý.']]},
+ 3:{intro:'Part 1 hỏi về chủ đề quen thuộc và trải nghiệm cá nhân. Câu trả lời tốt đi thẳng vào câu hỏi, có một lý do hoặc chi tiết phù hợp, nhưng không cần kéo dài thành bài nói Part 2.',sections:[
+  ['1. Trả lời trực tiếp trước','Hãy cho người nghe biết câu trả lời chính ngay từ đầu. Với câu hỏi yes/no, có thể trả lời có/không rồi diễn đạt lại chủ đề; với câu hỏi “what/where/when”, nêu đúng thông tin được hỏi. Không cần mở đầu dài bằng câu chung chung.',['Yes, I do. I enjoy reading.','I usually take the bus to university.','My favourite subject is physics.']],
+  ['2. Thêm lý do có liên quan','Một mệnh đề với because thường đủ để giải thích lựa chọn hoặc cảm nhận. Lý do nên là điều bạn thực sự có thể phát triển, chẳng hạn tiết kiệm thời gian, thư giãn hoặc thuận tiện; không cần tìm một lập luận quá học thuật cho câu hỏi về đời sống hằng ngày.',['I enjoy reading because it helps me relax.','I take the bus because parking near my university is difficult.']],
+  ['3. Cụ thể hóa bằng ví dụ nhỏ','Thêm một tình huống, thời gian hoặc thói quen khiến câu trả lời đáng tin và dễ hình dung hơn. Dùng for example hoặc especially khi thật sự có ví dụ; một chi tiết thật thường hữu ích hơn nhiều tính từ chung chung như very nice, very good.',['For example, I read for half an hour before bed.','I especially like the quiet study area in our library.']],
+  ['4. Độ dài và những điều nên tránh','Một câu hỏi đơn giản có thể chỉ cần một hoặc hai câu; câu hỏi “why” thường phù hợp với khoảng hai đến bốn câu ngắn. Tránh lặp nguyên câu hỏi, học thuộc một đoạn không liên quan hoặc thêm chi tiết bạn không thể giải thích nếu giám khảo hỏi tiếp.',['Not very often, actually. I usually go at weekends when I have more time.','I prefer studying alone because I can concentrate, although I sometimes review difficult topics with friends.']],
+  ['Ghi nhớ nhanh','Khung Answer–Reason–Example là gợi ý để phát triển ý, không phải công thức bắt buộc cho mọi câu. Khi câu hỏi chỉ cần một thông tin ngắn, trả lời gọn và chính xác sẽ tự nhiên hơn.']]},
+ 4:{intro:'Part 2 yêu cầu nói dài về một chủ đề với các gợi ý trên cue card. Bạn có một phút chuẩn bị; ghi từ khóa và quan hệ giữa các ý thay vì viết nguyên câu để phần nói vẫn tự nhiên.',sections:[
+  ['1. Đọc đề và chọn một câu chuyện','Xác định danh từ chính của đề, mốc thời gian và các gợi ý bắt buộc. Chọn một trải nghiệm bạn nhớ đủ chi tiết; trải nghiệm đời thường vẫn phù hợp nếu trả lời đúng câu hỏi. Không cần chọn một câu chuyện “đặc biệt nhất” hay phức tạp nhất.',['PLACE: Quy Nhon · coastal city','WHEN / WHO: last summer · family','WHAT: beach · seafood · sunset','WHY: peaceful · closer to family']],
+  ['2. Dùng một phút để lập bản đồ ý','Chia giấy thành các từ khóa: mở đầu, bối cảnh, sự kiện/chi tiết và cảm nhận/lý do. Mỗi gợi ý trên thẻ nên có ít nhất một ý; nếu có thời gian, thêm một ví dụ hoặc một chi tiết giác quan. Ghi từ đơn và mũi tên như “quiet beach → relaxed” thay vì viết cả đoạn.',['I would like to talk about…','During the day…','One evening…','What made it memorable was…']],
+  ['3. Sắp xếp thời lượng và trình tự','Mở đầu ngắn để xác định chủ đề; sau đó dành phần lớn thời gian cho việc đã xảy ra và các chi tiết đáng nhớ; kết thúc bằng lý do hoặc cảm xúc. Mốc thời gian như at first, later that day và one evening giúp người nghe theo được câu chuyện. Với tốc độ vừa phải, bài 1–2 phút thường vào khoảng 150–250 từ, nhưng thời lượng nói và độ rõ quan trọng hơn việc đếm từ.',['At first, we walked along the beach.','Later that day, we tried some local seafood.','One evening, we watched the sunset from a hill.']],
+  ['4. Phát triển chi tiết thay vì liệt kê','Khi nêu một hoạt động, thêm điều kiện hoặc phản ứng: bạn ở đâu, ai đi cùng, điều gì xảy ra và bạn cảm thấy thế nào. Một chi tiết nhìn/nghe/nếm cụ thể giúp câu chuyện sống động; không cần thêm nhiều tính từ hoặc bịa sự kiện để kéo dài.',['The beach was quiet, so we could hear the waves clearly.','The trip felt special because we had time to talk without rushing.']],
+  ['5. Giữ ngữ pháp nhất quán và kết thúc tự nhiên','Khi kể chuyến đi đã qua, phần lớn sự kiện dùng quá khứ; có thể chuyển sang hiện tại để nêu nhận xét chung hoặc sang điều kiện để nói nếu quay lại. Bài mẫu là nguồn tham khảo cách tổ chức, không phải đoạn cần học thuộc nguyên văn.',['We travelled by train and stayed there for three days.','If I returned, I would explore some nearby villages.']],
+  ['Ghi nhớ nhanh','Một câu chuyện có trình tự, đủ các gợi ý và vài chi tiết cá nhân thường dễ nghe hơn một danh sách địa điểm. Không có yêu cầu phải dùng từ thật khó để nói đủ thời lượng.']]},
+ 2:{intro:'Bài này tập trung vào cách kể thói quen hiện tại và một sự việc gần đây trong cùng câu trả lời. Tín hiệu thời gian giúp chọn đúng thì; liên từ because và although giúp giải thích và đối chiếu ý.',sections:[
+  ['1. Hiện tại đơn cho thói quen','Dùng hiện tại đơn cho lịch trình, sở thích hoặc việc thường lặp lại. Các cụm usually, often, every day và on weekdays thường đi cùng kiểu thông tin này. Với he/she/it, động từ thường thêm -s hoặc -es.',['I usually study at home because it is quiet.','She reviews her notes every evening.','We often work in the library.']],
+  ['2. Quá khứ đơn cho việc đã kết thúc','Dùng quá khứ đơn khi sự việc xảy ra trong một khoảng thời gian đã kết thúc như last weekend hoặc yesterday. Động từ có quy tắc thường thêm -ed; các động từ bất quy tắc cần dạng riêng như go–went, meet–met và have–had.',['Last weekend, I visited a friend.','We went to the library and worked together.','I met my project group yesterday.']],
+  ['3. Giữ hai mốc thời gian tách biệt','Khi câu trả lời có cả thói quen và sự kiện mới xảy ra, hãy đưa mốc thời gian gần động từ để người nghe nhận ra chuyển đổi. Có thể dùng but hoặc however để tạo tương phản giữa điều thường làm và lần gần đây.',['I usually study alone, but last week I worked with a classmate.','I often take the bus. Yesterday, however, I walked to campus.']],
+  ['4. Because và although','Because nối một kết quả với nguyên nhân: “I stayed home because I was tired.” Although mở đầu phần tương phản: “Although I was tired, I finished the assignment.” Không đặt but ngay sau mệnh đề although trong cùng một cấu trúc; nếu dùng but thì bỏ although.',['I study at home because it is quiet.','Although the library was busy, I could concentrate.','The trip was long, but it was enjoyable.']],
+  ['Ghi nhớ nhanh','Mốc thời gian quyết định cách kể: thói quen ở hiện tại, sự kiện đã hoàn tất ở quá khứ. Trước khi kết thúc câu, kiểm tra động từ chính và tránh trộn hiện tại/quá khứ mà không có lý do.']]},
+ 8:{intro:'Từ nối giúp làm rõ quan hệ giữa hai ý, chứ không phải từ trang trí để tăng band. Chọn đúng chức năng, đặt ở vị trí tự nhiên và bảo đảm nội dung sau từ nối thật sự liên quan.',sections:[
+  ['1. Lý do và kết quả','Because giới thiệu nguyên nhân; so thường đưa ra kết quả trong cùng câu; as a result thường nối kết quả ở câu kế tiếp. Hãy xác định ý nào là nguyên nhân trước khi chọn từ nối để tránh đảo ngược quan hệ.',['I take the bus because it is affordable.','The bus is convenient, so I use it every day.','The route is direct. As a result, I arrive on time.']],
+  ['2. Tương phản và nhượng bộ','But thường nối hai mệnh đề đối lập trong cùng câu; however thường đứng đầu hoặc giữa câu với dấu câu phù hợp; although tạo mệnh đề nhượng bộ. Tránh dùng nhiều từ cùng chức năng trong một câu.',['The trip takes longer, but it is cheaper.','The trip takes longer; however, it is cheaper.','Although the bus is crowded, I still prefer it.']],
+  ['3. Ví dụ và bổ sung','For example giới thiệu một trường hợp minh họa cho ý trước. In addition thêm một ý cùng hướng; không dùng nó khi ý sau thực ra đang phản bác ý trước. Một ví dụ cụ thể làm rõ luận điểm hơn việc lặp lại từ “important”.',['Public transport is useful. For example, students can travel without driving.','It is affordable. In addition, it reduces the need to find parking.']],
+  ['4. Từ nối trong câu trả lời nói','Well, let me think hoặc to be honest có thể giúp mở đầu khi bạn cần sắp xếp ý, nhưng chúng không thay cho nội dung. Lặp firstly, moreover, therefore ở mọi câu có thể làm lời nói cứng và khiến quan hệ ý không tự nhiên. Đại từ như it, they và this cũng là cách nối ý khi tham chiếu đã rõ.',['To be honest, I prefer the bus because it is affordable.','The bus is convenient. It also helps me avoid parking near campus.']],
+  ['Ghi nhớ nhanh','Một từ nối đúng chức năng tốt hơn nhiều từ nối lặp lại. Nếu bỏ từ nối mà người nghe vẫn hiểu quan hệ giữa hai ý, hãy giữ câu đơn giản.']]},
+ 5:{intro:'Part 3 mở rộng chủ đề Part 2 sang ý kiến và vấn đề chung của xã hội. PEEL là khung giúp câu trả lời có luận điểm, lý do, bằng chứng hoặc ví dụ và kết nối trở lại câu hỏi.',sections:[
+  ['1. Point – nêu ý chính','Trả lời trực tiếp quan điểm trước khi giải thích. Câu đầu có thể thể hiện đồng ý, phản đối, mức độ hoặc ưu tiên; tránh lặp lại nguyên câu hỏi mà chưa đưa ra ý kiến.',['I think public parks are important for every neighbourhood.','In general, public transport should be more reliable.']],
+  ['2. Explain – giải thích cơ chế hoặc lý do','Giải thích vì sao ý đó đúng hoặc trong điều kiện nào nó đúng. Câu hỏi “why?” hoặc “how?” có thể giúp kiểm tra xem phần giải thích đã đi xa hơn việc nhắc lại luận điểm chưa. Dùng because, since hoặc this is because để nêu nguyên nhân rõ ràng.',['They give residents a free place to exercise and relax.','This matters because many people live in small apartments without gardens.']],
+  ['3. Example – đưa bằng chứng cụ thể','Ví dụ có thể là nhóm người, tình huống hoặc hệ quả dễ hình dung; không nhất thiết phải là số liệu nghiên cứu. Dùng for example khi ví dụ minh họa đúng luận điểm, và tránh khẳng định số liệu chính xác nếu bạn không biết nguồn.',['For example, children can play there after school while older residents meet their neighbours.','A student may choose a direct bus instead of driving to class.']],
+  ['4. Link – kết nối về câu hỏi','Kết thúc bằng kết quả, ý nghĩa hoặc điều kiện liên quan đến câu hỏi ban đầu. Không cần lặp lại y hệt câu Point; hãy mở rộng nhẹ bằng so, therefore hoặc as a result. Câu trả lời thường có thể phát triển trong vài câu rõ ràng, thay vì kéo dài bằng ý lặp.',['As a result, parks can support health and community life.','Therefore, reliable transport can make city travel more practical.']],
+  ['5. PEEL linh hoạt','Một câu trả lời Part 3 không bắt buộc phải có đúng bốn câu hay đúng thứ tự PEEL. Nếu câu hỏi yêu cầu so sánh, dự đoán hoặc nêu mặt trái, có thể thêm điều kiện hoặc phản biện; vẫn cần làm rõ luận điểm và giải thích vì sao.',['Public parks matter because they offer free outdoor space. For example, families can exercise there after school. This is especially valuable in crowded areas, so parks can improve both health and community life.']],
+  ['Ghi nhớ nhanh','PEEL giúp bạn phát triển một ý có chiều sâu: nói điều mình nghĩ, giải thích, minh họa rồi nêu hệ quả. Chọn một luận điểm rõ thường hiệu quả hơn liệt kê nhiều ý chưa được giải thích.']]},
+ 6:{intro:'Từ vựng theo chủ đề giúp diễn đạt chính xác về môi trường, năng lượng và giao thông. Hãy học nghĩa, cách kết hợp từ và điều kiện sử dụng; một từ chuyên ngành chỉ hữu ích khi bạn dùng nó đúng ngữ cảnh.',sections:[
+  ['1. Môi trường và chất thải','Pollution là ô nhiễm; waste là rác hoặc phần bị lãng phí; emissions là khí thải được thải ra. Sustainable development là phát triển đáp ứng nhu cầu hiện tại nhưng quan tâm đến khả năng của các thế hệ sau. Những từ này không thể thay thế lẫn nhau trong mọi câu.',['air pollution','reduce household waste','lower carbon emissions','sustainable development']],
+  ['2. Năng lượng và công nghệ','Renewable energy đến từ nguồn có thể được bổ sung tự nhiên, như solar power và wind power. Fossil fuels gồm than, dầu và khí tự nhiên; energy-efficient mô tả thiết bị hoặc cách dùng tiêu thụ ít năng lượng hơn cho cùng một chức năng. Không nên gọi mọi nguồn điện là renewable.',['renewable energy','solar panels','wind power','an energy-efficient appliance']],
+  ['3. Giao thông đô thị','Public transport gồm phương tiện công cộng như bus và train. Traffic congestion là tình trạng ùn tắc; carbon footprint là tổng lượng phát thải gắn với một hoạt động hoặc người. Hãy giải thích tác động theo điều kiện thực tế: phương tiện công cộng chỉ thu hút thêm người dùng nếu tuyến và giờ chạy phù hợp.',['reliable public transport','reduce traffic congestion','a low-carbon journey','an affordable option']],
+  ['4. Collocation và cách triển khai ý','Học các từ thường đi cạnh nhau: reduce emissions, generate electricity, conserve energy và improve air quality. Trong câu trả lời, đưa thuật ngữ vào một câu giải thích hoặc ví dụ để người nghe hiểu bạn đang nói điều gì, thay vì xếp nhiều danh từ kỹ thuật liền nhau.',['Solar panels generate electricity from sunlight.','Reliable buses can reduce traffic congestion.','Turning off unused lights helps conserve energy.']],
+  ['Ghi nhớ nhanh','Độ chính xác quan trọng hơn độ khó của từ. Nếu chưa chắc một thuật ngữ, diễn đạt ý bằng từ quen thuộc và giải thích rõ; tránh dùng “zero pollution” hoặc “completely clean” nếu bạn không thể bảo vệ khẳng định đó.']]},
+ 9:{intro:'Paraphrase bằng mô tả giúp bạn tiếp tục nói khi quên một danh từ. Thay vì dừng hẳn, hãy diễn đạt nhóm đồ vật, công dụng, hình dáng, vị trí hoặc cách sử dụng để người nghe suy ra ý.',sections:[
+  ['1. Mô tả theo nhóm và chức năng','Bắt đầu bằng a device, an appliance, a tool hoặc a place, rồi nói vật đó làm gì. Cấu trúc “a device that…” giúp nối danh từ với mệnh đề giải thích. Chọn nhóm đủ cụ thể để không biến thành “a thing” quá mơ hồ.',['a small appliance that keeps food cold','a device that measures temperature','a tool that cuts paper']],
+  ['2. Thêm đặc điểm nhận diện','Nếu chức năng chưa đủ, bổ sung nơi thường thấy, hình dáng, vật liệu hoặc người sử dụng. Chỉ cần một hoặc hai đặc điểm đúng; không cần mô tả mọi thứ. Cách này cũng hữu ích khi bạn biết công dụng nhưng quên tên gọi.',['It is usually found in a kitchen.','It has a screen and a few buttons.','People use it to check the temperature of a room.']],
+  ['3. Dùng cụm sửa lời tự nhiên','I mean có thể mở đầu phần diễn đạt lại; it is a kind of… giới thiệu nhóm đồ vật; what I use it for is… mở đầu công dụng. Dùng cụm này khi cần thiết, không lặp chúng trước mọi câu.',['It is a household appliance that keeps food cold.','I mean, you use it to keep milk and vegetables fresh.','It is a kind of tool used for cutting paper.']],
+  ['4. Giữ mạch ý và tránh suy đoán','Sau khi mô tả, đưa một ví dụ sử dụng để câu trả lời có ngữ cảnh. Nếu không chắc tên gọi, hãy giữ cách mô tả trung thực thay vì đoán một từ có thể sai; một lần dừng ngắn để chọn từ tốt hơn là nói một cụm dài không rõ nghĩa.',['People use it every day to store food and leftovers.','I use it when I need to measure the room temperature.']],
+  ['Ghi nhớ nhanh','Công thức gợi nhớ là nhóm đồ vật + chức năng + một đặc điểm hoặc ví dụ. Đây là chiến lược diễn đạt thay thế, không phải lý do để tránh học từ vựng chính xác.']]},
+ 10:{intro:'Lexical Resource không chỉ là biết nhiều từ mà còn là chọn đúng từ, dùng đúng kết hợp và diễn đạt lại khi cần. Collocation là nhóm từ thường đi cùng nhau; học cả cụm giúp câu tự nhiên và giảm lỗi kết hợp từ.',sections:[
+  ['1. Collocation là gì?','Trong tiếng Anh, một số từ thường kết hợp thành cụm quen thuộc: make progress, raise awareness, heavy workload và play a role. Không phải mọi từ đồng nghĩa đều ghép được với nhau; vì vậy học từ trong cụm và câu mẫu thường an toàn hơn học một danh sách từ đơn.',['make steady progress','raise public awareness','a heavy workload','play an important role']],
+  ['2. Paraphrase nhưng giữ nguyên nghĩa','Paraphrase là diễn đạt lại ý bằng cách đổi cấu trúc hoặc cụm từ phù hợp, chứ không phải thay từng từ bằng từ khó hơn. Free time có thể đổi thành spare time trong nhiều ngữ cảnh; important có thể diễn đạt thành play an important role nếu cấu trúc câu phù hợp.',['free time → spare time','important → play an important role','very useful → practical and convenient']],
+  ['3. Ghép cụm với cấu trúc ngữ pháp','Sau collocation cần đúng dạng từ và giới từ: make progress in something; take advantage of an opportunity; play a role in doing something. Hãy giữ nguyên giới từ cần thiết và kiểm tra xem danh từ ở dạng đếm được hay không.',['I have made progress in pronunciation.','This tool plays a role in helping students review.','We should take advantage of this opportunity.']],
+  ['4. Chọn từ theo ngữ cảnh','Một từ nâng cao dùng sai sắc thái hoặc collocation có thể làm ý kém chính xác hơn một từ đơn giản nhưng đúng. “Substantial” thường mô tả mức độ, lượng hoặc thay đổi đáng kể; không phải lúc nào cũng thay được cho “very big” khi nói về kích thước vật thể.',['The project requires a substantial investment.','We made significant progress this semester.','A spacious room is more natural than a substantial room.']],
+  ['Ghi nhớ nhanh','Học cụm từ cùng nghĩa, cấu trúc và một ví dụ. Khi nói, ưu tiên sự chính xác và tự nhiên; dùng từ linh hoạt chỉ khi bạn nắm được cách kết hợp của nó.']]},
+ 7:{intro:'IELTS Speaking được đánh giá theo bốn tiêu chí: Fluency and Coherence, Lexical Resource, Grammatical Range and Accuracy, và Pronunciation. Bốn tiêu chí có trọng số ngang nhau; một từ khó hoặc một phát âm riêng lẻ không thể quyết định toàn bộ band.',sections:[
+  ['1. Fluency and Coherence · Lưu loát và mạch lạc','Tiêu chí này xem bạn duy trì lời nói, sắp xếp ý và liên kết thông tin thế nào. Lưu loát không có nghĩa là nói nhanh liên tục; ngập ngừng để nghĩ ý khác với ngập ngừng kéo dài vì không tìm được từ, và các ý cần theo trình tự người nghe hiểu được.',['I usually study at home. It is quiet, so I can concentrate.','Last weekend, I worked with a classmate. First, we divided the research; then we compared our notes.']],
+  ['2. Lexical Resource · Vốn từ','Tiêu chí này xem độ rộng, sự chính xác, cách kết hợp và khả năng diễn đạt lại. Dùng từ phù hợp với chủ đề quan trọng hơn nhồi idiom hoặc từ hiếm; nếu chưa biết một từ, khả năng giải thích bằng cách khác vẫn giúp truyền đạt ý.',['We took a direct bus to campus.','It is a device that measures the temperature.']],
+  ['3. Grammatical Range and Accuracy · Ngữ pháp','Người chấm xem cả sự đa dạng cấu trúc lẫn độ chính xác và phù hợp. Câu phức chỉ có giá trị nếu quan hệ giữa các mệnh đề rõ; dùng nhiều cấu trúc đơn giản chính xác có thể dễ hiểu hơn một câu rất dài nhưng khó kiểm soát.',['Although the journey was long, it was enjoyable.','I study at home because I can concentrate there.']],
+  ['4. Pronunciation · Phát âm','Trọng tâm là mức độ dễ hiểu và cách dùng âm, trọng âm, nhịp, ngữ điệu cùng connected speech. Không cần xóa accent Việt; lỗi đáng ưu tiên sửa là lỗi thường xuyên khiến người nghe khó nhận ra từ hoặc mối quan hệ giữa các ý.',['I wanted the BLUE one, not the black one.','The trip was memorable because we spent time together.']],
+  ['5. Cách đọc kết quả của ứng dụng','Điểm ứng dụng là phản hồi ước tính phục vụ luyện tập, không phải điểm IELTS chính thức. Một câu ngắn hoặc bản chép lời không cung cấp đủ bằng chứng để kết luận chắc chắn về cả bốn tiêu chí; cần xem kết quả như tín hiệu chọn nội dung nên ôn tiếp.',['The four criteria are considered across the speaking performance.','A clear accent is not the same as a native accent.']],
+  ['Ghi nhớ nhanh','Bốn tiêu chí ngang trọng số và đo các mặt khác nhau. Một bài trả lời cân bằng cần nội dung mạch lạc, từ phù hợp, ngữ pháp có kiểm soát và lời nói dễ hiểu.']]},
+ 11:{intro:'Band descriptors mô tả các đặc điểm thường gặp trong phần thể hiện nói, không phải danh sách mẹo để đạt band. Các tiêu chí được xem trên phần thể hiện tổng thể; một câu riêng lẻ hoặc một từ mới không đủ để xác định trình độ.',sections:[
+  ['1. Band 4–5: diễn đạt cơ bản nhưng còn hạn chế','Ở khoảng band 4, người nói thường cần những khoảng dừng rõ, câu trả lời có thể ngắn và liên kết đơn giản; vốn từ phù hợp hơn với chủ đề quen thuộc. Ở band 5, người nói thường giữ được lời nói lâu hơn nhưng có thể nói chậm, lặp từ hoặc dùng discourse markers và liên từ quá nhiều; câu phức thường khó kiểm soát.',['Band 4: I like it. It is good.','Band 5: I think it is useful because… um… it helps me study.']],
+  ['2. Band 6: có thể phát triển ý trong thời gian dài hơn','Người nói thường có đủ từ để thảo luận chủ đề và có thể dùng câu ngắn lẫn câu phức. Vẫn có thể có lỗi, ngập ngừng hoặc dùng từ chưa tự nhiên; mục tiêu là ý chính nhìn chung rõ và người nghe thường hiểu mà không phải cố gắng quá nhiều.',['I prefer studying at home because I can organise my notes, although I sometimes meet classmates to review difficult topics.']],
+  ['3. Band 7: linh hoạt và giữ mạch tốt hơn','Người nói có thể duy trì câu trả lời dài, phát triển luận điểm rõ và dùng từ nối linh hoạt hơn. Có thể còn lỗi hoặc ngập ngừng, nhưng chúng thường không làm đứt mạch; cả câu đơn và câu phức được sử dụng hiệu quả hơn.',['Public transport is convenient for students. If the routes were more reliable, more people might leave their motorbikes at home.']],
+  ['4. Band 8: chính xác, linh hoạt và tự nhiên hơn','Descriptors band 8 nhấn mạnh vốn từ rộng được dùng linh hoạt, phần lớn câu không có lỗi, nhịp và trọng âm phù hợp trong nhiều câu nói dài. Lỗi hoặc lựa chọn từ chưa chuẩn đôi khi vẫn xảy ra; yêu cầu không phải là hoàn hảo hay có giọng bản ngữ.',['Renewable energy could reduce emissions substantially, provided that the electricity grid can store and distribute it reliably.']],
+  ['5. So sánh bằng bằng chứng cụ thể','Khi xem hai câu trả lời, so sánh cách phát triển ý, mức lặp, độ chính xác từ/cụm, sự linh hoạt của câu và khả năng dễ hiểu. Không suy ra band chỉ từ số từ, tốc độ, một idiom hoặc việc câu trả lời có vẻ “nâng cao”.',['Instead of counting linking words, check whether each connection expresses a real relationship.','Compare several answers across different topics, not just one memorised sample.']],
+  ['Ghi nhớ nhanh','Band là mô tả tổng hợp và đòi hỏi sự nhất quán. Chọn một đặc điểm quan sát được để cải thiện sẽ hữu ích hơn việc cố bắt chước toàn bộ câu trả lời của người khác.']]},
+ 12:{intro:'Lộ trình bốn tuần giới thiệu các kiến thức theo thứ tự từ độ rõ của âm và câu ngắn đến câu chuyện dài, ý kiến xã hội và cách tự xem lại. Đây là bản đồ nội dung tham khảo; nhịp học có thể điều chỉnh theo lịch cá nhân.',sections:[
+  ['1. Tuần 1 · Phát âm và Part 1','Tuần đầu tập trung vào âm cuối, những cặp âm dễ nhầm, trọng âm, ngữ điệu và cách trả lời câu hỏi quen thuộc. Mục tiêu kiến thức là hiểu cách tạo độ rõ và cách phát triển câu trả lời từ ý chính sang lý do, ví dụ.',['rice /s/ – rise /z/','Answer → reason → example']],
+  ['2. Tuần 2 · Câu chuyện Part 2','Nội dung chuyển sang một phút chuẩn bị, ghi từ khóa, sắp xếp mốc thời gian và phát triển chi tiết cá nhân. Câu chuyện dễ theo dõi khi có mở đầu, sự kiện chính và lý do đáng nhớ; không cần học thuộc mẫu có sẵn.',['When / where / who → what happened → why it mattered','A detail + a feeling + a reason']],
+  ['3. Tuần 3 · Ý kiến Part 3 và từ theo chủ đề','PEEL cung cấp một khung để trả lời câu hỏi trừu tượng: luận điểm, giải thích, ví dụ và hệ quả. Cùng lúc, từ vựng về môi trường, năng lượng, giao thông và paraphrase giúp trình bày ý cụ thể hơn mà không cần dùng từ vượt quá khả năng kiểm soát.',['Point → Explain → Example → Link','renewable energy · reduce emissions · public transport']],
+  ['4. Tuần 4 · Tiêu chí và band descriptors','Tuần cuối tổng hợp bốn tiêu chí và những khác biệt khái quát giữa các mức band. Nội dung nhấn mạnh cách đọc phản hồi dựa trên nhiều dấu hiệu, nhận ra lỗi lặp lại và đặt ưu tiên vào khả năng truyền đạt rõ ràng, không chạy theo một mẹo chấm điểm.',['Fluency and Coherence · Lexical Resource','Grammar · Pronunciation']],
+  ['5. Ôn tập có khoảng cách','Khi ôn lại một nội dung sau một khoảng nghỉ, bạn phải nhớ lại cách giải thích thay vì chỉ nhìn lướt qua; việc quay lại nhiều lần cách nhau giúp nhận ra điểm nào đã chắc và điểm nào còn dễ quên. Có thể xen kẽ phát âm, từ vựng và phát triển ý để tránh chỉ luyện một kỹ năng.',['Âm cuối → trọng âm → nối âm','Ý chính → lý do → ví dụ → hệ quả']],
+  ['Ghi nhớ nhanh','Mỗi chặng bổ sung một lớp kỹ năng, nhưng các kiến thức liên kết với nhau trong một bài nói hoàn chỉnh. Một lịch học khả thi và có thời gian nghỉ thường bền hơn kế hoạch quá dày rồi bỏ dở.']]}
+};
 const PATH_LESSON_RULES={
  0:{part:1,minSeconds:30,minVoiced:15,minWords:12,minUnique:8,tryMinWords:8,minTryUnique:6,minGroups:8,
   groups:[/\brice\b/,/\brise\b/,/\bseat\b/,/\bseed\b/,/\bcoat\b/,/\bcode\b/,/\bbat\b/,/\bbad\b/],
@@ -4355,6 +4476,7 @@ const PATH_WEEKS=[
  ['Tuần 4','Làm 2–3 bài thi thử đầy đủ, nghe lại bản ghi và sửa lỗi lặp lại.']
 ];
 let pathView=null;
+let pathNotice='';
 
 function cleanLearningPath(input){
  const src=input&&typeof input==='object'&&!Array.isArray(input)?input:{};
@@ -4480,18 +4602,18 @@ function pathContinueButton(){
  return `<button class="w path-continue" onclick="pathContinue()">${esc(label)} ${icon('arrow')}</button>`;
 }
 function pathMap(){
- const next=pathNext(),setup=st.learningPath.setup,percentage=pathPercent();
+ const next=pathNext(),setup=st.learningPath.setup,percentage=pathPercent(),notice=pathNotice;
+ pathNotice='';
  const criteria=setup.baseline?[[setup.baseline.f,'lưu loát'],[setup.baseline.l,'từ vựng'],[setup.baseline.g,'ngữ pháp']]
   .filter(([value])=>value!=null).sort((a,b)=>a[0]-b[0]):[];
  const focus=criteria.length?'Ưu tiên theo bài nói thử: '+criteria[0][1]+'. ':'';
  const days=setup.examDate?Math.round(Date.parse(setup.examDate+'T00:00:00Z')/DAY-dayNumber(Date.now())):null;
- const minutes=setup.minutes,exampleMinutes=minutes?Math.max(1,Math.floor(minutes*.25)):0;
- const tryMinutes=minutes?Math.max(1,Math.floor(minutes*.25)):0;
- const speakingMinutes=minutes?minutes-exampleMinutes-tryMinutes:0;
+ const minutes=setup.minutes,readMinutes=minutes?Math.max(1,Math.floor(minutes*.6)):0;
+ const reviewMinutes=minutes?Math.max(1,minutes-readMinutes):0;
  const target=scoreValue(st.goal)&&st.goal>=1?st.goal:setup.target;
- const plan=minutes?'Gợi ý mỗi ngày: '+exampleMinutes+' phút xem ví dụ, '+tryMinutes+' phút làm thử và '+speakingMinutes+' phút luyện nói, nghe lại. ':'';
+ const plan=minutes?'Gợi ý mỗi ngày: '+readMinutes+' phút xem nội dung, '+reviewMinutes+' phút nghe ví dụ và ôn ghi nhớ. ':'';
  return `${pageIntro('LỘ TRÌNH 4 TUẦN','Bản đồ luyện nói','Hoàn thành từng bài để mở bài tiếp theo.')}
-  <section class="c"><h2>Tiến độ của bạn · ${percentage}%</h2><progress max="100" value="${percentage}" aria-label="Tiến độ lộ trình"></progress>
+  <section class="c">${notice?`<p class="path-notice" role="status">${esc(notice)}</p>`:''}<h2>Tiến độ của bạn · ${percentage}%</h2><progress max="100" value="${percentage}" aria-label="Tiến độ lộ trình"></progress>
   <p class="mu">${setup.minutes?'Dự kiến '+setup.minutes+' phút mỗi ngày. ':''}${setup.examDate?'Ngày thi dự kiến: '+esc(setup.examDate)+(days>=0?' · còn '+days+' ngày':' · ngày đã qua')+'. ':''}
   ${target?'Mục tiêu: '+target.toFixed(1)+'. ':''}${setup.baseline?'Mức xuất phát ước tính: '+bandRange(setup.baseline.o)+'. ':''}${focus}${plan}Bốn tuần là các chặng nội dung, bạn có thể học theo nhịp của mình.</p></section>
   <div class="path-map">${PATH_WEEKS.map(([title,description],week)=>`<section class="c path-week"><h2>${title}</h2><p>${description}</p><ol>
@@ -4506,31 +4628,41 @@ function pathMap(){
 function pathLesson(){
  const item=PATH_LESSONS.find(entry=>entry.id===pathView);
  if(!item||!pathAllowed(item.id)){pathView=null;return pathMap()}
- const active=st.learningPath.active,step=active?.id===item.id?active.step:0;
- const [group,title,description]=LS[item.id];
- const rule=pathRule(item),review=pathTryReview?.id===item.id?pathTryReview:null;
- const heading=`<button type="button" class="g" onclick="showPathMap()">← Bản đồ lộ trình</button><article class="c path-lesson">
-  <p class="eyebrow">TUẦN ${item.week} · ${esc(group)} · BƯỚC ${step+1}/3</p><h1>${esc(title)}</h1>
-  <progress max="3" value="${step+1}" aria-label="Bước của bài học"></progress>${step===0&&item.id===13?minimalPairMarkup():''}`;
- if(step===0)return heading+`<h2>1. Xem ví dụ</h2><p>${esc(description)}</p><blockquote lang="en">${esc(item.example)}</blockquote>
-  <div class="row"><button class="g" data-example="${esc(item.example)}" onclick="say(this.dataset.example,.9)">Nghe ví dụ</button>
-  <button onclick="advancePathLesson(1)">Tiếp tục</button></div></article>`;
- if(step===1)return heading+`<h2>2. Làm thử một câu</h2><p lang="en">${esc(item.question)}</p>
-  <form onsubmit="submitPathTry(event)"><label>Câu trả lời bằng tiếng Anh<textarea name="answer" lang="en" rows="4" required oninput="invalidatePathTry(this)">${esc(review?.answer||'')}</textarea></label>
-   ${review?pathTryFeedback(review):''}<p id="path-try-edit-status" role="status"></p><p class="mu">Bước này chấm nội dung và ngữ pháp từ câu bạn nhập. Phát âm chỉ được đánh giá từ bản ghi ở thử thách nói.</p>
-   <div class="row"><button type="button" class="g" onclick="advancePathLesson(0)">Quay lại</button><button type="submit">Chấm câu trả lời</button>${review?.passed?'<button id="path-try-next" type="button" onclick="advancePathLesson(2)">Tiếp tục thử thách</button>':''}</div></form></article>`;
- const challengeTitle=rule.part===2?'3. Thử thách Part 2 · ít nhất 90 giây':'3. Thử thách nói 30 giây theo bài học';
- return heading+`<h2>${challengeTitle}</h2><p>${esc(rule.challenge||item.question)}</p>
-  <p>Ghi âm theo đúng nhiệm vụ trên. Bài chỉ hoàn thành khi bản ghi đủ thời lượng, có giọng nói rõ và bản chép lời thể hiện các từ hoặc ý mục tiêu. ${rule.pronunciationReference?'Ứng dụng cũng sẽ đối chiếu phát âm với các từ/cụm đang luyện. ':''}Nói lặp một cụm để kéo dài bản ghi sẽ không đạt. Ứng dụng dò từ khóa và cụm mục tiêu; đây là kiểm tra tự động giới hạn, không thay đánh giá ngữ nghĩa của giáo viên. Bài hoàn thành mở chặng tiếp theo và nhận 20 XP một lần.</p>
-  <div class="row"><button class="g" onclick="advancePathLesson(1)">Quay lại</button><button onclick="startPathChallenge()">Bắt đầu thử thách</button></div></article>`;
+ const [group,title]=LS[item.id],content=PATH_LESSON_CONTENT[item.id],done=Object.hasOwn(st.learningPath.completed,item.id);
+ if(!content)return `<article class="c path-lesson"><h1>${esc(title)}</h1><p>${esc(LS[item.id][2])}</p><button class="g" onclick="showPathMap()">Về bản đồ lộ trình</button></article>`;
+ const sections=content.sections.map((section,index)=>`<section class="path-study-section"><h2>${index+1}. ${esc(section[0])}</h2><p>${esc(section[1])}</p>${section[2]?.length?`<ul class="path-study-examples">${section[2].map(example=>`<li><span lang="en">${esc(example)}</span><button type="button" class="g" data-example="${esc(example)}" aria-label="Nghe ví dụ" onclick="say(this.dataset.example,.9)">Nghe mẫu</button></li>`).join('')}</ul>`:''}</section>`).join('');
+ return `<button type="button" class="g" onclick="showPathMap()">← Bản đồ lộ trình</button><article class="c path-lesson">
+  <p class="eyebrow">TUẦN ${item.week} · ${esc(group)} · NỘI DUNG BÀI HỌC</p><h1>${esc(title)}</h1><p class="path-lesson-intro">${esc(content.intro)}</p>
+  <div class="path-study-sections">${sections}</div>
+  <section class="path-lesson-model"><h2>Ví dụ tổng hợp</h2><blockquote lang="en">${esc(item.example)}</blockquote><button type="button" class="g" data-example="${esc(item.example)}" onclick="say(this.dataset.example,.9)">Nghe ví dụ</button></section>
+  <p class="mu">Bạn có thể đọc lại nội dung và nghe ví dụ bất cứ lúc nào.</p>
+  <div class="row"><button type="button" class="w" onclick="completePathLesson(${item.id})">${done?'Đã hoàn thành · về bản đồ':'Hoàn thành bài học · mở chặng tiếp theo'}</button></div></article>`;
 }
 function pathLessonsPage(){return pathView==null?pathMap():pathLesson()}
 function showPathMap(){pathView=null;tab='les';openView()}
 function openPathLesson(id){
  if(!pathAllowed(id))return;
  const active=st.learningPath.active;
- if(!active||active.id!==id){setPathActive(id,0);pathTryReview=null}
+ if(!active||active.id!==id)setPathActive(id,0);
  pathView=id;tab='les';openView();
+}
+function completePathLesson(id){
+ const item=PATH_LESSONS.find(entry=>entry.id===id);
+ if(pathView!==id||!item||!pathAllowed(id))return;
+ st.learningPath=mergeLearningPath(st.learningPath,storedEpu()?.learningPath);
+ if(!Object.hasOwn(st.learningPath.completed,id)){
+  const now=Date.now(),day=dayNumber(now),before=mergeGame(st.game,storedEpu()?.game);
+  const rewardMissing=!before.events.some(event=>event.id==='lesson_'+id);
+  st.learningPath.completed[id]=now;
+  if(rewardMissing){
+   if(before.rates[day]==null)before.rates[day]=10+Math.floor(Math.random()*21);
+   st.game=mergeGame(before,{events:[{id:'lesson_'+id,type:'lesson',at:now}]});
+  }
+  if(st.learningPath.active?.id===id){st.learningPath.active=null;st.learningPath.activeUpdated=Math.max(Date.now(),st.learningPath.activeUpdated+1)}
+  savePath();
+  pathNotice='Đã hoàn thành bài học “'+LS[id][1]+'” · lộ trình '+pathPercent()+'%.'+(rewardMissing?' Đã cộng 20 XP.':'');
+ }else pathNotice='Bài học đã hoàn thành. Bạn có thể mở bài tiếp theo trên bản đồ.';
+ pathView=null;tab='les';openView();
 }
 function advancePathLesson(step){
  const active=st.learningPath.active;
@@ -4574,54 +4706,19 @@ function startPathChallenge(){
 
 function pathResultControls(result){
  if(!result.pathMode)return '<button class="w" onclick="nextCue()">'+(S.i+1<S.it.length?'Câu tiếp theo':'Xem kết quả bài luyện')+' '+icon('arrow')+'</button>';
- const label=result.pathMode==='baseline'?'Xem lộ trình':'Về lộ trình';
- const status=result.pathMessage||(result.state==='pending'?'Đang kiểm tra bản ghi…':'Chưa hoàn tất thử thách.');
- return `<p id="path-result-status" role="status">${esc(status)}</p><button class="w" id="path-result-done" onclick="finishPathChallenge()"${result.pathComplete?'':' disabled'}>${label}</button>`;
+ const status=result.pathMessage||(result.state==='pending'?'Đang kiểm tra bản ghi…':'Chưa hoàn tất bài nói thử.');
+ return `<p id="path-result-status" role="status">${esc(status)}</p><button class="w" id="path-result-done" onclick="finishPathChallenge()"${result.pathComplete?'':' disabled'}>Xem lộ trình</button>`;
 }
 
 function recordPathChallenge(result){
- if(!result.pathMode)return false;
+ if(result.pathMode!=='baseline')return false;
  if(result.pathComplete)return true;
- if(result.pathMode==='baseline'){
-  if(!result.blob||result.duration<30||!(result.m?.voicedSeconds>=15)){
-   result.pathMessage='Cần bản ghi 30 giây, trong đó tối thiểu 15 giây có giọng nói được phát hiện.';return false;
-  }
- }else{
-  const item=PATH_LESSONS.find(entry=>entry.id===result.pathLesson);
-  if(!item||!pathAllowed(item.id))return false;
-  const rule=pathRule(item),evidence=pathEvidence(item.id,result.text,'challenge');
-  if(!result.blob||result.duration<rule.minSeconds){result.pathMessage='Cần bản ghi ít nhất '+rule.minSeconds+' giây cho nhiệm vụ này.';return false}
-  if(!(result.m?.voicedSeconds>=rule.minVoiced)){result.pathMessage='Chưa phát hiện đủ giọng nói rõ. Cần tối thiểu '+rule.minVoiced+' giây giọng nói trong bản ghi.';return false}
-  if(!evidence.passed){result.pathMessage=pathEvidenceText(evidence);return false}
-  if(rule.pronunciationReference){
-   const check=result.pron?.checks?.self;
-   if(result.pron?.busy){result.pathMessage='Đang đối chiếu pronunciation với các từ/cụm mục tiêu…';return false}
-   if(check?.reference?.trim()!==rule.pronunciationReference||!check?.grade){result.pathMessage='Chưa có đủ dữ liệu để chấm pronunciation của các từ/cụm mục tiêu. Hãy kiểm tra bản ghi và chấm lại phát âm.';return false}
-   if(check.grade.limited){result.pathMessage='Tín hiệu phát âm chưa đủ rõ để xác nhận mục tiêu. Hãy nói gần micro hơn, đọc rõ các cặp từ/cụm rồi ghi lại.';return false}
-  }
+ if(!result.blob||result.duration<30||!(result.m?.voicedSeconds>=15)){
+  result.pathMessage='Cần bản ghi 30 giây, trong đó tối thiểu 15 giây có giọng nói được phát hiện.';return false;
  }
  st.learningPath=mergeLearningPath(st.learningPath,storedEpu()?.learningPath);
- if(result.pathMode==='baseline'){
-  updatePathSetup({done:true,deferred:false,step:2,baseline:{o:result.s.o,f:result.s.f,l:result.s.l,g:result.s.g,at:Date.now()}});
-  result.pathMessage='Đã lưu mức xuất phát ước tính '+bandRange(result.s.o)+'.';
- }else{
-  const item=PATH_LESSONS.find(entry=>entry.id===result.pathLesson);
-  if(!item||!pathAllowed(item.id))return false;
-  const completed=Object.hasOwn(st.learningPath.completed,item.id);
-  const now=Date.now(),day=dayNumber(now),before=mergeGame(st.game,storedEpu()?.game);
-  const rewardMissing=!before.events.some(event=>event.id==='lesson_'+item.id);
-  if(!completed)st.learningPath.completed[item.id]=now;
-  if(rewardMissing){
-   if(before.rates[day]==null)before.rates[day]=10+Math.floor(Math.random()*21);
-   st.game=mergeGame(before,{events:[{id:'lesson_'+item.id,type:'lesson',at:now}]});
-  }
-  if(st.learningPath.active?.id===item.id){
-   st.learningPath.active=null;
-   st.learningPath.activeUpdated=Math.max(Date.now(),st.learningPath.activeUpdated+1);
-  }
-  savePath();
-  result.pathMessage='Bạn đã hoàn thành '+pathPercent()+'% lộ trình.'+(rewardMissing?' Đã cộng 20 XP.':'');
- }
+ updatePathSetup({done:true,deferred:false,step:2,baseline:{o:result.s.o,f:result.s.f,l:result.s.l,g:result.s.g,at:Date.now()}});
+ result.pathMessage='Đã lưu mức xuất phát ước tính '+bandRange(result.s.o)+'.';
  result.pathComplete=true;
  return true;
 }
