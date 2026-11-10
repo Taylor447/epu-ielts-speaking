@@ -130,7 +130,9 @@ export default {
 
     const socketMatch = url.pathname.match(/^\/api\/rooms\/([A-HJ-NP-Z2-9]{7})\/socket$/i);
     if (request.method === 'GET' && socketMatch && request.headers.get('Upgrade')?.toLowerCase() === 'websocket') {
-      return callRoom(env, socketMatch[1].toUpperCase(), '/socket' + url.search);
+      // Forward the original request so Cloudflare preserves the WebSocket upgrade.
+      const id = env.COOP_ROOMS.idFromName(socketMatch[1].toUpperCase());
+      return env.COOP_ROOMS.get(id).fetch(request);
     }
 
     return withCors(request, json({ error: 'Không tìm thấy đường dẫn coop.' }, 404), env);
@@ -147,7 +149,7 @@ export class CoopRoom {
     const url = new URL(request.url);
     if (request.method === 'POST' && url.pathname === '/create') return this.create(request);
     if (request.method === 'POST' && url.pathname === '/join') return this.join(request);
-    if (request.method === 'GET' && url.pathname === '/socket') return this.connect(request);
+    if (request.method === 'GET' && (url.pathname === '/socket' || /^\/api\/rooms\/[A-HJ-NP-Z2-9]{7}\/socket$/i.test(url.pathname))) return this.connect(request);
     return json({ error: 'Không tìm thấy phòng.' }, 404);
   }
 
