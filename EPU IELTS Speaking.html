@@ -814,6 +814,16 @@ body > nav button.on { background: color-mix(in srgb,var(--pr) 17%,transparent);
 
 
 @media(max-width:600px){}
+.coop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 12px; }
+.coop-room-code { display: inline-flex; align-items: center; gap: 10px; padding: 8px 12px; border: 1px solid var(--bd); border-radius: 12px; background: var(--sf); font: 800 1.2rem/1.3 ui-monospace, monospace; letter-spacing: .12em; }
+.coop-prompt { padding: 16px; border-left: 4px solid var(--action); border-radius: 8px; background: var(--sf); font-size: 1.15rem; font-weight: 700; }
+.coop-answer { white-space: pre-wrap; overflow-wrap: anywhere; }
+.coop-player-list { display: flex; flex-wrap: wrap; gap: 8px; padding: 0; list-style: none; }
+.coop-player-list li { padding: 7px 10px; border: 1px solid var(--bd); border-radius: 999px; background: var(--sf); }
+.coop-checks { display: grid; gap: 8px; margin: 12px 0; }
+.coop-checks label { display: flex; align-items: center; gap: 8px; }
+.coop-feedback { border-left: 3px solid var(--action); padding-left: 12px; }
+.coop-notice { min-height: 1.5em; }
 
 
 
@@ -1392,6 +1402,8 @@ if(typeof st!=='object'||Array.isArray(st))st={};
 if(!Array.isArray(st.h))st.h=[];
 if(!Array.isArray(st.c))st.c=[];
 if(!st.p||typeof st.p!=='object'||Array.isArray(st.p))st.p={};
+if(!st.coop||typeof st.coop!=='object'||Array.isArray(st.coop))st.coop={};
+if(typeof st.coop.endpoint!=='string')st.coop.endpoint='';
 const sv=(sync=true)=>{
  ensureProgressIds();
  st.learningV1=mergeLearning(st.learningV1,storedEpu()?.learningV1);
@@ -1563,57 +1575,166 @@ const TOPIC_WORD_DATA=[["electricity","/ˌiːlekˈtɹɪsɪti/","điện năng","
 D.push(...TOPIC_WORD_DATA);
 // Điểm IELTS ước tính từ bản chép lời
 
-const G=[/\bif\b/,/\b(which|who|where)\b/,/\b(have|has|had) (\w+ )?(been|\w+ed|done|gone|seen|made|taken)\b/,/\b(would|could|should|might|may)\b/,/\b(was|were|did|\w+ed)\b/,/\b(is|are|was|were|been) \w+ed\b/,/\b(will|going to)\b/,/\b(\w+er|more|less) (\w+ )?than\b/,/\b(because|although|though|while|when|since|unless)\b/];
-const SCORE_VERSION=2;
+const G=[/\bif\b/,/\b(which|who|where|that)\b/,/\b(have|has|had) (\w+ )?(been|\w+ed|done|gone|seen|made|taken)\b/,/\b(would|could|should|might|may|must)\b/,/\b(was|were|did|\w+ed)\b/,/\b(is|are|was|were|been) \w+ed\b/,/\b(will|going to)\b/,/\b(\w+er|more|less) (\w+ )?than\b/,/\b(because|although|though|while|when|since|unless)\b/];
+const SCORE_VERSION=7;
 const SCORE_CONNECTORS=/\b(on the other hand|as a result|for example|for instance|in my opinion|so that|because|however|although|moreover|firstly|besides|actually|which|while)\b/g;
 const SCORE_STOP=new Set(('a an the and or but if then so as of to in on at by for from with is are was were am be been being '+
  'i me my mine you your he him his she her it its we us our they them their this that these those there here '+
  'do does did have has had would could should can will may might not no yes very really just um uh er erm hmm').split(' '));
-
-function score(t,p,d){
- const text=String(t??'').toLowerCase().replace(/’/g,"'");
- const words=text.match(/[a-z]+(?:'[a-z]+)*/g)||[],n=words.length;
- if(n<5)return null;
- const duration=Number.isFinite(d)&&d>3?d:null;
- const target=p===2?(duration==null?200:Math.min(250,Math.max(150,150+(duration-60)*100/60))):
-  p===1?25:50;
- const wpm=duration==null?null:Math.round(n/duration*60);
- const fillers=words.filter(word=>/^(um|uh|er|erm|hmm)$/.test(word)).length;
- const connectors=new Set();
- const countedSentences=[];
- for(const sentence of text.split(/[.!?;\n]+/)){
-  const matches=[...sentence.matchAll(SCORE_CONNECTORS)];
-  if(!matches.length){countedSentences.push(sentence);continue}
-  const content=sentence.replace(SCORE_CONNECTORS,' ').match(/[a-z]+(?:'[a-z]+)*/g)||[];
-  const hasContent=content.length>=4&&new Set(content.filter(word=>!SCORE_STOP.has(word))).size>=2;
-  countedSentences.push(sentence.replace(SCORE_CONNECTORS,match=>{
-   if(!hasContent||connectors.has(match))return ' ';
-   connectors.add(match);
-   return match;
-  }));
+const RELEVANCE_STOP=new Set(('a an the and or but if then so as of to in on at by for from with is are was were am be been being '+
+ 'i me my mine you your he him his she her it its we us our they them their this that these those there here '+
+ 'do does did have has had would could should can will may might not no yes very really just um uh er erm hmm '+
+ 'what when where who whom whose why how which describe tell say give talk about usually often sometimes every each day time thing something someone anything reason people like likes love loved enjoy enjoyed prefer preferred think thought feel felt want wanted need needed use used try tried most favorite favourite kind kinds type types sort advantage advantages benefit benefits disadvantage disadvantages important importance special young older old more less best better favourite').split(' '));
+const RELEVANCE_GROUPS=[
+ 'clean cleanliness tidy neat dirty dirt dust litter rubbish trash pollution polluted mess',
+ 'area place location neighbourhood neighborhood community locality street district town city village hometown region house home apartment flat',
+ 'weather climate rain rainy sunny sunshine snow temperature hot cold warm cool season forecast',
+ 'electrical electric electronic device appliance gadget equipment phone smartphone laptop computer tablet charger television',
+ 'hobby pastime leisure free weekend activity sport football basketball swimming dance games exercise music song instrument book reading novel story literature',
+ 'travel trip journey holiday vacation visit visited tourism tourist destination sightseeing',
+ 'study education school university college course subject class major degree learn learning lecture',
+ 'work job career employment profession office colleague workplace salary',
+ 'friend friendship family relative parent mother father sibling brother sister child person teacher influence admire respect rolemodel',
+ 'food meal cuisine dish cooking cook eat restaurant',
+ 'transport transportation commute traffic vehicle car bus bicycle train motorbike walk',
+ 'technology digital internet online ai artificial intelligence robot robotics application app shopping shop purchase buy store market product',
+ 'change improve improvement develop development future plan goal hope wish',
+ 'environment nature green energy renewable climate sustainable electricity solar wind',
+ 'health healthy illness exercise sleep stress doctor'
+].map(group=>group.split(' '));
+const RELEVANCE_CANONICAL=new Map();
+RELEVANCE_GROUPS.forEach((group,index)=>group.forEach(word=>{if(!RELEVANCE_CANONICAL.has(word))RELEVANCE_CANONICAL.set(word,new Set());RELEVANCE_CANONICAL.get(word).add(index)}));
+function relevanceStem(word){return word.toLowerCase().replace(/ies$/,'y').replace(/(ing|ed)$/,'').replace(/s$/,'')}
+function analyzeAnswerRelevance(answer,question,topic=''){
+ const prompt=String(question||'').trim(),title=String(topic||'').trim();
+ if(!prompt&&!title)return {checked:false,allowed:true,status:'not-checked',anchors:[],matched:[],missing:[],ceiling:Infinity};
+ const anchors=[...new Set((prompt+' '+title).toLowerCase().match(/[a-z]+/g)||[])].filter(word=>word.length>2&&!RELEVANCE_STOP.has(word));
+ if(!anchors.length)return {checked:false,allowed:true,status:'not-checked',anchors:[],matched:[],missing:[],ceiling:Infinity};
+ const answerWords=new Set((String(answer||'').toLowerCase().match(/[a-z]+(?:'[a-z]+)*/g)||[]).map(relevanceStem));
+ const concepts=word=>RELEVANCE_CANONICAL.get(word)||RELEVANCE_CANONICAL.get(relevanceStem(word))||new Set(['token:'+relevanceStem(word)]);
+ const related=(left,right)=>[...concepts(left)].some(concept=>concepts(right).has(concept));
+ const matched=anchors.filter(word=>answerWords.has(relevanceStem(word))||[...answerWords].some(token=>related(token,word)));
+ const coverage=matched.length/anchors.length;
+ const allowed=matched.length>0;
+ const status=!allowed?'off-topic':coverage<.25&&anchors.length>=4?'weak':coverage<.45?'partial':'relevant';
+ const ceiling=status==='weak'?4.5:status==='partial'?5.5:Infinity;
+ return {checked:true,allowed,status,anchors,matched,missing:anchors.filter(word=>!matched.includes(word)),coverage,ceiling};
+}
+function answerScoringMessage(answer,question,topic=''){
+ const language=analyzeAnswerLanguage(answer);if(!language.allowed)return answerLanguageMessage(language);
+ const relevance=analyzeAnswerRelevance(answer,question,topic);
+ if(!relevance.allowed)return 'Câu trả lời có vẻ chưa bám câu hỏi nên chưa được cấp điểm. Hãy trả lời trực tiếp và nêu một chi tiết liên quan đến: '+relevance.anchors.slice(0,5).join(', ')+'.';
+ return 'Chưa đủ văn bản tiếng Anh để chấm; hãy nhập ít nhất 5 từ tiếng Anh.';
+}
+const VIETNAMESE_UNACCENTED=new Set(('toi khong nguoi thich hoc sinh vien truong nha duong pho sach dep khu vuc rat nhieu nhung vi nen duoc lam se da dang hon van con khi roi tren duoi tai boi cac cai ngay dem tieng viet anh tra loi hoi cau bang cho den mot minh chung toi muon moi thuong xuyen du lich cong nghe moi truong phat am nhin chung nay kha lai co xe qua va bui bam o gang giu gon them nua').split(' '));
+const ANSWER_TOKEN_PATTERN=/\p{L}+(?:['’]\p{L}+)*/gu;
+const stripVietnameseMarks=value=>value.normalize('NFD').replace(/\p{M}/gu,'').replace(/[đĐ]/g,'d').toLowerCase();
+const isVietnameseToken=value=>/[đĐăâêôơưĂÂÊÔƠƯ]/u.test(value)||/\p{M}/u.test(value.normalize('NFD'))||VIETNAMESE_UNACCENTED.has(stripVietnameseMarks(value));
+function analyzeAnswerLanguage(value){
+ const tokens=String(value??'').match(ANSWER_TOKEN_PATTERN)||[];
+ const vietnamese=tokens.filter(isVietnameseToken).length;
+ const english=tokens.filter(word=>/^[a-z]+(?:['’][a-z]+)*$/i.test(word)&&!isVietnameseToken(word)).length;
+ const other=tokens.length-english-vietnamese,total=tokens.length,ratio=total?english/total:0;
+ let reason=null;
+ if(!total)reason='empty';
+ else if(english===0&&vietnamese===total)reason='vietnamese';
+ else if(english===0)reason='non-english';
+ else if((vietnamese+other)>0&&(english<8||ratio<.72))reason='mixed';
+ else if(english<5)reason='short';
+ return {allowed:!reason,reason,english,vietnamese,other,total,ratio};
+}
+function answerLanguageMessage(value){
+ const state=typeof value==='string'?analyzeAnswerLanguage(value):value;
+ if(state.reason==='vietnamese')return 'Không cấp điểm IELTS cho câu trả lời hoàn toàn bằng tiếng Việt. Hãy trả lời bằng tiếng Anh rồi chấm lại.';
+ if(state.reason==='non-english')return 'Chưa nhận diện được câu trả lời tiếng Anh. Hãy viết câu trả lời bằng tiếng Anh rồi chấm lại.';
+ if(state.reason==='mixed')return `Câu trả lời đang trộn ngôn ngữ: nhận diện ${state.english} từ tiếng Anh và ${state.vietnamese+state.other} từ không phải tiếng Anh (${Math.round(state.ratio*100)}% tiếng Anh). Cần ít nhất 8 từ tiếng Anh và tối thiểu 72% nội dung bằng tiếng Anh để chấm.`;
+ if(state.reason==='short')return `Chưa đủ văn bản tiếng Anh để ước tính: nhận diện ${state.english} từ; cần ít nhất 5 từ.`;
+ return 'Hãy nhập câu trả lời bằng tiếng Anh để chấm.';
+}
+const SCORE_GRAMMAR_RULES=[
+ {label:'Hòa hợp chủ-vị: “I is/are”',pattern:/\bi\s+(?:is|are)\b/gi,weight:1.05},
+ {label:'Hòa hợp chủ-vị: “you/we/they is/was”',pattern:/\b(?:you|we|they)\s+(?:is|was)\b/gi,weight:.9},
+ {label:'Hòa hợp chủ-vị: “he/she/it” + động từ nguyên mẫu',pattern:/\b(?:he|she|it)\s+(?:have|do|go|like|use|live|study|work|play|watch|enjoy|want|need|make|say|try|think|help|give|take|know|eat|drink|read|write|speak)\b/gi,weight:.85},
+ {label:'Dùng do/does chưa đúng chủ ngữ',pattern:/\b(?:he|she|it)\s+don't\b|\b(?:i|you|we|they)\s+doesn't\b/gi,weight:.95},
+ {label:'Thiếu chủ ngữ sau “I think”',pattern:/\bi think\s+(?:is|are|was|were|have|has|can|will|like|go|goes|went)\b/gi,weight:.95},
+ {label:'Dùng “am” với tính từ “agree”',pattern:/\b(?:i|you|we|they|he|she|it)\s+am\s+agree\b/gi,weight:.9},
+ {label:'“There is/are” chưa khớp danh từ',pattern:/\bthere\s+is\s+(?:many|several|a lot of|two|three|four|five)\b|\bthere\s+are\s+(?:a|one|each|every)\b/gi,weight:.85},
+ {label:'Dùng động từ quá khứ sau did/does',pattern:/\b(?:did|does)\s+(?:went|saw|made|ate|came|got|took|bought|visited|liked|played|worked|studied|goes)\b/gi,weight:1},
+ {label:'Danh từ không đếm được ở dạng số nhiều',pattern:/\b(?:informations|advices|furnitures|equipments|homeworks|knowledges|researches)\b/gi,weight:.8},
+ {label:'So sánh kép',pattern:/\b(?:more better|more easier|more cheaper|more bigger|most easiest|most best|less better)\b/gi,weight:1},
+ {label:'Dùng “to” trước động từ thêm -ing',pattern:/\b(?:want|need|hope|plan|decide|try|prefer|would like)\s+to\s+[a-z]+ing\b/gi,weight:.85},
+ {label:'Có thể thiếu động từ “be” trước tính từ',pattern:/\b(?:i|you|we|they|he|she|it)\s+(?:very|really|quite)\s+(?:happy|tired|interested|busy|important|useful|comfortable|difficult|convenient|clean|crowded|beautiful|excited|nervous)\b/gi,weight:.7}
+];
+const SCORE_FINITE=/\b(?:am|is|are|was|were|be|been|being|have|has|had|do|does|did|can|could|will|would|should|might|may|must|like|likes|liked|love|loves|loved|enjoy|enjoys|enjoyed|prefer|prefers|preferred|use|uses|used|live|lives|lived|study|studies|studied|work|works|worked|go|goes|went|make|makes|made|help|helps|helped|feel|feels|felt|think|thinks|thought|provide|provides|provided|give|gives|gave|improve|improves|improved|become|becomes|became|change|changes|changed|visit|visits|visited|watch|watches|watched|play|plays|played|keep|keeps|kept|try|tries|tried|say|says|said|want|wants|wanted|need|needs|needed|learn|learns|learned|create|creates|created|encourage|encourages|encouraged|remain|remains|remained|bring|brings|brought|support|supports|supported|affect|affects|affected|protect|protects|protected|offer|offers|offered)\b/;
+const SCORE_TOPIC_TERMS=[...new Set(D.flatMap(row=>[row[0],row[4]]).filter(value=>typeof value==='string'&&/[a-z]/i.test(value)).map(value=>value.toLowerCase().trim()))];
+const SCORE_COLLOCATIONS=[...new Set(D.map(row=>row[4]).filter(value=>typeof value==='string'&&value.includes(' ')).map(value=>value.toLowerCase().trim()))];
+function grammarDiagnostics(text){
+ const findings=[];
+ for(const rule of SCORE_GRAMMAR_RULES){
+  const matcher=new RegExp(rule.pattern.source,'gi');let match,count=0;
+  while((match=matcher.exec(text))&&count<3&&findings.length<16){
+   findings.push({label:rule.label,example:match[0].replace(/\s+/g,' ').trim().slice(0,70),weight:rule.weight});count++;
+  }
  }
- const countedText=countedSentences.join(' ');
- const countedWords=countedText.match(/[a-z]+(?:'[a-z]+)*/g)||[];
- const counted=countedWords.length,unique=[...new Set(countedWords)];
- const effectiveWords=Math.min(counted,unique.length*2.5);
- const durationCoverage=p===2&&duration!=null?Math.min(1,duration/60):1;
- const coverage=Math.min(effectiveWords/target,1)*durationCoverage;
- const scoringWpm=duration==null?null:Math.round(effectiveWords/duration*60);
- const connectorCount=connectors.size;
- const connectorCredit=Math.min(connectorCount,4,Math.max(1,effectiveWords/25));
- const errors=(text.match(/\b(i is|he don't|she don't|more better|i has|they was|informations)\b/g)||[]).length;
- const longWords=words.filter(word=>word.length>6).length;
- const longRatio=longWords/n;
- const countedLongRatio=counted?countedWords.filter(word=>word.length>6).length/counted:0;
- const f=4+1.5*coverage+(scoringWpm==null?.5:scoringWpm>=100&&scoringWpm<=170?1.5:scoringWpm>=70?.75:0)+
-  connectorCredit*.25-Math.min(fillers,4)*.375;
- const l=4+Math.min(unique.length/(target*.7),1)*1.5+Math.min(countedLongRatio/.12,1)*1.5+
-  (counted&&unique.length/counted>.6?1:counted&&unique.length/counted>.5?.5:0);
- const g=4+Math.min(G.filter(pattern=>pattern.test(countedText)).length,7)*.5+coverage-Math.min(errors,3)*.5;
- const q=value=>half(Math.max(3.5,Math.min(8.5,value)));
- const s={f:q(f),l:q(l),g:q(g),p:null,n,r:wpm,scoreVersion:SCORE_VERSION,
-  metrics:{target:Math.round(target),duration,effectiveWords,scoringWpm,connectorCount,longRatio,countedLongRatio,errors,fillers}};
- s.o=half(avg([s.f,s.l,s.g]));return s;
+ const sentences=text.split(/[.!?;\n]+/).map(value=>value.trim()).filter(Boolean);
+ let completeSentences=0;
+ for(const sentence of sentences){
+  const tokens=sentence.match(/[a-z]+(?:'[a-z]+)*/g)||[];
+  if(SCORE_FINITE.test(sentence))completeSentences++;
+  const dependent=/^(?:because|although|if|when|while|since|unless|which|who|that)\b/i.test(sentence);
+  if(dependent&&!sentence.includes(',')&&findings.length<16){findings.push({label:'Mệnh đề phụ có thể đang đứng riêng',example:sentence.slice(0,70),weight:.7});continue}
+  if(tokens.length>=2&&tokens.length<=4&&!SCORE_FINITE.test(sentence)&&findings.length<16){findings.push({label:'Cụm ngắn có thể chưa thành câu hoàn chỉnh',example:sentence.slice(0,70),weight:.65})}
+ }
+ return {findings,completeSentences,sentenceCount:sentences.length,sentenceVariety:new Set(sentences.map(sentence=>(sentence.match(/[a-z]+(?:'[a-z]+)*/g)||[]).length)).size};
+}
+function score(t,p,d,question='',topic=''){
+ const original=String(t??'').replace(/’/g,"'");
+ const language=analyzeAnswerLanguage(original),relevance=analyzeAnswerRelevance(original,question,topic);if(!language.allowed||!relevance.allowed)return null;
+ const text=original.replace(ANSWER_TOKEN_PATTERN,word=>isVietnameseToken(word)?' ':word.toLowerCase());
+ const words=text.match(/[a-z]+(?:'[a-z]+)*/g)||[],n=words.length;if(n<5)return null;
+ const duration=Number.isFinite(d)&&d>3?d:null;
+ const target=p===2?(duration==null?200:Math.min(250,Math.max(150,150+(duration-60)*100/60))):p===1?25:50;
+ const wpm=duration==null?null:Math.round(n/duration*60),fillers=words.filter(word=>/^(?:um|uh|er|erm|hmm)$/.test(word)).length;
+ const connectors=new Set(),countedSentences=[],sentenceParts=text.split(/([.!?;\n]+)/);
+ for(let i=0;i<sentenceParts.length;i+=2){
+  const sentence=sentenceParts[i],delimiter=sentenceParts[i+1]||'';
+  const matches=[...sentence.matchAll(new RegExp(SCORE_CONNECTORS.source,'gi'))];
+  if(!matches.length){countedSentences.push(sentence+delimiter);continue}
+  const content=sentence.replace(new RegExp(SCORE_CONNECTORS.source,'gi'),' ').match(/[a-z]+(?:'[a-z]+)*/g)||[];
+  const hasContent=content.length>=4&&new Set(content.filter(word=>!SCORE_STOP.has(word))).size>=2;
+  countedSentences.push(sentence.replace(new RegExp(SCORE_CONNECTORS.source,'gi'),match=>{if(!hasContent||connectors.has(match.toLowerCase()))return ' ';connectors.add(match.toLowerCase());return match})+delimiter);
+ }
+ const countedText=countedSentences.join(' '),countedWords=countedText.match(/[a-z]+(?:'[a-z]+)*/g)||[],counted=countedWords.length;
+ const unique=[...new Set(countedWords)],effectiveWords=Math.min(counted,unique.length*2.5),scoringWpm=duration==null?null:Math.round(effectiveWords/duration*60);
+ const contentWords=countedWords.filter(word=>word.length>2&&!SCORE_STOP.has(word)),uniqueContent=[...new Set(contentWords)];
+ const diversity=Math.min(uniqueContent.length/24,1),typeToken=uniqueContent.length/Math.max(1,contentWords.length);
+ const topicHits=SCORE_TOPIC_TERMS.filter(term=>term.includes(' ')?countedText.includes(term):uniqueContent.includes(term)).slice(0,8);
+ const collocationHits=SCORE_COLLOCATIONS.filter(term=>countedText.includes(term)).slice(0,4);
+ const grammar=grammarDiagnostics(countedText),grammarPenalty=Math.min(3.2,grammar.findings.reduce((sum,item)=>sum+item.weight,0));
+ const structureCount=G.filter(pattern=>pattern.test(countedText)).length,connectorCount=connectors.size;
+ const repeatedRatio=contentWords.length?1-uniqueContent.length/contentWords.length:0;
+ const repetitionPenalty=Math.min(.6,Math.max(0,repeatedRatio-.45)*1.2);
+ const paceCredit=wpm==null?0:wpm>=100&&wpm<=175?.45:wpm>=80&&wpm<100||wpm>175&&wpm<=190?.2:0;
+ const fRaw=4+Math.min(connectorCount,4)*.34+Math.min(grammar.completeSentences,5)*.26+Math.min(grammar.sentenceVariety/3,1)*.4+paceCredit-Math.min(fillers,4)*.42-repetitionPenalty;
+ const lexicalBase=4+diversity*2.2+Math.min(typeToken/.78,1)*.65+Math.min(topicHits.length,4)*.35+Math.min(collocationHits.length,2)*.25;
+ const gRaw=4+Math.min(structureCount,6)*.62+Math.min(grammar.completeSentences,5)*.15+(grammar.sentenceVariety>=3?.25:0)-grammarPenalty;
+ let ceilings={f:7.5,l:8.5,g:8};
+ if(n<8)ceilings={f:4.5,l:4,g:4.5};
+ else if(p===2&&effectiveWords<30)ceilings={f:4.5,l:4,g:4.5};
+ else if(p===2&&effectiveWords<60)ceilings={f:5,l:4.5,g:5};
+ else if(p===2&&effectiveWords<100)ceilings={f:5.5,l:5,g:5.5};
+ else if(p===2&&effectiveWords<150)ceilings={f:6,l:5.5,g:6};
+ else if((p===1&&n<15)||(p===3&&n<20))ceilings={f:5.5,l:5,g:5.5};
+ const shortPart2Duration=p===2&&duration!=null&&duration<60;
+ if(shortPart2Duration)ceilings={f:Math.min(ceilings.f,4.5),l:Math.min(ceilings.l,5),g:Math.min(ceilings.g,5)};
+ let overallCeiling=Infinity;
+ if(p===2){overallCeiling=effectiveWords<30?4.5:effectiveWords<60?5:effectiveWords<100?5.5:effectiveWords<150?6:Infinity;if(shortPart2Duration)overallCeiling=Math.min(overallCeiling,4.5)}
+ overallCeiling=Math.min(overallCeiling,relevance.ceiling);
+ const band=(value,ceiling)=>Math.min(ceiling,Math.max(3.5,half(value)));
+ const longRatio=words.filter(word=>word.length>6).length/n,countedLongRatio=counted?countedWords.filter(word=>word.length>6).length/counted:0;
+ const s={f:band(fRaw,ceilings.f),l:band(lexicalBase,ceilings.l),g:band(gRaw,ceilings.g),p:null,n,r:wpm,scoreVersion:SCORE_VERSION,
+  metrics:{part:p,target:Math.round(target),duration,englishRatio:Math.round(language.ratio*100),englishWords:language.english,vietnameseWords:language.vietnamese,effectiveWords,scoringWpm,connectorCount,longRatio,countedLongRatio,errors:grammar.findings.length,grammarPenalty,grammarFindings:grammar.findings,completeSentences:grammar.completeSentences,sentenceCount:grammar.sentenceCount,sentenceVariety:grammar.sentenceVariety,repetitionRatio:repeatedRatio,fillers,topicHits,relevance,spellingStatus:'pending',spellingChecked:0,spellingFindings:[],lexicalPenalty:0,lexicalBase,lexicalCeiling:ceilings.l,ceilings,overallCeiling,shortPart2Duration,shortPart2Length:p===2&&effectiveWords<150}};
+ s.o=Math.min(overallCeiling,half(avg([s.f,s.l,s.g])));return s;
 }
 // Mười mẫu minh họa phát triển dần cùng một chủ đề; không phải bài chấm IELTS chính thức.
 const SCORE_EXAMPLE_PARTS=[
@@ -1805,7 +1926,8 @@ const bars=m=>K.map(([key,label])=>{
 const V={
  onboarding:onboardingPage,
  library:libraryPage,
- review:reviewPage,
+  review:reviewPage,
+  coop:()=>coopPage(),
  home:()=>{
   const m=band();
   return `<section class="hero">${heroMotif}<div class="hero-copy">
@@ -1813,7 +1935,8 @@ const V={
   <p>${st.p.n?'Xin chào, '+esc(st.p.n)+'. ':''}Chọn một chủ đề, nói thử và xem phản hồi để điều chỉnh cách nói qua từng bài luyện.</p>
   <div class="hero-actions"><button onclick="go('prac')">Bắt đầu luyện ${icon('arrow')}</button><button class="g" onclick="go('les')">Xem bài học</button></div></div>
   <div class="hero-score"><small>ĐIỂM ƯỚC TÍNH</small><div class="big">${bandNumber(m?.o)}</div><small>${m?'Trung bình '+m.n+' lượt gần nhất'+(m.legacy?' · dữ liệu theo nguồn điểm trước':''):'Chấm một câu để xem điểm'}</small></div></section>
-  ${pathContinueButton()}
+   ${pathContinueButton()}
+   <button class="g w quick-entry" type="button" onclick="go('coop')">Học coop 2 người · Luyện cùng bạn</button>
   <div class="pwa-install-box"><button type="button" class="g" id="pwa-install" onclick="addToHomeScreen()">${pwaButtonLabel()}</button><small id="pwa-status" role="status">${pwaStatusMessage()}</small></div>
   <button class="w quick-entry" type="button" onclick="startQuick()">Nói nhanh 60 giây · một câu ngẫu nhiên</button>
   ${gameHome()}
@@ -1825,7 +1948,8 @@ const V={
  },
  prac:()=>S?(S.mode==='exam'?examView():sess()):`${pageIntro('LUYỆN TẬP','Luyện nói theo chủ đề','Chọn một phần và chủ đề, hoặc luyện cả ba phần theo thứ tự.')}
  ${examEntry()}
- <button class="g w quick-entry" type="button" onclick="startQuick()">Nói nhanh 60 giây · một câu ngẫu nhiên</button>
+  <button class="g w quick-entry" type="button" onclick="startQuick()">Nói nhanh 60 giây · một câu ngẫu nhiên</button>
+  <button class="g w quick-entry" type="button" onclick="go('coop')">Học coop 2 người · Luyện cùng bạn</button>
  <button class="w" onclick="startExam(123)">${icon('prac')} Thi thử IELTS Speaking · Part 1–2–3</button>`+
  PART_NAMES.map((title,i)=>`<article class="c part-card part-${i+1}">${partMotif(i)}<span class="part-index">PART 0${i+1}</span><h2>${title}</h2><p>${PI[i]}</p><div class="chips">${TP.map(([name],t)=>`<button class="g topic-badge topic-${t}" onclick="start([${i+1}],${t})" title="${TOPIC_LABELS[t]}">${icon(TOPIC_ICONS[t],'topic-icon')} ${name}</button>`).join('')}</div></article>`).join('')+freq(),
  les:pathLessonsPage,
@@ -2007,7 +2131,7 @@ async function runBrowserAIWhisper(automatic=false,force=false){
   }
 }
 
-function applyWhisperText(){
+async function applyWhisperText(){
   const entry=pronunciationTarget(),text=entry?.whisper?.text;
   if(!text)return;
   const field=$('#tx');
@@ -2016,15 +2140,23 @@ function applyWhisperText(){
     whisperStatus(entry,'Đã điền bản chép lời vào ô câu trả lời.');
     return;
   }
-  const revised=score(text,entry.x.p,entry.blob?entry.duration:0);
+  const language=analyzeAnswerLanguage(text);
+  if(!language.allowed){whisperStatus(entry,answerLanguageMessage(language));return}
+  const relevance=analyzeAnswerRelevance(text,entry.x.q,entry.x.t);
+  if(!relevance.allowed){whisperStatus(entry,answerScoringMessage(text,entry.x.q,entry.x.t));return}
+  whisperStatus(entry,'Đang kiểm tra câu tiếng Anh và từ vựng ngoại tuyến…');
+  let revised;try{revised=await scoreWithDictionary(text,entry.x.p,entry.blob?entry.duration:0,entry.x.q,entry.x.t)}catch{revised=score(text,entry.x.p,entry.blob?entry.duration:0,entry.x.q,entry.x.t);if(revised)revised.metrics.spellingStatus='unavailable'}
+  if(S?.result!==entry)return;
   if(!revised){
-    whisperStatus(entry,'Cần ít nhất 5 từ tiếng Anh để cập nhật điểm bài nói.');
+    whisperStatus(entry,answerScoringMessage(text,entry.x.q,entry.x.t));
     return;
   }
-  const pronunciation=audioBand(entry.s);
+  const pronunciation=entry.blob&&entry.duration>3&&entry.pron?.assessment?.reference===text?entry.pron.assessment.band:null;
   Object.assign(entry.s,revised,{p:pronunciation});
-  entry.s.o=practiceBand(entry.s);
-  Object.assign(entry.history,{f:revised.f,l:revised.l,g:revised.g,o:entry.s.o,updated:Date.now()});
+  if(pronunciation==null){delete entry.s.pronBasis;delete entry.history.pronBasis;if(entry.pron&&entry.pron.assessment?.reference!==text)entry.pron.assessment=null}
+  else{entry.s.pronBasis='acoustic-v1';entry.history.pronBasis='acoustic-v1'}
+  entry.s.o=Math.min(entry.s.metrics?.overallCeiling??Infinity,practiceBand(entry.s));
+  Object.assign(entry.history,{f:revised.f,l:revised.l,g:revised.g,p:pronunciation,o:entry.s.o,updated:Date.now()});
   entry.text=text;
   entry.wordIdeasReady=false;entry.wordIdeasError=false;
   void loadWordSuggestions(entry);
@@ -2693,6 +2825,96 @@ function vhtml(m, result) {
 let S=null,tab='home',dur=0,lb=null;
 const activeAnalyses=new Map();
 
+// Học coop hai người qua Worker; thông tin phiên chỉ giữ trong sessionStorage.
+const COOP_SESSION_KEY='epu-coop-session';
+let coopSession=null,coopSocket=null,coopStatus='',coopReconnectTimer=null,coopReconnects=0,coopPageLeaving=false,coopLastConnectAt=0;
+try{
+ const saved=JSON.parse(sessionStorage.getItem(COOP_SESSION_KEY)||'null');
+ if(saved&&typeof saved.endpoint==='string'&&typeof saved.roomCode==='string'&&typeof saved.playerId==='string'&&typeof saved.playerToken==='string')coopSession=saved;
+}catch{}
+
+function coopEndpoint(){return String(st.coop?.endpoint||'').replace(/\/+$/,'')}
+function coopPage(){
+ const endpoint=coopEndpoint();
+ const config=`<section class="c"><h2>Kết nối Cloudflare Worker</h2><p>Nhập địa chỉ Worker đã triển khai để tạo phòng hoặc tham gia. Cả hai người cần dùng cùng địa chỉ.</p>
+  <form class="row" onsubmit="event.preventDefault();saveCoopEndpoint(this)"><label class="grow">Địa chỉ Worker<input name="endpoint" type="url" value="${esc(endpoint)}" placeholder="https://epu-speaking-coop.ten-tai-khoan.workers.dev" required></label><button type="submit">Lưu địa chỉ</button></form>
+  <p class="mu">${endpoint?'Địa chỉ đã lưu trên thiết bị này.':'Chưa cấu hình backend. Hãy triển khai hướng dẫn trong thư mục coop-worker trước.'} Coop trực tiếp cần mở EPU bằng HTTPS; mở file HTML offline không đồng bộ phòng.</p></section>`;
+ if(!coopSession)return `${pageIntro('HỌC CÙNG BẠN','Coop 2 người','Luyện theo cặp: một người trả lời, người kia góp ý theo tiêu chí rõ ràng. Không tự bịa band điểm cho phiên coop.')}${config}
+  <div class="coop-grid"><form class="c" onsubmit="event.preventDefault();createCoopRoom(this)"><h2>Tạo phòng mới</h2><label>Tên hiển thị<input name="name" maxlength="32" value="${esc(st.p.n||'Người nói 1')}" required></label>
+   <div class="field-grid"><label>Part<select name="part"><option value="1">Part 1 · câu hỏi ngắn</option><option value="2">Part 2 · cue card</option><option value="3">Part 3 · thảo luận</option></select></label><label>Chủ đề<select name="topic">${TP.map((row,index)=>`<option value="${index}">${esc(TOPIC_LABELS[index]||row[0])}</option>`).join('')}</select></label></div>
+   <button type="submit"${endpoint?'':' disabled'}>Tạo phòng coop</button></form>
+  <form class="c" onsubmit="event.preventDefault();joinCoopRoom(this)"><h2>Tham gia phòng</h2><label>Tên hiển thị<input name="name" maxlength="32" value="${esc(st.p.n||'Người nói 2')}" required></label><label>Mã phòng<input name="code" maxlength="7" pattern="[A-HJ-NP-Z2-9a-hj-np-z]{7}" autocomplete="off" placeholder="7 ký tự" required></label><button type="submit"${endpoint?'':' disabled'}>Tham gia</button></form></div>
+  <p class="coop-notice mu" id="coop-status" role="status" aria-live="polite">${esc(coopStatus)}</p>
+  <article class="c"><h2>Cách hoạt động</h2><ol><li>Tạo phòng rồi gửi mã 7 ký tự cho bạn học.</li><li>Hai người luân phiên trả lời và dùng checklist để góp ý.</li><li>Phiên coop chỉ chia sẻ chữ và nhận xét; không gửi bản ghi âm, không chấm band tự động.</li></ol><p>Phòng và transcript tạm thời được xóa sau 2 giờ. Chỉ chia sẻ mã phòng với người bạn muốn mời.</p></article>`;
+
+ const state=coopSession.state,players=state?.players||[];
+ const roomHead=`<section class="c"><div class="section-head"><div><p class="eyebrow">PHÒNG HỌC COOP · PART ${state?.part||'—'}</p><h2>${esc(state?.topic||'Đang kết nối…')}</h2></div><button class="g" type="button" onclick="copyCoopCode()">Sao chép mã</button></div>
+  <p>Mã phòng <span class="coop-room-code">${esc(coopSession.roomCode)}</span></p><ul class="coop-player-list">${players.map(player=>`<li>${esc(player.name)} · ${player.online?'đang kết nối':'chờ kết nối'}</li>`).join('')}</ul>
+  <p class="coop-notice mu" id="coop-status" role="status" aria-live="polite">${esc(coopStatus)}</p><button class="g" type="button" onclick="leaveCoop()">Kết thúc phiên trên thiết bị này</button></section>`;
+ if(!state||state.phase==='waiting')return `${pageIntro('HỌC CÙNG BẠN','Đang chờ bạn học','Gửi mã phòng cho một người bạn. Khi họ tham gia, câu hỏi đầu tiên sẽ xuất hiện.')}${roomHead}<button class="g" type="button" onclick="go('prac')">Về luyện tập</button>`;
+ if(state.phase==='expired')return `${pageIntro('HỌC CÙNG BẠN','Phòng đã hết hạn','Phòng tự xóa sau 2 giờ. Tạo phòng mới để tiếp tục.')}${roomHead}<button onclick="leaveCoop()">Đóng phiên</button>`;
+ if(state.phase==='complete'){
+  const turns=state.answers.map((answer,index)=>{const speaker=players.find(player=>player.id===answer.playerId)?.name||'Người học';const review=answer.review;return `<article class="c"><h3>Lượt ${index+1} · ${esc(speaker)}</h3><p class="coop-prompt" lang="en">${esc(answer.question)}</p><p class="coop-answer" lang="en">${esc(answer.text)}</p><p>Góp ý: ${review?.onTopic?'✓ Bám đề':'△ Cần bám đề rõ hơn'} · ${review?.reasonExample?'✓ Có lý do/ví dụ':'△ Thêm lý do/ví dụ'} · ${review?.clear?'✓ Ý rõ':'△ Nói gọn và rõ hơn'}</p>${review?.note?`<p class="coop-feedback">${esc(review.note)}</p>`:''}</article>`}).join('');
+  return `${pageIntro('HỌC CÙNG BẠN','Hoàn thành phiên coop','Hai bạn đã đổi vai nói và góp ý. Chọn một điểm cần cải thiện rồi thử lại khi sẵn sàng.')}${roomHead}<h2>Tổng kết lượt nói</h2>${turns}<button onclick="leaveCoop()">Đóng phiên</button>`;
+ }
+ const speaker=players[state.turn%2],reviewer=players[(state.turn+1)%2],isSpeaker=speaker?.id===coopSession.playerId,prompt=state.prompts?.[state.turn]||'';
+ let turnPanel='';
+ if(state.phase==='answer')turnPanel=isSpeaker?`<article class="c"><p class="eyebrow">LƯỢT ${state.turn+1}/${state.prompts.length} · ĐẾN LƯỢT BẠN NÓI</p><h2>${state.part===2?'Nói theo cue card':'Trả lời câu hỏi'}</h2><div class="coop-prompt" lang="en">${esc(prompt)}</div><p>${state.part===2?'Hãy nói khoảng 60–90 giây, sau đó nhập vài ý chính để bạn học góp ý.':'Nói câu trả lời bằng tiếng Anh, sau đó nhập transcript hoặc ý chính để bạn học góp ý.'}</p><form onsubmit="event.preventDefault();sendCoopAnswer(this)"><label>Transcript / ý chính bằng tiếng Anh<textarea name="answer" rows="5" maxlength="1600" minlength="10" required placeholder="Nhập điều bạn vừa nói…"></textarea></label><button type="submit">Gửi cho bạn học góp ý</button></form></article>`:`<article class="c"><p class="eyebrow">LƯỢT ${state.turn+1}/${state.prompts.length}</p><h2>Đang đến lượt ${esc(speaker?.name||'bạn học')} nói</h2><div class="coop-prompt" lang="en">${esc(prompt)}</div><p>Góp ý sau khi transcript được gửi. Tiến trình tự đồng bộ khi cả hai còn kết nối.</p></article>`;
+ else if(state.phase==='review')turnPanel=!isSpeaker?`<article class="c"><p class="eyebrow">LƯỢT ${state.turn+1}/${state.prompts.length} · ĐẾN LƯỢT BẠN GÓP Ý</p><h2>Nghe/đọc câu trả lời và phản hồi</h2><div class="coop-prompt" lang="en">${esc(state.currentAnswer?.question||prompt)}</div><blockquote class="coop-answer" lang="en">${esc(state.currentAnswer?.text||'')}</blockquote><form onsubmit="event.preventDefault();sendCoopReview(this)"><div class="coop-checks"><label><input type="checkbox" name="onTopic"> Trả lời đúng trọng tâm câu hỏi</label><label><input type="checkbox" name="reasonExample"> Có lý do hoặc ví dụ cụ thể</label><label><input type="checkbox" name="clear"> Ý rõ, dễ theo dõi</label></div><label>Một góp ý ngắn<input name="note" maxlength="240" placeholder="Ví dụ: Nêu thiết bị trước, rồi nói công dụng."></label><button type="submit">Gửi góp ý và đổi lượt</button></form></article>`:`<article class="c"><h2>Đang chờ ${esc(reviewer?.name||'bạn học')} góp ý</h2><blockquote class="coop-answer" lang="en">${esc(state.currentAnswer?.text||'')}</blockquote><p>Góp ý sẽ hiện ở đây khi bạn học gửi.</p></article>`;
+ return `${pageIntro('HỌC CÙNG BẠN','Luyện cùng một người bạn','Cùng chủ đề, đổi vai nói và góp ý theo checklist thay vì cạnh tranh band điểm.')}${roomHead}${turnPanel}<p class="mu">Đây là hoạt động học theo cặp, không thay thế điểm ước tính IELTS của chế độ luyện cá nhân.</p>`;
+}
+
+function saveCoopEndpoint(form){
+ try{const url=new URL(form.elements.endpoint.value.trim());if(url.protocol!=='https:'||url.pathname!=='/'||url.search||url.hash)throw new Error('Hãy nhập địa chỉ HTTPS gốc của Cloudflare Worker.');st.coop.endpoint=url.origin;sv(false);coopStatus='Đã lưu địa chỉ backend trên thiết bị này.'}
+ catch(error){coopStatus=error.message||'Địa chỉ Worker chưa hợp lệ.'}
+ render(false);
+}
+async function coopPost(path,payload){
+ const endpoint=coopEndpoint();if(!endpoint)throw new Error('Hãy nhập và lưu địa chỉ Worker trước.');
+ const response=await fetch(endpoint+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+ const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||`Không kết nối được backend (${response.status}).`);return data;
+}
+function coopSaveSession(data,endpoint,name){
+ coopSession={endpoint,roomCode:data.roomCode,playerId:data.playerId,playerToken:data.playerToken,displayName:name,state:data.state||null};
+ try{sessionStorage.setItem(COOP_SESSION_KEY,JSON.stringify(coopSession))}catch{}
+ coopStatus='Đã vào phòng. Đang đồng bộ với bạn học…';coopReconnects=0;
+ if(tab!=='coop'){tab='coop';openView()}else render(false);
+}
+async function createCoopRoom(form){
+ const button=form.querySelector('[type="submit"]');if(button)button.disabled=true;
+ try{const name=form.elements.name.value.trim(),part=Number(form.elements.part.value),topicIndex=Number(form.elements.topic.value),row=TP[topicIndex];if(!row)throw new Error('Chủ đề không hợp lệ.');
+  const prompts=part===1?row[1].slice(0,4):part===2?[row[2],row[2]]:row[3].slice(0,4);if(prompts.length<2)throw new Error('Chủ đề này chưa có đủ câu hỏi để đổi lượt.');
+  const data=await coopPost('/api/rooms',{displayName:name,part,topic:TOPIC_LABELS[topicIndex]||row[0],prompts});coopSaveSession(data,coopEndpoint(),name)
+ }catch(error){coopStatus=error.message||'Không tạo được phòng.';if(button)button.disabled=false;render(false)}
+}
+async function joinCoopRoom(form){
+ const button=form.querySelector('[type="submit"]');if(button)button.disabled=true;
+ try{const name=form.elements.name.value.trim(),code=form.elements.code.value.trim().toUpperCase();const data=await coopPost(`/api/rooms/${encodeURIComponent(code)}/join`,{displayName:name});coopSaveSession(data,coopEndpoint(),name)}
+ catch(error){coopStatus=error.message||'Không tham gia được phòng.';if(button)button.disabled=false;render(false)}
+}
+function connectCoopSocket(){
+ if(!coopSession||coopPageLeaving||coopSocket&&coopSocket.readyState<2)return;
+ if(Date.now()-coopLastConnectAt<900)return;
+ if(!('WebSocket'in window)){coopStatus='Trình duyệt này chưa hỗ trợ kết nối coop realtime.';return}
+ let socketUrl;try{socketUrl=new URL(`/api/rooms/${encodeURIComponent(coopSession.roomCode)}/socket`,coopSession.endpoint);socketUrl.protocol='wss:';socketUrl.searchParams.set('playerId',coopSession.playerId);socketUrl.searchParams.set('token',coopSession.playerToken)}catch{coopStatus='Địa chỉ phòng không hợp lệ.';return}
+ try{
+  coopLastConnectAt=Date.now();
+  coopSocket=new WebSocket(socketUrl.href);
+  coopSocket.addEventListener('open',()=>{coopReconnects=0;coopStatus='Đã kết nối trực tiếp với phòng.';if(tab==='coop')render(false)});
+  coopSocket.addEventListener('message',event=>{let message;try{message=JSON.parse(event.data)}catch{return}
+   if(message.type==='state'&&message.state){coopSession.state=message.state;try{sessionStorage.setItem(COOP_SESSION_KEY,JSON.stringify(coopSession))}catch{};coopStatus=message.state.phase==='waiting'?'Đang chờ bạn học tham gia…':'Đang đồng bộ trực tiếp.';if(tab==='coop')render(false)}
+   else if(message.type==='error'||message.type==='expired'){coopStatus=message.error||message.message||'Phòng đã kết thúc.';if(message.type==='expired')coopSession.state={...coopSession.state,phase:'expired'};if(tab==='coop')render(false)}
+  });
+  coopSocket.addEventListener('close',()=>{coopSocket=null;if(coopPageLeaving||!coopSession||coopSession.state?.phase==='expired')return;coopStatus='Mất kết nối. Đang thử kết nối lại…';if(tab==='coop')render(false);if(coopReconnects<5){const delay=Math.min(12000,1000*2**coopReconnects++);clearTimeout(coopReconnectTimer);coopReconnectTimer=setTimeout(connectCoopSocket,delay)}});
+  coopSocket.addEventListener('error',()=>{coopStatus='Không kết nối được Worker. Kiểm tra địa chỉ hoặc thử tải lại.';if(tab==='coop')render(false)});
+ }catch{coopStatus='Không tạo được kết nối WebSocket.'}
+}
+function sendCoopMessage(message){if(!coopSocket||coopSocket.readyState!==WebSocket.OPEN){coopStatus='Chưa kết nối. Chờ kết nối lại rồi thử gửi.';if(tab==='coop')render(false);return false}coopSocket.send(JSON.stringify(message));coopStatus='Đã gửi. Đang chờ đồng bộ…';return true}
+function sendCoopAnswer(form){const answer=form.elements.answer.value.trim();if(answer.length<10){coopStatus='Hãy nhập ít nhất 10 ký tự để bạn học có thể góp ý.';render(false);return}sendCoopMessage({type:'answer',answer})}
+function sendCoopReview(form){sendCoopMessage({type:'review',checks:{onTopic:form.elements.onTopic.checked,reasonExample:form.elements.reasonExample.checked,clear:form.elements.clear.checked},note:form.elements.note.value.trim()})}
+async function copyCoopCode(){try{await navigator.clipboard.writeText(coopSession?.roomCode||'');coopStatus='Đã sao chép mã phòng.'}catch{coopStatus='Không sao chép tự động được; bạn có thể ghi lại mã đang hiển thị.'}if(tab==='coop')render(false)}
+function leaveCoop(){coopPageLeaving=true;clearTimeout(coopReconnectTimer);coopSocket?.close(1000,'Participant left');coopSocket=null;coopPageLeaving=false;coopSession=null;coopStatus='Phiên đã đóng trên thiết bị này. Phòng sẽ tự hết hạn sau tối đa 2 giờ.';try{sessionStorage.removeItem(COOP_SESSION_KEY)}catch{}render(false)}
+
 function start(parts,topic){
  stopQuickClock();stopPracticeMedia();
  const n=TP.length,first=topic??Math.floor(Math.random()*n),later=topic??(first+1+Math.floor(Math.random()*(n-1)))%n;
@@ -2752,15 +2974,25 @@ function restorePreviousAnswer(){
  openView();
 }
 
-function ev(){
+async function ev(){
  const input=$('#tx'),out=$('#evaluation'),x=S?.it[S.i];
- if(!input||!out||!x||S.result)return;
+ if(!input||!out||!x||S.result||S.scoring)return;
   if(S.mode==='baseline'&&(!lb||dur<30)){
    out.innerHTML='<p role="alert">Hãy ghi âm ít nhất 30 giây trước khi chấm mức xuất phát.</p>';return;
  }
- const s=score(input.value,x.p,lb?dur:0);
+ const session=S,text=input.value.trim(),language=analyzeAnswerLanguage(text);
+ if(!language.allowed){out.innerHTML='<p class="mu" role="alert">'+esc(answerLanguageMessage(language))+'</p>';input.focus();return}
+ const relevance=analyzeAnswerRelevance(text,x.q,x.t);
+ if(!relevance.allowed){out.innerHTML='<p class="mu" role="alert">'+esc(answerScoringMessage(text,x.q,x.t))+'</p>';input.focus();return}
+ if(text.length>3600){out.innerHTML='<p class="mu" role="alert">Câu trả lời tối đa 3.600 ký tự.</p>';input.focus();return}
+ S.scoring=true;input.readOnly=true;const submit=$('#evaluate-answer');if(submit)submit.disabled=true;
+ out.innerHTML='<p class="mu" role="status">Đang chấm ba tiêu chí và đối chiếu từ điển ngoại tuyến…</p>';
+ let s;
+ try{s=await scoreWithDictionary(text,x.p,lb?dur:0,x.q,x.t)}catch{s=score(text,x.p,lb?dur:0,x.q,x.t);if(s){s.metrics.spellingStatus='unavailable';s.metrics.spellingChecked=0}}
+ if(S!==session)return;
+ S.scoring=false;input.readOnly=false;if(submit)submit.disabled=false;
  if(!s){
-  out.innerHTML='<p class="mu" role="alert">Nhập ít nhất 5 từ tiếng Anh để chấm ba tiêu chí bài nói. Bạn có thể dùng mục Phát âm cho bản ghi ngắn.</p>';
+  out.innerHTML='<p class="mu" role="alert">'+esc(answerScoringMessage(text,x.q,x.t))+' Bạn có thể dùng mục Phát âm cho bản ghi ngắn.</p>';
   input.focus();
   return;
  }
@@ -3038,7 +3270,8 @@ function render(enter=false){
  main.classList.toggle('route-enter',enter);
  main.innerHTML=V[tab]();
  if(tab==='library')void libraryRefresh();
- if(tab==='review')mountReviewPage();
+  if(tab==='review')mountReviewPage();
+  if(tab==='coop')connectCoopSocket();
  document.querySelectorAll('[data-head-route]').forEach(button=>{
   if(button.dataset.headRoute===tab)button.setAttribute('aria-current','page');
   else button.removeAttribute('aria-current');
@@ -3525,7 +3758,8 @@ function assessmentBand(report,heard,sample=false){
 
 function applyPronunciationBand(result) {
   if(!result.s)return;
-  const band=result.pron?.assessment?.band??null;
+  const assessment=result.pron?.assessment;
+  const band=result.blob&&result.duration>3&&assessment?.reference===result.text&&Number.isFinite(assessment.band)?assessment.band:null;
   if(band===audioBand(result.s))return;
   result.s.p=band;
   result.history.p=band;
@@ -3536,7 +3770,7 @@ function applyPronunciationBand(result) {
     result.s.pronBasis='acoustic-v1';
     result.history.pronBasis='acoustic-v1';
   }
-  result.s.o=practiceBand(result.s);
+  result.s.o=Math.min(result.s.metrics?.overallCeiling??Infinity,practiceBand(result.s));
   Object.assign(result.history,{o:result.s.o,updated:Date.now()});
   sv();
   const target=$('#result-scores');
@@ -3677,23 +3911,35 @@ function celebrateResult(){
 }
 
 function scoreExplanation(s){
- const m=s.metrics;
- if(!m)return '';
- const duration=m.duration==null?'Không có bản ghi để tính tốc độ':s.r+' từ/phút · bản ghi '+Math.round(m.duration)+' giây'+
-  (s.r!==m.scoringWpm?' · '+m.scoringWpm+' từ/phút sau khi hạn chế từ lặp':'');
+ const m=s.metrics;if(!m)return '';
+ const duration=m.duration==null?'Không có bản ghi nên chưa đo WPM.':`${s.r} từ/phút · bản ghi ${Math.round(m.duration)} giây${s.r!==m.scoringWpm?' · '+m.scoringWpm+' từ/phút sau khi hạn chế từ lặp':''}`;
+ const grammarNotes=(m.grammarFindings||[]).slice(0,5).map(item=>`${esc(item.label)} (“${esc(item.example)}”)`).join('; ');
+ const spellingNotes=(m.spellingFindings||[]).slice(0,5).map(item=>`${esc(item.word)}${item.count>1?' ×'+item.count:''} → ${item.suggestions.map(esc).join(' / ')}`).join('; ');
+ const spellingStatus=m.spellingStatus==='checked'?`Đã đối chiếu ngoại tuyến ${m.spellingChecked} từ.`:m.spellingStatus==='partial'?`Đã đối chiếu ${m.spellingChecked} từ; một số nhóm từ điển chưa tải được.`:m.spellingStatus==='unavailable'?'Chưa tải được từ điển ngoại tuyến; lượt này không bị trừ điểm chính tả.':'Không có từ đủ dài để kiểm tra chính tả.';
+ const relevance=m.relevance?.checked?`Độ bám đề ${Math.round(m.relevance.coverage*100)}% (${m.relevance.matched.length}/${m.relevance.anchors.length} từ khóa câu hỏi/chủ đề khớp): ${m.relevance.status==='relevant'?'có bằng chứng phù hợp':m.relevance.status==='partial'?'mới khớp một phần': 'ít ý khớp'} · từ khóa khớp: ${(m.relevance.matched||[]).slice(0,6).map(esc).join(', ')||'chưa có'}${m.relevance.missing?.length?' · còn thiếu: '+m.relevance.missing.slice(0,4).map(esc).join(', '):''}${Number.isFinite(m.relevance.ceiling)?` · trần tổng theo độ bám đề ${m.relevance.ceiling}`:''}.`:'';
+ const part2Limit=m.part===2&&(m.shortPart2Length||m.shortPart2Duration)?`Part 2: ${s.n} từ thực tế, khoảng ${m.effectiveWords} từ sau khi hạn chế lặp${m.duration==null?' · chưa có bản ghi để đo thời lượng':` · bản ghi ${Math.round(m.duration)} giây`}; trần Fluency ${m.ceilings.f}, Lexical ${m.ceilings.l}, Grammar ${m.ceilings.g}, điểm tổng ${Number.isFinite(m.overallCeiling)?m.overallCeiling:'không áp trần do độ dài'}.`:'Part 2 cần khoảng 150–250 từ trong 1–2 phút; câu ngắn hoặc bản ghi dưới 60 giây bị giới hạn riêng từng tiêu chí.';
  return `<details class="result-feedback"><summary>Vì sao được điểm này?</summary><ul>
-  <li>${s.n} từ · ${Math.round(m.effectiveWords)} từ được tính sau khi hạn chế từ lặp · mốc độ dài ${m.target} từ.</li>
+  <li>${s.n} từ tiếng Anh${m.vietnameseWords?` · đã bỏ ${m.vietnameseWords} từ không phải tiếng Anh khỏi số đo`:''} · nhận diện ${m.englishRatio}% từ tiếng Anh · mốc độ dài tham khảo ${m.target} từ.</li>
+  ${relevance?`<li>${relevance}</li>`:''}
+  ${m.part===2?`<li>${part2Limit}</li>`:''}
   <li>${duration}.</li>
-  <li>${m.connectorCount} cụm nối khác nhau trong câu có nội dung · ${Math.round(m.longRatio*100)}% từ dài trên 6 chữ cái trong bản chép lời${Math.round(m.longRatio*100)!==Math.round(m.countedLongRatio*100)?' ('+Math.round(m.countedLongRatio*100)+'% sau khi lọc từ nối)':''}.</li>
-  <li>${m.errors} mẫu lỗi ngữ pháp có thể nhận diện.</li></ul>
-  <small>Khoảng điểm là ước tính để luyện tập, dựa trên bản chép lời và một số quy tắc. Tốc độ dùng thời lượng bản ghi gồm cả khoảng dừng. Bộ dò lỗi chỉ bao phủ một số mẫu và có thể nhầm hoặc bỏ sót.</small></details>`;
+  <li>${m.connectorCount} cụm nối khác nhau trong câu có nội dung · ${Math.round(m.longRatio*100)}% từ dài trên 6 chữ cái (chỉ hiển thị, không tự cộng điểm vì từ dài).</li>
+  <li>Ngữ pháp: ${m.errors} mẫu lỗi nghi vấn, trừ tối đa ${m.grammarPenalty.toFixed(1)} điểm ước tính.${grammarNotes?' '+grammarNotes:''}</li>
+  <li>Chính tả: ${spellingStatus}${m.lexicalPenalty?` Trừ ${m.lexicalPenalty.toFixed(1)} điểm từ vựng ước tính.`:''}${spellingNotes?' '+spellingNotes:''}</li></ul>
+  <small>Đây là ước tính luyện tập từ bản chép lời, không phải điểm IELTS chính thức. Bộ dò ngữ pháp chỉ nhận diện một số mẫu. Từ điển ngoại tuyến chỉ nêu từ nghi vấn gần cách viết; tên riêng, thuật ngữ và biến thể có thể bị bỏ sót hoặc đánh dấu nhầm.</small></details>`;
 }
 
 function scoreOverview(result) {
   const {s}=result;
   const p = audioBand(s);
+  const relevanceMeter=s.metrics?.relevance?.checked
+   ?`<p class="mu" role="status"><strong>Độ phù hợp nội dung với câu hỏi: ${Math.round(s.metrics.relevance.coverage*100)}%</strong> · khớp ${s.metrics.relevance.matched.length}/${s.metrics.relevance.anchors.length} từ khóa/ý chính. Đây là chỉ số bám đề để luyện tập, không phải band IELTS độc lập.</p>`:'';
+  const relevanceNotice=s.metrics?.relevance?.status==='partial'||s.metrics?.relevance?.status==='weak'
+   ?`<p class="mu" role="status">Câu trả lời mới bám đề một phần; điểm tổng được giới hạn ở ${Math.min(s.metrics.relevance.ceiling??Infinity,s.metrics.overallCeiling??Infinity)} cho đến khi có thêm nội dung trực tiếp liên quan.</p>`:'';
+  const part2Limit=s.metrics?.part===2&&(s.metrics.shortPart2Length||s.metrics.shortPart2Duration)
+   ?`<p class="mu" role="status">Part 2 còn ngắn${s.metrics.shortPart2Length?` (${s.n} từ thực tế, khoảng ${s.metrics.effectiveWords} từ sau khi hạn chế lặp; nên hướng tới ít nhất 150 từ)`:''}${s.metrics.shortPart2Duration?` · bản ghi ${Math.round(s.metrics.duration)} giây, dưới 1 phút`:''}. Trần riêng Fluency ${s.metrics.ceilings.f}, Lexical ${s.metrics.ceilings.l}, Grammar ${s.metrics.ceilings.g}; điểm tổng tối đa ${Number.isFinite(s.metrics.overallCeiling)?s.metrics.overallCeiling:'theo tiêu chí'}.</p>`:'';
   return `<div class="result-header"><div><p class="eyebrow">PHẢN HỒI BÀI NÓI</p><h2 id="result-title" tabindex="-1">Điểm luyện tập ước tính</h2></div><div class="big">${bandNumber(s.o)}</div></div>
-  ${bars(s)}<p><small>${s.n} từ${s.r?' · '+s.r+' từ/phút':''} · ${p==null?'Điểm tạm tính từ 3 tiêu chí':'Điểm tổng hợp từ 4 tiêu chí'}</small></p>
+  ${bars(s)}${relevanceMeter}${relevanceNotice}${part2Limit}<p><small>${s.n} từ${s.r?' · '+s.r+' từ/phút':''} · ${p==null?(result.blob?'Chưa có đủ dữ liệu âm thanh phù hợp để ước tính Pronunciation':'Pronunciation chưa chấm vì không có dữ liệu âm thanh'):'Điểm tổng hợp từ 4 tiêu chí'}</small></p>
   ${scoreExplanation(s)}
   <div class="result-feedback">${resultComparison(result)}</div>
   <p class="mu"><small>${p==null?'Xác nhận câu bạn định nói trong phần Phát âm để nhận điểm từ bản ghi.':'Pronunciation dựa trên độ khớp âm vị và âm cuối với câu đã xác nhận. Đây là thang phản hồi luyện tập.'}</small></p>`;
@@ -3758,6 +4004,68 @@ async function dictionaryShard(key) {
   dictionaryCache.set(bucket, pending);
   if (dictionaryCache.size > 4) dictionaryCache.delete(dictionaryCache.keys().next().value);
   return pending;
+}
+
+function editDistanceWithin(left,right,limit){
+ if(Math.abs(left.length-right.length)>limit)return limit+1;
+ let previous=Array.from({length:right.length+1},(_,index)=>index);
+ for(let i=1;i<=left.length;i++){
+  const current=Array(right.length+1).fill(limit+1);current[0]=i;let rowMin=current[0];
+  const start=Math.max(1,i-limit),end=Math.min(right.length,i+limit);
+  for(let j=start;j<=end;j++){
+   current[j]=Math.min(previous[j]+1,current[j-1]+1,previous[j-1]+(left[i-1]===right[j-1]?0:1));
+   rowMin=Math.min(rowMin,current[j]);
+  }
+  if(rowMin>limit)return limit+1;
+  previous=current;
+ }
+ return previous[right.length];
+}
+function spellingSuggestionsFor(word,keys){
+ const limit=word.length>=7?2:1,candidates=[];
+ for(const candidate of keys){
+  if(candidate===word||candidate[0]!==word[0]||candidate.length<4||Math.abs(candidate.length-word.length)>limit||! /^[a-z]+$/.test(candidate))continue;
+  const distance=editDistanceWithin(word,candidate,limit);
+  if(distance<=limit)candidates.push({word:candidate,distance});
+ }
+ return candidates.sort((a,b)=>a.distance-b.distance||Math.abs(a.word.length-word.length)-Math.abs(b.word.length-word.length)||a.word.localeCompare(b.word)).slice(0,3);
+}
+async function offlineSpellingAssessment(text){
+ const counts=new Map();
+ for(const word of String(text??'').toLowerCase().match(/[a-z]+(?:'[a-z]+)*/g)||[]){
+  if(word.length<4||word.includes("'")||SCORE_STOP.has(word))continue;
+  counts.set(word,(counts.get(word)||0)+1);
+ }
+ const groups=new Map();
+ for(const word of counts.keys()){const bucket=word[0];if(!groups.has(bucket))groups.set(bucket,[]);groups.get(bucket).push(word)}
+ if(!groups.size)return {status:'skipped',checked:0,findings:[]};
+ let failed=false,checked=0;const findings=[];
+ for(const [bucket,words] of groups){
+  let dictionary;
+  try{dictionary=await dictionaryShard(bucket)}catch{failed=true;continue}
+  const [entries,aliases,keys]=dictionary;
+  if(!keys.length){failed=true;continue}
+  checked+=words.length;
+  for(const word of words){
+   if(Object.hasOwn(entries,word)||Object.hasOwn(aliases,word))continue;
+   const suggestions=spellingSuggestionsFor(word,keys);
+   if(suggestions.length)findings.push({word,count:counts.get(word)||1,suggestions:suggestions.map(item=>item.word),distance:suggestions[0].distance});
+  }
+ }
+ const status=failed?(checked?'partial':'unavailable'):'checked';
+ return {status,checked,findings};
+}
+async function scoreWithDictionary(text,part,duration,question='',topic=''){
+ const result=score(text,part,duration,question,topic);if(!result)return null;
+ const spelling=await offlineSpellingAssessment(text);
+ const penalty=Math.min(2.5,spelling.findings.reduce((sum,item)=>sum+(item.distance===1?.4:.7)*Math.min(item.count,2),0));
+ result.metrics.spellingStatus=spelling.status;
+ result.metrics.spellingChecked=spelling.checked;
+ result.metrics.spellingFindings=spelling.findings;
+ result.metrics.lexicalPenalty=penalty;
+ result.l=Math.min(result.metrics.lexicalCeiling,Math.max(3.5,half(result.metrics.lexicalBase-penalty)));
+ result.o=Math.min(result.metrics.overallCeiling??Infinity,half(avg([result.f,result.l,result.g])));
+ return result;
 }
 
 function dictionarySuggestions(keys, query) {
@@ -4552,13 +4860,20 @@ function advancePathLesson(step){
  if(step===2&&(active.step!==1||pathTryReview?.id!==pathView||!pathTryReview.passed))return;
  setPathActive(pathView,step);openView();
 }
-function submitPathTry(event){
+async function submitPathTry(event){
  event.preventDefault();
  const item=PATH_LESSONS.find(entry=>entry.id===pathView);
  if(!item||st.learningPath.active?.id!==item.id||st.learningPath.active.step!==1)return;
- const value=event.currentTarget.elements.answer.value.trim(),rule=pathRule(item),evidence=pathEvidence(item.id,value,'try'),scored=score(value,rule.part,0);
+ const form=event.currentTarget;if(form.dataset.scoring==='true')return;
+ const value=form.elements.answer.value.trim(),rule=pathRule(item),evidence=pathEvidence(item.id,value,'try'),language=analyzeAnswerLanguage(value),prompt=rule.challenge||item.question,topic=LS[item.id][1];
+ const relevance=analyzeAnswerRelevance(value,prompt,topic);
+ if(!language.allowed||!relevance.allowed){pathTryReview={id:item.id,answer:value,evidence,score:null,scorePassed:false,passed:false,scoreMessage:answerScoringMessage(value,prompt,topic)};openView();return}
+ form.dataset.scoring='true';const button=form.querySelector('button[type="submit"]');if(button){button.disabled=true;button.textContent='Đang chấm…'}
+ let scored;try{scored=await scoreWithDictionary(value,rule.part,0,prompt,topic)}catch{scored=score(value,rule.part,0,prompt,topic)}
+ if(pathView!==item.id)return;
+ form.dataset.scoring='false';if(button){button.disabled=false;button.textContent='Chấm câu trả lời'}
  const scorePassed=Boolean(scored&&scored.o>=4.5),passed=evidence.passed&&scorePassed;
- pathTryReview={id:item.id,answer:value,evidence,score:scored,scorePassed,passed};
+ pathTryReview={id:item.id,answer:value,evidence,score:scored,scorePassed,passed,scoreMessage:scored?null:answerScoringMessage(value,prompt,topic)};
  openView();
 }
 function invalidatePathTry(input){
@@ -4568,10 +4883,10 @@ function invalidatePathTry(input){
  const status=$('#path-try-edit-status');if(status)status.textContent='Câu trả lời đã đổi. Hãy chấm lại để xem đánh giá mới.';
 }
 function pathTryFeedback(review){
- const scores=review.score?`<p>Điểm ước tính cho văn bản: ${bandRange(review.score.o)} · Lưu loát ${bandNumber(review.score.f)} · Từ vựng ${bandNumber(review.score.l)} · Ngữ pháp ${bandNumber(review.score.g)}.</p>`:'<p>Chưa đủ văn bản để ước tính các tiêu chí.</p>';
+ const scores=review.score?`<p>Điểm ước tính cho văn bản: ${bandRange(review.score.o)} · Lưu loát ${bandNumber(review.score.f)} · Từ vựng ${bandNumber(review.score.l)} · Ngữ pháp ${bandNumber(review.score.g)}.</p>${scoreExplanation(review.score)}`:`<p>${esc(review.scoreMessage||'Chưa đủ văn bản tiếng Anh để ước tính các tiêu chí.')}</p>`;
  const content=pathEvidenceText(review.evidence,'try');
  const feedback=review.passed?'Đạt mục tiêu nội dung của bài. Bạn có thể sang thử thách nói.':[
-  !review.evidence.passed?content:'',!review.scorePassed?'Điểm văn bản hiện dưới ngưỡng luyện tập 4.5. Thử thêm câu trả lời rõ ý với lý do hoặc ví dụ.':''
+  !review.evidence.passed?content:'',!review.score?review.scoreMessage:'',review.score&&!review.scorePassed?'Điểm văn bản hiện dưới ngưỡng luyện tập 4.5. Thử thêm câu trả lời rõ ý với lý do hoặc ví dụ.':''
  ].filter(Boolean).join(' ');
  return `<section id="path-try-review" class="path-try-feedback" aria-live="polite"><h3>${review.passed?'Đã chấm · có thể tiếp tục':'Đã chấm · hãy chỉnh câu trả lời'}</h3>${scores}<p>${esc(feedback)}</p><p class="mu">Đây là phản hồi ước tính để luyện tập, không phải điểm IELTS chính thức.</p></section>`;
 }
@@ -5224,18 +5539,24 @@ function examView(){
  ${pending?`<section class="exam-pending"><h2>Câu trả lời của bạn</h2><p lang="en">${esc(pending.turn.answer)}</p><p class="mu" role="status">${pending.interrupted?'Phiên đã tạm dừng. Bạn có thể tiếp tục bằng câu trả lời đã nhập.':x.k?'Đang đánh giá câu trả lời…':'Đang chuẩn bị câu hỏi nối tiếp…'}</p>${pending.interrupted?'<button onclick="resumeExam()">Tiếp tục</button>':''}</section>`:
   recordingMarkup()+'<div id="after"></div><section id="evaluation"></section>'}</article><button class="g w" onclick="leavePractice()">Thoát bài thi thử</button>`;
 }
-function submitExam(){
+async function submitExam(){
  const exam=S,input=$('#tx'),x=exam?.it[exam.i];
- if(exam?.mode!=='exam'||exam.pending||!input||!x)return;
+ if(exam?.mode!=='exam'||exam.pending||exam.scoring||!input||!x)return;
  if(exam.full&&!lb){$('#evaluation').innerHTML='<p role="alert">Thi thử đầy đủ yêu cầu ghi âm câu này. Hãy ghi âm trước khi nộp.</p>';return}
  if(exam.full&&x.p===2&&dur<60){$('#evaluation').innerHTML='<p role="alert">Part 2 cần bản ghi ít nhất một phút.</p>';return}
- const answer=input.value.trim(),estimate=score(answer,x.p,lb?dur:0);
- if(!estimate||answer.length>3600){
-  $('#evaluation').innerHTML='<p class="mu" role="alert">Hãy nhập câu trả lời có ít nhất 5 từ tiếng Anh và tối đa 3.600 ký tự.</p>';
+ const answer=input.value.trim(),language=analyzeAnswerLanguage(answer),relevance=analyzeAnswerRelevance(answer,x.q,x.t);
+ if(!language.allowed||!relevance.allowed||answer.length>3600){
+  $('#evaluation').innerHTML='<p class="mu" role="alert">'+esc(answer.length>3600?'Câu trả lời tối đa 3.600 ký tự.':answerScoringMessage(answer,x.q,x.t))+'</p>';
   input.focus();return;
  }
+ exam.scoring=true;input.readOnly=true;const submit=$('#evaluate-answer');if(submit)submit.disabled=true;
+ $('#evaluation').innerHTML='<p class="mu" role="status">Đang chấm câu trả lời và kiểm tra từ vựng ngoại tuyến…</p>';
+ let estimate;try{estimate=await scoreWithDictionary(answer,x.p,lb?dur:0,x.q,x.t)}catch{estimate=score(answer,x.p,lb?dur:0,x.q,x.t);if(estimate)estimate.metrics.spellingStatus='unavailable'}
+ if(S!==exam)return;
+ exam.scoring=false;input.readOnly=false;if(submit)submit.disabled=false;
+ if(!estimate){$('#evaluation').innerHTML='<p class="mu" role="alert">'+esc(answerScoringMessage(answer,x.q,x.t))+'</p>';return}
  const blob=lb,confirmed=$('#pron-confirm')?.checked,prior=exam.pronDraft?.pron;
- const p=prior?.assessment?.reference===answer?prior.assessment.band:null;
+ const p=blob&&dur>3&&prior?.assessment?.reference===answer?prior.assessment.band:null;
  const report=prior?.checks?.self?.report;
  exam.pending={turn:{part:x.p,question:x.q,answer,wpm:estimate.r,duration:blob?dur:0},estimate,p,pronNote:p!=null&&report?pronunciationAdvice(report):''};
  prepareLearningAudio();
@@ -5344,15 +5665,21 @@ async function advanceExam(exam,blob,confirmed,heard){
     }catch{}
    }
    if(S!==exam||signal.aborted)return;
-   const result=feedback||localExamFeedback(answers);
+   const localScores=localExamFeedback(answers);
+   const result=feedback?{...feedback,f:localScores.f,l:localScores.l,g:localScores.g}:localScores;
+   const spellingFlags=answers.flatMap(answer=>answer.estimate.metrics?.spellingFindings||[]).slice(0,5);
+   if(spellingFlags.length)result.lexical=(result.lexical||'')+' Từ điển ngoại tuyến nghi vấn: '+spellingFlags.map(item=>item.word+' → '+item.suggestions.join('/')).join(', ')+'.';
+   const grammarFlags=answers.flatMap(answer=>answer.estimate.metrics?.grammarFindings||[]).slice(0,4);
+   if(grammarFlags.length)result.grammar=(result.grammar||'')+' Bộ dò tại chỗ nhận diện một số mẫu cần kiểm tra: '+grammarFlags.map(item=>item.example).join('; ')+'.';
    const pronunciation=avg(answers.map(item=>item.p));
-   const scores={f:result.f,l:result.l,g:result.g,p:pronunciation==null?null:half(pronunciation)};
+   const scores={f:localScores.f,l:localScores.l,g:localScores.g,p:pronunciation==null?null:half(pronunciation)};
    if(scores.p!=null)scores.pronBasis='acoustic-v1';
-   scores.o=practiceBand(scores);
+   const examAnswerCeiling=Math.min(...answers.map(answer=>answer.estimate.metrics?.overallCeiling??Infinity));
+   scores.o=Math.min(examAnswerCeiling,practiceBand(scores));
    exam.final={result,scores,local:!feedback};
    const now=Date.now();
    const gameBefore=gameBadgeStatus();
-   st.h.push({id:exam.id,d:now,updated:now,kind:'exam',pt:exam.parts.length===1?x.p:null,t:x.t,...scores,scoreVersion:feedback?0:SCORE_VERSION});
+   st.h.push({id:exam.id,d:now,updated:now,kind:'exam',pt:exam.parts.length===1?x.p:null,t:x.t,...scores,scoreVersion:SCORE_VERSION});
    answers.forEach((answer,index)=>{
     const id=exam.id+'_'+index,day=dayNumber(now),part=answer.turn.part;
     gameAdd({id:'p_'+id+'_'+day,type:'practice',at:now,part,topic:exam.topic[0],seconds:answer.turn.duration,vocab:gameSavedVocabulary(answer.turn.answer),f:answer.estimate.f,l:answer.estimate.l,g:answer.estimate.g,scoreVersion:SCORE_VERSION},index===0?gameBefore:null);
@@ -5373,9 +5700,10 @@ function examSummary(exam){
  const points=(title,items)=>Array.isArray(items)&&items.length?`<h3>${title}</h3><ul>${items.map(item=>'<li>'+esc(item)+'</li>').join('')}</ul>`:'';
  const notes=[...new Set(exam.answers.map(item=>item.pronNote).filter(Boolean))];
  const scored=exam.answers.filter(item=>item.p!=null).length;
+ const turnDetails=exam.answers.map((item,index)=>`<details><summary>Câu ${index+1} · Part ${item.turn.part} · ${bandRange(item.estimate.o)}</summary>${scoreExplanation(item.estimate)}</details>`).join('');
  return `<section class="hero">${heroMotif}<div class="hero-copy"><p class="eyebrow">GIÁM KHẢO AI · KẾT QUẢ</p><h1>Hoàn thành bài thi thử</h1><p>Đã trả lời ${exam.answers.length} câu · Part ${exam.parts.join(' + ')}</p></div>
  <div class="hero-score"><small lang="en">PREDICTED BAND SCORE</small><div class="big">${bandNumber(scores.o)}</div><small>${scores.p==null?'Ước tính từ 3 tiêu chí':'Ước tính từ 4 tiêu chí'}</small></div></section>
- <article class="c examiner-feedback"><h2>Nhận xét tổng kết</h2><p class="mu"><small>${local?'Nhận xét trên thiết bị':'Nhận xét bằng OpenAI'}</small></p><p>${esc(result.overview)}</p>${bars(scores)}
+ <article class="c examiner-feedback"><h2>Nhận xét tổng kết</h2><p class="mu"><small>${local?'Nhận xét trên thiết bị':'Nhận xét bằng OpenAI'}</small></p><p>${esc(result.overview)}</p>${bars(scores)}<details class="result-feedback"><summary>Chi tiết điểm từng câu và lỗi nghi vấn</summary>${turnDetails}</details>
  <dl><dt>Lưu loát và mạch lạc</dt><dd>${esc(result.fluency)}</dd><dt>Từ vựng</dt><dd>${esc(result.lexical)}</dd><dt>Ngữ pháp</dt><dd>${esc(result.grammar)}</dd>
  <dt>Phát âm</dt><dd>${scored?'Đã đối chiếu âm vị từ '+scored+'/'+exam.answers.length+' bản ghi.':'Để nhận điểm phát âm, hãy ghi âm và xác nhận câu định nói trước khi nộp.'}</dd></dl>
  ${points('Luyện phát âm',notes.slice(0,3))}${points('Điểm mạnh',result.strengths)}${points('Luyện gì tiếp theo',result.actions)}

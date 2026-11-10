@@ -1,0 +1,17 @@
+{
+  "$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema.json",
+  "name": "epu-speaking-coop",
+  "main": "src/index.js",
+  "compatibility_date": "2026-11-10",
+  "durable_objects": {
+    "bindings": [
+      { "name": "COOP_ROOMS", "class_name": "CoopRoom" }
+    ]
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["CoopRoom"] }
+  ],
+  "vars": {
+    "ALLOWED_ORIGIN": "https://taylor447.github.io"
+  }
+}
