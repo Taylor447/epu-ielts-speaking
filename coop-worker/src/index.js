@@ -124,7 +124,7 @@ export default {
 
     const url = new URL(request.url);
     if (request.method === 'GET' && url.pathname === '/health') {
-      return withCors(request, json({ ok: true, service: 'epu-speaking-coop' }), env);
+      return withCors(request, json({ ok: true, service: 'epu-speaking-coop', turnConfigured: Boolean(env.TURN_KEY_ID && env.TURN_API_TOKEN) }), env);
     }
 
     if (request.method === 'POST' && url.pathname === '/api/rooms') {
@@ -162,6 +162,42 @@ export default {
       return withCors(request, new Response(result.body, { status: result.status, headers: result.headers }), env);
     }
 
+    const iceMatch = url.pathname.match(/^\/api\/rooms\/([A-HJ-NP-Z2-9]{7})\/ice-servers$/i);
+    if (request.method === 'POST' && iceMatch) {
+      const fallback = [{ urls: 'stun:stun.cloudflare.com:3478' }, { urls: 'stun:stun.l.google.com:19302' }];
+      if (!env.TURN_KEY_ID || !env.TURN_API_TOKEN) {
+        return withCors(request, json({ turnAvailable: false, iceServers: fallback }), env);
+      }
+      let input;
+      try { input = await request.json(); } catch { return withCors(request, json({ error: 'Thông tin phiên gọi không hợp lệ.' }, 400), env); }
+      const playerId = typeof input?.playerId === 'string' ? input.playerId : '';
+      const playerToken = typeof input?.playerToken === 'string' ? input.playerToken : '';
+      if (!playerId || !playerToken) return withCors(request, json({ error: 'Phiên phòng đã hết. Hãy vào lại phòng coop.' }, 401), env);
+      const auth = await callRoom(env, iceMatch[1].toUpperCase(), '/authorize-turn', { playerId, playerToken });
+      if (!auth.ok) {
+        const payload = await auth.json().catch(() => ({ error: 'Phiên phòng không hợp lệ.' }));
+        return withCors(request, json(payload, auth.status), env);
+      }
+      try {
+        const turnResponse = await fetch(`https://rtc.live.cloudflare.com/v1/turn/keys/${encodeURIComponent(env.TURN_KEY_ID)}/credentials/generate-ice-servers`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${env.TURN_API_TOKEN}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ttl: 3600 })
+        });
+        if (!turnResponse.ok) throw new Error('TURN credential request failed');
+        const payload = await turnResponse.json();
+        const iceServers = Array.isArray(payload?.iceServers) ? payload.iceServers.filter(server => {
+          const urls = Array.isArray(server?.urls) ? server.urls : [server?.urls];
+          return urls.some(value => typeof value === 'string' && /^(stun|stuns|turn|turns):/i.test(value));
+        }) : [];
+        const turnAvailable = iceServers.some(server => (Array.isArray(server.urls) ? server.urls : [server.urls]).some(value => typeof value === 'string' && /^turns?:/i.test(value)));
+        if (!turnAvailable) throw new Error('TURN servers missing from response');
+        return withCors(request, json({ turnAvailable: true, iceServers }), env);
+      } catch {
+        return withCors(request, json({ turnAvailable: false, iceServers: fallback, warning: 'TURN chưa sẵn sàng; đang thử kết nối trực tiếp.' }), env);
+      }
+    }
+
     const socketMatch = url.pathname.match(/^\/api\/rooms\/([A-HJ-NP-Z2-9]{7})\/socket$/i);
     if (request.method === 'GET' && socketMatch && request.headers.get('Upgrade')?.toLowerCase() === 'websocket') {
       // Forward the original request so Cloudflare preserves the WebSocket upgrade.
@@ -183,6 +219,7 @@ export class CoopRoom {
     const url = new URL(request.url);
     if (request.method === 'POST' && url.pathname === '/create') return this.create(request);
     if (request.method === 'POST' && url.pathname === '/join') return this.join(request);
+    if (request.method === 'POST' && url.pathname === '/authorize-turn') return this.authorizeTurn(request);
     if (request.method === 'GET' && (url.pathname === '/socket' || /^\/api\/rooms\/[A-HJ-NP-Z2-9]{7}\/socket$/i.test(url.pathname))) return this.connect(request);
     return json({ error: 'Không tìm thấy phòng.' }, 404);
   }
@@ -228,6 +265,19 @@ export class CoopRoom {
     await this.ctx.storage.put('room', state);
     await this.broadcast(state);
     return json({ state: publicState(state), playerId: input.id, playerToken: input.token, roomCode: state.code });
+  }
+
+  async authorizeTurn(request) {
+    const input = await request.json().catch(() => ({}));
+    const state = await this.readState();
+    if (!state || state.expiresAt <= Date.now()) return json({ error: 'Phòng đã hết hạn.' }, 410);
+    const player = state.players.find(item => item.id === input.playerId);
+    if (!player || !input.playerToken || player.tokenHash !== await digest(input.playerToken)) return json({ error: 'Phiên phòng không hợp lệ.' }, 403);
+    const now = Date.now();
+    if (player.turnIssuedAt && now - player.turnIssuedAt < 15000) return json({ error: 'Hãy đợi một chút trước khi thử lại đường truyền.' }, 429);
+    player.turnIssuedAt = now;
+    await this.ctx.storage.put('room', state);
+    return json({ ok: true });
   }
 
   async connect(request) {

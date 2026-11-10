@@ -23,7 +23,18 @@ Cloudflare có thể tạo một bản sao thư mục Worker trong GitHub của 
 - Nếu Cloudflare vẫn đang triển khai, chờ hoàn tất rồi thử **Kiểm tra và lưu** lại.
 - Cả hai người phải nhập đúng cùng một địa chỉ Worker. Địa chỉ được lưu riêng trên từng thiết bị.
 - Chat và nội dung câu trả lời được lưu tạm trong phòng tối đa 2 giờ; bản ghi câu trả lời được Worker chuyển tới người còn lại đang kết nối nhưng không lưu vào lịch sử phòng. Mỗi bản ghi tối đa 550 KB.
-- Âm thanh cuộc gọi truyền trực tiếp giữa hai trình duyệt bằng WebRTC; Worker chỉ chuyển tín hiệu kết nối. Cần HTTPS và quyền micro. Hiện chỉ cấu hình STUN, chưa có TURN, nên một số mạng trường học/công ty hoặc NAT nghiêm ngặt có thể không kết nối được.
+- Âm thanh cuộc gọi truyền trực tiếp giữa hai trình duyệt bằng WebRTC; Worker chỉ chuyển tín hiệu kết nối. Cần HTTPS và quyền micro. Nếu chưa cấu hình TURN, app thử kết nối bằng STUN; một số mạng trường học/công ty hoặc NAT nghiêm ngặt vẫn có thể chặn.
+
+## Bật TURN để tăng khả năng gọi thoại
+
+TURN chuyển tiếp âm thanh khi hai thiết bị không thể kết nối trực tiếp. Đây là cấu hình tùy chọn trên Cloudflare, không cần đưa bí mật vào trang web:
+
+1. Trong Cloudflare, tạo một **Realtime TURN key** và giữ lại **Key ID** cùng **Key API token**.
+2. Mở Worker `epu-speaking-coop` → **Settings** → **Variables and Secrets**.
+3. Thêm biến thường `TURN_KEY_ID` với Key ID; thêm secret `TURN_API_TOKEN` với Key API token.
+4. Lưu thay đổi và triển khai lại Worker. Trang sẽ tự xin thông tin TURN ngắn hạn, chỉ sau khi xác thực thành viên trong phòng.
+
+Không dán TURN API token vào mã HTML, GitHub hoặc ô địa chỉ Worker. TURN là dịch vụ chuyển tiếp; hãy xem giới hạn và chi phí hiện hành của Cloudflare trước khi bật cho nhiều người dùng.
 
 ## Ghi chú cho người phát triển
 
