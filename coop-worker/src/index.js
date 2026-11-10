@@ -4,6 +4,9 @@ const MAX_NAME = 32;
 const MAX_PROMPTS = 8;
 const MAX_ANSWER = 1600;
 const MAX_NOTE = 240;
+const MAX_CHAT_MESSAGE = 500;
+const MAX_SOCKET_MESSAGE = 2 * 1024 * 1024;
+const MAX_COOP_AUDIO_BYTES = 550 * 1024;
 
 const json = (body, status = 200, headers = {}) => new Response(JSON.stringify(body), {
   status,
@@ -32,6 +35,36 @@ function cleanName(value) {
   return typeof value === 'string' ? value.replace(/[<>\u0000-\u001f]/g, '').trim().slice(0, MAX_NAME) : '';
 }
 
+function cleanChatMessage(value) {
+  return typeof value === 'string' ? value.replace(/[\u0000-\u001f\u007f]/g, ' ').trim().slice(0, MAX_CHAT_MESSAGE) : '';
+}
+
+function cleanAudioDataUrl(value) {
+  if (typeof value !== 'string') return null;
+  const match = value.match(/^data:audio\/[a-z0-9.+-]+;base64,([a-z0-9+/]+={0,2})$/i);
+  if (!match) return null;
+  const encoded = match[1];
+  const bytes = Math.floor(encoded.length * 3 / 4) - (encoded.endsWith('==') ? 2 : encoded.endsWith('=') ? 1 : 0);
+  return bytes > 0 && bytes <= MAX_COOP_AUDIO_BYTES ? value : null;
+}
+
+function cleanCallSignal(value) {
+  if (!value || typeof value !== 'object') return null;
+  if (['offer', 'answer'].includes(value.kind) && value.description?.type === value.kind && typeof value.description.sdp === 'string' && value.description.sdp.length <= 16000) {
+    return { kind: value.kind, description: { type: value.kind, sdp: value.description.sdp } };
+  }
+  if (value.kind === 'candidate' && value.candidate && typeof value.candidate.candidate === 'string' && value.candidate.candidate.length <= 2048) {
+    return { kind: 'candidate', candidate: {
+      candidate: value.candidate.candidate,
+      sdpMid: typeof value.candidate.sdpMid === 'string' ? value.candidate.sdpMid.slice(0, 128) : null,
+      sdpMLineIndex: Number.isInteger(value.candidate.sdpMLineIndex) ? value.candidate.sdpMLineIndex : null,
+      usernameFragment: typeof value.candidate.usernameFragment === 'string' ? value.candidate.usernameFragment.slice(0, 128) : null
+    } };
+  }
+  if (['hangup', 'reject'].includes(value.kind)) return { kind: value.kind };
+  return null;
+}
+
 function cleanPrompts(value) {
   if (!Array.isArray(value) || value.length < 2 || value.length > MAX_PROMPTS) return null;
   const prompts = value.map(item => typeof item === 'string' ? item.trim().slice(0, 360) : '');
@@ -48,6 +81,7 @@ function publicState(state, onlineIds = new Set()) {
     turn: state.turn,
     currentAnswer: state.currentAnswer,
     answers: state.answers,
+    chat: Array.isArray(state.chat) ? state.chat : [],
     createdAt: state.createdAt,
     expiresAt: state.expiresAt,
     players: state.players.map(player => ({ id: player.id, name: player.name, online: onlineIds.has(player.id) }))
@@ -170,6 +204,8 @@ export class CoopRoom {
       turn: 0,
       currentAnswer: null,
       answers: [],
+      chat: [],
+      chatLastSentAt: {},
       players: [{ id: input.host.id, tokenHash: await digest(input.host.token), name: input.host.name }],
       createdAt: now,
       updatedAt: now,
@@ -220,7 +256,7 @@ export class CoopRoom {
     const attachment = socket.deserializeAttachment();
     const playerId = attachment?.playerId;
     const raw = typeof message === 'string' ? message : new TextDecoder().decode(message);
-    if (raw.length > MAX_ANSWER + 1000) {
+    if (raw.length > MAX_SOCKET_MESSAGE) {
       socket.send(JSON.stringify({ type: 'error', error: 'Tin nhắn vượt quá giới hạn.' }));
       return;
     }
@@ -238,9 +274,51 @@ export class CoopRoom {
       return;
     }
 
-    if (input?.type === 'answer') {
+    let outgoingAudio = null;
+    if (input?.type === 'signal') {
+      const targetId = typeof input.targetPlayerId === 'string' ? input.targetPlayerId : '';
+      const signal = cleanCallSignal(input.signal);
+      if (!targetId || targetId === playerId || !state.players.some(player => player.id === targetId) || !signal) {
+        socket.send(JSON.stringify({ type: 'error', error: 'Tín hiệu cuộc gọi không hợp lệ.' }));
+        return;
+      }
+      const payload = JSON.stringify({ type: 'signal', from: playerId, signal });
+      let delivered = false;
+      for (const peerSocket of this.ctx.getWebSockets(targetId)) {
+        try { peerSocket.send(payload); delivered = true; } catch {}
+      }
+      if (!delivered) socket.send(JSON.stringify({ type: 'error', error: 'Bạn học chưa kết nối. Hãy đợi bạn ấy vào phòng rồi thử gọi lại.' }));
+      return;
+    } else if (input?.type === 'chat') {
+      const text = cleanChatMessage(input.text);
+      const now = Date.now();
+      state.chat ||= [];
+      state.chatLastSentAt ||= {};
+      if (!text) {
+        socket.send(JSON.stringify({ type: 'error', error: 'Hãy nhập tin nhắn trước khi gửi.' }));
+        return;
+      }
+      if (now - Number(state.chatLastSentAt[playerId] || 0) < 600) {
+        socket.send(JSON.stringify({ type: 'error', error: 'Bạn gửi hơi nhanh. Hãy chờ một chút rồi gửi tiếp.' }));
+        return;
+      }
+      state.chatLastSentAt[playerId] = now;
+      state.chat.push({ playerId, text, sentAt: now });
+      if (state.chat.length > 50) state.chat.splice(0, state.chat.length - 50);
+      state.updatedAt = now;
+      await this.ctx.storage.put('room', state);
+      await this.broadcast(state);
+      return;
+    } else if (input?.type === 'answer') {
       const active = state.players[state.turn % 2];
       const answer = typeof input.answer === 'string' ? input.answer.trim().slice(0, MAX_ANSWER) : '';
+      if (input.audio != null) {
+        outgoingAudio = cleanAudioDataUrl(input.audio);
+        if (!outgoingAudio) {
+          socket.send(JSON.stringify({ type: 'error', error: 'Bản ghi không hợp lệ hoặc quá lớn. Hãy thu ngắn hơn rồi gửi lại.' }));
+          return;
+        }
+      }
       if (state.phase !== 'answer' || active?.id !== playerId || answer.length < 10) {
         socket.send(JSON.stringify({ type: 'error', error: 'Chưa đến lượt bạn hoặc câu trả lời quá ngắn.' }));
         return;
@@ -275,6 +353,7 @@ export class CoopRoom {
     state.updatedAt = Date.now();
     await this.ctx.storage.put('room', state);
     await this.broadcast(state);
+    if (outgoingAudio) await this.broadcastAudio(state.turn, playerId, outgoingAudio);
   }
 
   async onlineIds() {
@@ -284,6 +363,14 @@ export class CoopRoom {
   async broadcast(state) {
     const payload = JSON.stringify({ type: 'state', state: publicState(state, await this.onlineIds()) });
     for (const socket of this.ctx.getWebSockets()) {
+      try { socket.send(payload); } catch {}
+    }
+  }
+
+  async broadcastAudio(turn, senderId, audio) {
+    const payload = JSON.stringify({ type: 'audio', turn, audio });
+    for (const socket of this.ctx.getWebSockets()) {
+      if (socket.deserializeAttachment()?.playerId === senderId) continue;
       try { socket.send(payload); } catch {}
     }
   }

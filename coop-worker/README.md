@@ -12,6 +12,7 @@ Việc này do người quản lý trang làm một lần. Bạn cần tài kho�
 4. Sao chép địa chỉ Worker có dạng `ten-worker.ten-tai-khoan.workers.dev`.
 5. Mở trang EPU bằng HTTPS → **Học coop 2 người** → dán địa chỉ đó → bấm **Kiểm tra và lưu**.
 6. Gửi cùng địa chỉ Worker cho người học khác; họ dán vào ô đó trên thiết bị của mình. Sau đó một người tạo phòng, gửi mã 7 ký tự, người kia nhập mã để tham gia.
+7. Trong phòng, hai người có thể chat, ghi âm câu trả lời để gửi cho bạn học nghe, hoặc gọi thoại. Khi gọi, người nhận cần bấm **Nhận cuộc gọi** và cho phép micro.
 
 Cloudflare có thể tạo một bản sao thư mục Worker trong GitHub của bạn để quản lý việc triển khai. Thao tác này không sửa mã trang EPU gốc. Nút triển khai yêu cầu repo công khai và mã nguồn Worker nằm riêng trong `coop-worker`.
 
@@ -21,7 +22,8 @@ Cloudflare có thể tạo một bản sao thư mục Worker trong GitHub của 
 - Mở trực tiếp `địa-chỉ-worker/health`. Kết quả đúng có `"ok":true` và `"service":"epu-speaking-coop"`.
 - Nếu Cloudflare vẫn đang triển khai, chờ hoàn tất rồi thử **Kiểm tra và lưu** lại.
 - Cả hai người phải nhập đúng cùng một địa chỉ Worker. Địa chỉ được lưu riêng trên từng thiết bị.
-- Coop chỉ đồng bộ chữ và góp ý, không gửi bản ghi âm. Phòng cùng nội dung tạm thời tự xóa sau 2 giờ.
+- Chat và nội dung câu trả lời được lưu tạm trong phòng tối đa 2 giờ; bản ghi câu trả lời được Worker chuyển tới người còn lại đang kết nối nhưng không lưu vào lịch sử phòng. Mỗi bản ghi tối đa 550 KB.
+- Âm thanh cuộc gọi truyền trực tiếp giữa hai trình duyệt bằng WebRTC; Worker chỉ chuyển tín hiệu kết nối. Cần HTTPS và quyền micro. Hiện chỉ cấu hình STUN, chưa có TURN, nên một số mạng trường học/công ty hoặc NAT nghiêm ngặt có thể không kết nối được.
 
 ## Ghi chú cho người phát triển
 
