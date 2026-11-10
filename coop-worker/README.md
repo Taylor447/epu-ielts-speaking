@@ -1,24 +1,28 @@
-# Backend học coop EPU
+# Bật học coop cho EPU — không cần dùng cửa sổ lệnh
 
-Worker này giữ phòng học tối đa hai người và đồng bộ lượt nói/góp ý theo thời gian thực bằng Cloudflare Durable Objects. Nội dung phòng tự hết hạn sau 2 giờ. Đây là backend phục vụ GitHub Pages; không cần cài thư viện trong trang web.
+## Thiết lập một lần
 
-## Triển khai
+Việc này do người quản lý trang làm một lần. Bạn cần tài khoản Cloudflare và GitHub. Không cần cài Node.js hay chạy lệnh.
 
-1. Cài Node.js trên máy và mở terminal tại thư mục `coop-worker`.
-2. Chạy `npm install`.
-3. Chạy `npx wrangler login` và đăng nhập tài khoản Cloudflare của bạn.
-4. Chạy `npm run deploy`. Lệnh đầu tiên tạo Durable Object SQLite theo migration `v1`.
-5. Sao chép địa chỉ `https://…workers.dev` mà Cloudflare trả về.
-6. Mở trang EPU → **Học coop 2 người**, dán địa chỉ Worker vào ô cấu hình và lưu. Cả hai người dùng cùng một địa chỉ Worker.
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https%3A%2F%2Fgithub.com%2FTaylor447%2Fepu-ielts-speaking%2Ftree%2Fmain%2Fcoop-worker)
 
-Nếu trang được chuyển sang domain khác, cập nhật `ALLOWED_ORIGIN` trong `wrangler.jsonc`, rồi chạy lại `npm run deploy`. Giá trị mặc định là `https://taylor447.github.io`.
+1. Bấm **Deploy to Cloudflare** ở trên rồi đăng nhập Cloudflare và GitHub nếu được yêu cầu.
+2. Giữ các thiết lập có sẵn; đặt tên Worker nếu Cloudflare hỏi rồi chọn triển khai.
+3. Cloudflare sẽ tạo Worker và bộ nhớ phòng học cần thiết. Chờ đến khi thấy triển khai hoàn tất.
+4. Sao chép địa chỉ Worker có dạng `ten-worker.ten-tai-khoan.workers.dev`.
+5. Mở trang EPU bằng HTTPS → **Học coop 2 người** → dán địa chỉ đó → bấm **Kiểm tra và lưu**.
+6. Gửi cùng địa chỉ Worker cho người học khác; họ dán vào ô đó trên thiết bị của mình. Sau đó một người tạo phòng, gửi mã 7 ký tự, người kia nhập mã để tham gia.
 
-## Hành vi và dữ liệu
+Cloudflare có thể tạo một bản sao thư mục Worker trong GitHub của bạn để quản lý việc triển khai. Thao tác này không sửa mã trang EPU gốc. Nút triển khai yêu cầu repo công khai và mã nguồn Worker nằm riêng trong `coop-worker`.
 
-- Mỗi phòng có mã ngẫu nhiên 7 ký tự và tối đa hai chỗ.
-- Hai người luân phiên nói và góp ý theo câu hỏi của Part 1, cue card Part 2 hoặc Part 3.
-- Worker chỉ giữ transcript và góp ý trong bộ nhớ Durable Object, xóa phòng sau 2 giờ; không lưu band giả hoặc kết quả vào hồ sơ EPU.
-- Người có mã phòng có thể xem transcript/góp ý trong phiên. Không nhập thông tin riêng tư vào phần trả lời.
-- Ứng dụng không gửi âm thanh qua coop. Mỗi người có thể nói vào micro của mình; phần coop chỉ đồng bộ câu trả lời dạng chữ và góp ý.
+## Nếu chưa kết nối được
 
-Worker có endpoint kiểm tra nhanh `/health`. Khi Worker chưa được triển khai hoặc địa chỉ chưa được cấu hình trong ứng dụng, trang sẽ báo trạng thái và không giả vờ đã kết nối.
+- Địa chỉ có thể dán kèm hoặc không kèm `https://`; EPU sẽ tự thêm nếu thiếu. Địa chỉ cần kết thúc bằng `.workers.dev`.
+- Mở trực tiếp `địa-chỉ-worker/health`. Kết quả đúng có `"ok":true` và `"service":"epu-speaking-coop"`.
+- Nếu Cloudflare vẫn đang triển khai, chờ hoàn tất rồi thử **Kiểm tra và lưu** lại.
+- Cả hai người phải nhập đúng cùng một địa chỉ Worker. Địa chỉ được lưu riêng trên từng thiết bị.
+- Coop chỉ đồng bộ chữ và góp ý, không gửi bản ghi âm. Phòng cùng nội dung tạm thời tự xóa sau 2 giờ.
+
+## Ghi chú cho người phát triển
+
+Worker dùng Cloudflare Durable Objects với SQLite. Có thể triển khai thủ công từ thư mục này bằng `npm install`, đăng nhập Wrangler bằng `npx wrangler login`, rồi chạy `npm run deploy`. Chỉ cần cách này nếu bạn muốn quản lý Worker bằng dòng lệnh.
