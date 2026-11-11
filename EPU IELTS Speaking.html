@@ -816,6 +816,8 @@ body > nav button.on { background: color-mix(in srgb,var(--pr) 17%,transparent);
 @media(max-width:600px){}
 .coop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 12px; }
 .coop-room-code { display: inline-flex; align-items: center; gap: 10px; padding: 8px 12px; border: 1px solid var(--bd); border-radius: 12px; background: var(--sf); font: 800 1.2rem/1.3 ui-monospace, monospace; letter-spacing: .12em; }
+.coop-messenger-link { display: inline-flex; align-items: center; gap: 8px; min-height: 43px; padding: 9px 15px; border: 1px solid var(--bd); border-radius: 12px; background: var(--sf); color: var(--pr); font-weight: 690; text-decoration: none; }
+@media (hover: hover) { .coop-messenger-link:hover { border-color: var(--pr); background: color-mix(in srgb, var(--sf) 82%, var(--pr)); } }
 .coop-prompt { padding: 16px; border-left: 4px solid var(--action); border-radius: 8px; background: var(--sf); font-size: 1.15rem; font-weight: 700; }
 .coop-answer { white-space: pre-wrap; overflow-wrap: anywhere; }
 .coop-player-list { display: flex; flex-wrap: wrap; gap: 8px; padding: 0; list-style: none; }
@@ -2917,32 +2919,8 @@ try{
 }catch{}
 
 function coopEndpoint(){return String(st.coop?.endpoint||'').replace(/\/+$/,'')}
-function coopChatPanel(state){
- const messages=(state?.chat||[]).slice(-50).map(message=>{
-  const player=state.players.find(item=>item.id===message.playerId),mine=message.playerId===coopSession.playerId;
-  const time=new Date(Number(message.sentAt)||Date.now()).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});
-  return `<li class="coop-chat-message${mine?' mine':''}"><div><strong>${esc(mine?'Bạn':player?.name||'Bạn học')}</strong><time>${esc(time)}</time></div><p>${esc(message.text)}</p></li>`;
- }).join('')||'<li class="mu">Chưa có tin nhắn. Gửi lời chào cho bạn học nhé.</li>';
- return `<section class="c coop-chat"><h2>Trò chuyện trực tiếp</h2><p class="mu">Tin nhắn được đồng bộ trong phòng và tự xóa khi phòng hết hạn.</p><ol class="coop-chat-log" role="log" aria-live="polite" aria-relevant="additions text" aria-label="Tin nhắn trong phòng" onscroll="coopChatPinnedToBottom=this.scrollHeight-this.scrollTop-this.clientHeight<28">${messages}</ol><form class="coop-chat-send" onsubmit="event.preventDefault();sendCoopChat(this)"><label>Tin nhắn<textarea name="text" rows="2" maxlength="500" oninput="coopChatDraft=this.value" placeholder="Nhắn cho bạn học…">${esc(coopChatDraft)}</textarea></label><button type="submit">Gửi</button></form></section>`;
-}
-function coopCallPanel(state){
- const peer=(state?.players||[]).find(item=>item.id!==coopSession.playerId),supported='RTCPeerConnection'in window&&navigator.mediaDevices?.getUserMedia;
- let actions='';
- if(coopCallState==='incoming')actions='<button type="button" onclick="acceptCoopCall()">Nhận cuộc gọi</button><button type="button" class="g" onclick="rejectCoopCall()">Từ chối</button>';
- else if(coopCallState==='outgoing')actions='<button type="button" class="g" onclick="endCoopCall(true)">Hủy cuộc gọi</button>';
- else if(coopCallState==='connected')actions=`<button type="button" onclick="enableCoopRemoteAudio()">${coopRemoteAudioPlaying?'Kiểm tra tiếng bạn học':'Bật tiếng bạn học'}</button><button type="button" class="g" onclick="toggleCoopMute()">${coopMuted?'Bật micro':'Tắt micro'}</button><button type="button" class="g" onclick="endCoopCall(true)">Kết thúc cuộc gọi</button>`;
- else actions=`<button type="button" onclick="startCoopCall()"${supported&&peer?.online?'':' disabled'}>Gọi thoại${peer?.name?' '+esc(peer.name):''}</button>`;
- const pill=coopCallState==='connected'?'Đang gọi':coopCallState==='incoming'?'Có cuộc gọi đến':coopCallState==='outgoing'?'Đang kết nối':'Sẵn sàng';
- const localTrack=coopLocalStream?.getAudioTracks()[0],localMic=!localTrack?'Chưa mở micro':coopMuted||!localTrack.enabled?'Micro đang tắt tiếng':'Micro đang bật';
- const remoteAudio=coopRemoteTrackState==='live'?(coopRemoteAudioPlaying?'Đang phát tiếng bạn học':'Đã nhận âm thanh'):coopRemoteTrackState==='muted'?'Micro bạn học đang tạm dừng':coopRemoteTrackState==='missing'?'Chưa nhận được micro':coopRemoteTrackState==='ended'?'Luồng tiếng đã kết thúc':coopCallState==='incoming'?'Đang gọi bạn':coopCallState==='connected'?'Đang chờ tiếng':'Chưa kết nối';
- const status=coopCallState==='incoming'?`${esc(peer?.id===coopCallTarget?peer.name:'Bạn học')} đang gọi cho bạn.`:!supported?'Trình duyệt cần HTTPS, micro được cấp quyền và hỗ trợ WebRTC.':coopCallState==='idle'&&!peer?.online?'Đợi bạn học kết nối vào phòng để bắt đầu cuộc gọi.':esc(coopVoiceStatus);
- const liveControls=coopCallState==='connected'?`<label class="coop-volume-control">Âm lượng bạn học<input type="range" min="0" max="1" step="0.05" value="${coopRemoteVolume}" aria-label="Âm lượng giọng bạn học" oninput="setCoopRemoteVolume(this.value)"><output id="coop-remote-volume-value">${Math.round(coopRemoteVolume*100)}%</output></label>`:'';
- const active=coopCallState!=='idle';
- const people=active?`<div class="coop-call-people"><div class="coop-call-person"><span class="coop-call-avatar" aria-hidden="true">🎙</span><span><small>Bạn · micro</small><strong>${localMic}</strong></span></div><div class="coop-call-person"><span class="coop-call-avatar" aria-hidden="true">🔊</span><span><small>${esc(peer?.name||'Bạn học')} · âm thanh</small><strong>${remoteAudio}</strong></span></div></div><div class="coop-remote-audio-slot" aria-label="Điều khiển âm thanh từ bạn học"></div>`:'';
- const stepMic=coopLocalStream?'is-done':'is-current',stepConnection=coopCallState==='connected'?'is-done':coopLocalStream?'is-current':'',stepAudio=coopRemoteTrackState==='live'&&coopRemoteAudioPlaying?'is-done':coopCallState==='connected'?'is-current':'';
- const steps=`<div class="coop-call-steps" aria-label="Tiến trình cuộc gọi"><span class="${stepMic}">Micro</span><span class="${stepConnection}">Kết nối</span><span class="${stepAudio}">Âm thanh hai chiều</span></div>`;
- const networkNote=active&&coopIceConfigState==='stun-only'?'<p class="coop-call-network-note">Đang dùng STUN miễn phí và sẽ tự thử nối lại khi mạng đổi. Một số mạng di động dùng NAT nhà mạng chặn kết nối trực tiếp; nếu vẫn lỗi thì cần TURN hoặc đổi nhà mạng/Wi‑Fi.</p>':coopIceConfigState==='loading'?'<p class="coop-call-network-note">Đang chuẩn bị đường truyền thoại…</p>':'';
- return `<section class="coop-call-panel" data-state="${coopCallState}"><div class="coop-call-heading"><div><p class="eyebrow">HỌC CÙNG BẠN</p><h2>Gọi thoại trực tiếp</h2><p class="coop-call-subtitle">${active?'Kiểm tra micro và âm thanh của cả hai người tại đây.':'Gọi trực tiếp trong phòng học coop.'}</p></div><span class="coop-call-pill" data-state="${coopCallState}">${pill}</span></div>${active?steps:''}${people}<div class="coop-call-actions">${actions}</div>${liveControls}${networkNote}<p class="coop-notice mu" role="status" aria-live="polite">${status}</p></section>`;
+function coopMessengerPanel(){
+ return '<section class="c coop-messenger-panel"><p class="eyebrow">TRAO ĐỔI QUA FACEBOOK</p><h2>Messenger Web</h2><p>Dùng Messenger để nhắn tin hoặc gọi cho bạn học. Sao chép mã phòng ở thẻ phía trên, gửi cho bạn học qua Messenger, rồi quay lại EPU để luyện nói và góp ý theo lượt.</p><a class="coop-messenger-link" href="https://www.facebook.com/messages/" target="_blank" rel="noopener noreferrer">Mở Messenger trên web ↗</a><p class="mu">Messenger mở ở thẻ mới. Bạn tự chọn người nhận và đăng nhập Facebook nếu được yêu cầu; EPU không đọc hay đồng bộ tin nhắn/cuộc gọi Messenger.</p></section>';
 }
 function coopRecordingPanel(maxSeconds){
  const busy=['opening','processing','transcribing'].includes(coopRecordState),recording=coopRecordState==='recording',transcribing=coopRecordState==='transcribing';
@@ -2982,11 +2960,11 @@ function coopPage(){
  const roomHead=`<section class="c"><div class="section-head"><div><p class="eyebrow">PHÒNG HỌC COOP · PART ${state?.part||'—'}</p><h2>${esc(state?.topic||'Đang kết nối…')}</h2></div><button class="g" type="button" onclick="copyCoopCode()">Sao chép mã</button></div>
   <p>Mã phòng <span class="coop-room-code">${esc(coopSession.roomCode)}</span></p><ul class="coop-player-list">${players.map(player=>`<li>${esc(player.name)} · ${player.online?'đang kết nối':'chờ kết nối'}</li>`).join('')}</ul>
   <p class="coop-notice mu" id="coop-status" role="status" aria-live="polite">${esc(coopStatus)}</p><button class="g" type="button" onclick="leaveCoop()">Kết thúc phiên trên thiết bị này</button></section>`;
- if(!state||state.phase==='waiting')return `${pageIntro('HỌC CÙNG BẠN','Đang chờ bạn học','Gửi mã phòng cho một người bạn. Khi họ tham gia, câu hỏi đầu tiên sẽ xuất hiện.')}${roomHead}${coopCallPanel(state)}${coopChatPanel(state)}<button class="g" type="button" onclick="go('prac')">Về luyện tập</button>`;
+ if(!state||state.phase==='waiting')return `${pageIntro('HỌC CÙNG BẠN','Đang chờ bạn học','Gửi mã phòng cho một người bạn. Khi họ tham gia, câu hỏi đầu tiên sẽ xuất hiện.')}${roomHead}${coopMessengerPanel()}<button class="g" type="button" onclick="go('prac')">Về luyện tập</button>`;
  if(state.phase==='expired')return `${pageIntro('HỌC CÙNG BẠN','Phòng đã hết hạn','Phòng tự xóa sau 2 giờ. Tạo phòng mới để tiếp tục.')}${roomHead}<button onclick="leaveCoop()">Đóng phiên</button>`;
  if(state.phase==='complete'){
   const turns=state.answers.map((answer,index)=>{const speaker=players.find(player=>player.id===answer.playerId)?.name||'Người học';const review=answer.review,audio=coopAudioByTurn.get(String(index));return `<article class="c"><h3>Lượt ${index+1} · ${esc(speaker)}</h3><p class="coop-prompt" lang="en">${esc(answer.question)}</p><p class="coop-answer" lang="en">${esc(answer.text)}</p>${audio?`<audio class="recording-playback" controls preload="metadata" src="${esc(audio)}" aria-label="Nghe bản ghi lượt ${index+1}"></audio>`:''}<p>Góp ý: ${review?.onTopic?'✓ Bám đề':'△ Cần bám đề rõ hơn'} · ${review?.reasonExample?'✓ Có lý do/ví dụ':'△ Thêm lý do/ví dụ'} · ${review?.clear?'✓ Ý rõ':'△ Nói gọn và rõ hơn'}</p>${review?.note?`<p class="coop-feedback">${esc(review.note)}</p>`:''}</article>`}).join('');
-  return `${pageIntro('HỌC CÙNG BẠN','Hoàn thành phiên coop','Hai bạn đã đổi vai nói và góp ý. Chọn một điểm cần cải thiện rồi thử lại khi sẵn sàng.')}${roomHead}<h2>Tổng kết lượt nói</h2>${turns}${coopCallPanel(state)}${coopChatPanel(state)}<button onclick="leaveCoop()">Đóng phiên</button>`;
+  return `${pageIntro('HỌC CÙNG BẠN','Hoàn thành phiên coop','Hai bạn đã đổi vai nói và góp ý. Chọn một điểm cần cải thiện rồi thử lại khi sẵn sàng.')}${roomHead}<h2>Tổng kết lượt nói</h2>${turns}${coopMessengerPanel()}<button onclick="leaveCoop()">Đóng phiên</button>`;
  }
  const speaker=players[state.turn%2],reviewer=players[(state.turn+1)%2],isSpeaker=speaker?.id===coopSession.playerId,prompt=state.prompts?.[state.turn]||'';
  const audioSource=coopAudioByTurn.get(String(state.turn));
@@ -2995,7 +2973,7 @@ function coopPage(){
  let turnPanel='';
  if(state.phase==='answer')turnPanel=isSpeaker?`<article class="c"><p class="eyebrow">LƯỢT ${state.turn+1}/${state.prompts.length} · ĐẾN LƯỢT BẠN NÓI</p><h2>${state.part===2?'Nói theo cue card':'Trả lời câu hỏi'}</h2><div class="coop-prompt" lang="en">${esc(prompt)}</div><p>${state.part===2?'Hãy ghi âm khoảng 60–90 giây. Whisper sẽ tự chép lời tiếng Anh để bạn kiểm tra/sửa rồi gửi cho bạn học.':'Hãy ghi âm câu trả lời. Whisper sẽ tự chép lời tiếng Anh để bạn kiểm tra/sửa trước khi gửi.'}</p><form onsubmit="event.preventDefault();sendCoopAnswer(this)">${coopRecordingPanel(maxRecordSeconds)}<label>Transcript tiếng Anh — hãy kiểm tra và sửa nếu cần<textarea name="answer" rows="5" maxlength="1600" minlength="10" required oninput="coopAnswerDraft=this.value"${coopRecordState==='transcribing'?' readonly':''} placeholder="Sau khi ghi âm, transcript tiếng Anh sẽ tự điền vào đây…">${esc(coopAnswerDraft)}</textarea></label><p class="mu" role="status" aria-live="polite">${coopAnswerPending?'Đang gửi câu trả lời…':''}</p><button type="submit"${coopAnswerPending||['opening','recording','processing','transcribing'].includes(coopRecordState)?' disabled':''}>Gửi câu trả lời và bản ghi</button></form></article>`:`<article class="c"><p class="eyebrow">LƯỢT ${state.turn+1}/${state.prompts.length}</p><h2>Đang đến lượt ${esc(speaker?.name||'bạn học')} nói</h2><div class="coop-prompt" lang="en">${esc(prompt)}</div><p>Đợi bạn học gửi transcript và bản ghi âm; bạn sẽ nghe rồi góp ý.</p></article>`;
  else if(state.phase==='review')turnPanel=!isSpeaker?`<article class="c"><p class="eyebrow">LƯỢT ${state.turn+1}/${state.prompts.length} · ĐẾN LƯỢT BẠN GÓP Ý</p><h2>Nghe/đọc câu trả lời và phản hồi</h2><div class="coop-prompt" lang="en">${esc(state.currentAnswer?.question||prompt)}</div>${audioMarkup}<blockquote class="coop-answer" lang="en">${esc(state.currentAnswer?.text||'')}</blockquote><form onsubmit="event.preventDefault();sendCoopReview(this)"><div class="coop-checks"><label><input type="checkbox" name="onTopic"> Trả lời đúng trọng tâm câu hỏi</label><label><input type="checkbox" name="reasonExample"> Có lý do hoặc ví dụ cụ thể</label><label><input type="checkbox" name="clear"> Ý rõ, dễ theo dõi</label></div><label>Một góp ý ngắn<input name="note" maxlength="240" placeholder="Ví dụ: Nêu thiết bị trước, rồi nói công dụng."></label><button type="submit">Gửi góp ý và đổi lượt</button></form></article>`:`<article class="c"><h2>Đang chờ ${esc(reviewer?.name||'bạn học')} góp ý</h2>${audioMarkup}<blockquote class="coop-answer" lang="en">${esc(state.currentAnswer?.text||'')}</blockquote><p>Góp ý sẽ hiện ở đây khi bạn học gửi.</p></article>`;
- return `${pageIntro('HỌC CÙNG BẠN','Luyện cùng một người bạn','Cùng chủ đề, đổi vai nói, nghe bản ghi, nhắn tin và góp ý theo checklist.')}${roomHead}${turnPanel}${coopCallPanel(state)}${coopChatPanel(state)}<p class="mu">Đây là hoạt động học theo cặp, không thay thế điểm ước tính IELTS của chế độ luyện cá nhân.</p>`;
+ return `${pageIntro('HỌC CÙNG BẠN','Luyện cùng một người bạn','Cùng chủ đề, đổi vai nói, nghe bản ghi và góp ý theo checklist; trao đổi ngoài EPU qua Messenger Web.')}${roomHead}${turnPanel}${coopMessengerPanel()}<p class="mu">Đây là hoạt động học theo cặp, không thay thế điểm ước tính IELTS của chế độ luyện cá nhân.</p>`;
 }
 
 async function saveCoopEndpoint(form){
@@ -3265,36 +3243,7 @@ async function acceptCoopCall(){
  catch(error){sendCoopSignal(target,{kind:'reject'});endCoopCall(false,error?.name==='NotAllowedError'?'Bạn chưa cấp quyền micro nên chưa thể nhận cuộc gọi.':error?.name==='NotFoundError'?'Không tìm thấy micro trên thiết bị.':error?.name==='NotReadableError'?'Micro đang được ứng dụng khác sử dụng. Hãy đóng ứng dụng đó rồi thử lại.':error.message||'Không nhận được cuộc gọi.')}
 }
 function rejectCoopCall(){if(coopCallTarget)sendCoopSignal(coopCallTarget,{kind:'reject'});endCoopCall(false,'Bạn đã từ chối cuộc gọi.')}
-async function handleCoopSignal(message){
- const from=message.from,signal=message.signal;if(!from||!signal)return;
- try{
-  if(signal.kind==='offer'){
-   if(coopCallState!=='idle'){
-    if(!coopPeer||from!==coopCallTarget){sendCoopSignal(from,{kind:'reject'});return}
-    await coopPeer.setRemoteDescription(new RTCSessionDescription(signal.description));await flushCoopIce();
-    const answer=await coopPeer.createAnswer();await coopPeer.setLocalDescription(answer);
-    if(!sendCoopSignal(from,{kind:'answer',description:coopPeer.localDescription.toJSON(),iceRestart:true}))throw new Error('Chưa gửi được phản hồi nối lại.');
-    clearTimeout(coopIceRestartTimer);coopIceRestartTimer=null;
-    coopVoiceStatus='Đang hoàn tất kết nối lại sau khi mạng đổi…';renderCoopLive();return;
-   }
-   coopCallTarget=from;coopCallInitiator=from;coopIncomingOffer=signal.description;coopCallState='incoming';coopVoiceStatus='Có cuộc gọi thoại đến.';renderCoopLive();return;
-  }
-  if(signal.kind==='candidate'&&coopCallState==='idle'&&!coopCallTarget){
-   const roomPeer=coopSession?.state?.players?.find(player=>player.id===from);
-   if(roomPeer&&coopPendingIce.length<64)coopPendingIce.push(signal.candidate);
-   return;
-  }
-  if(from!==coopCallTarget)return;
-  if(signal.kind==='restart-request'&&coopPeer&&coopSession?.playerId===coopCallInitiator){scheduleCoopIceRestart('Bạn học vừa đổi mạng',250)}
-  else if(signal.kind==='answer'&&coopPeer){await coopPeer.setRemoteDescription(new RTCSessionDescription(signal.description));await flushCoopIce();clearTimeout(coopIceRestartTimer);coopIceRestartTimer=null;clearTimeout(coopCallMediaTimer);coopCallMediaTimer=null;coopVoiceStatus='Bạn học đã nhận cuộc gọi; đang thử nối trực tiếp qua STUN…';const pc=coopPeer;coopIceTimer=setTimeout(()=>{if(pc===coopPeer&&coopCallState==='outgoing'&&pc.iceConnectionState!=='connected'&&pc.iceConnectionState!=='completed')scheduleCoopIceRestart('Cuộc gọi chưa tìm được đường STUN',250)},20000);renderCoopLive()}
-  else if(signal.kind==='candidate'){
-   const remoteUfrags=(coopPeer?.remoteDescription?.sdp||'').split(/\r?\n/).filter(line=>line.startsWith('a=ice-ufrag:')).map(line=>line.slice(12).trim());
-   if(coopPeer?.remoteDescription&&(!signal.candidate?.usernameFragment||remoteUfrags.includes(signal.candidate.usernameFragment))){try{await coopPeer.addIceCandidate(new RTCIceCandidate(signal.candidate))}catch{}}
-   else if(coopPendingIce.length<40)coopPendingIce.push(signal.candidate);
-  }else if(signal.kind==='reject')endCoopCall(false,'Bạn học đã từ chối cuộc gọi.');
-  else if(signal.kind==='hangup')endCoopCall(false,'Bạn học đã kết thúc cuộc gọi.');
- }catch{endCoopCall(false,'Không thiết lập được kết nối thoại. Hãy thử gọi lại.')}
-}
+async function handleCoopSignal(){return}
 async function enableCoopRemoteAudio(){coopRemoteAudioRequested=true;const audio=coopRemoteAudioElement||document.getElementById('coop-peer-audio');if(coopRemoteVolume===0){coopRemoteVolume=.9;const slider=$('.coop-volume-control input');if(slider)slider.value='0.9'}if(!audio?.srcObject){coopVoiceStatus='Đã bật đầu ra tiếng; đang chờ luồng âm thanh từ bạn học.';renderCoopLive();return}audio.muted=false;audio.volume=coopRemoteVolume;try{await audio.play();coopRemoteAudioPlaying=true;coopVoiceStatus=coopRemoteTrackState==='live'?'Đang phát tiếng bạn học.':'Đã bật đầu ra; đang chờ tiếng bạn học.'}catch{coopRemoteAudioPlaying=false;coopVoiceStatus='Trình duyệt chặn phát tiếng. Hãy bấm lại nút nghe hoặc kiểm tra âm lượng/tab của trình duyệt.'}renderCoopLive()}
 function setCoopRemoteVolume(value){coopRemoteVolume=Math.max(0,Math.min(1,Number(value)||0));const audio=coopRemoteAudioElement||document.getElementById('coop-peer-audio');if(audio){audio.volume=coopRemoteVolume;audio.muted=coopRemoteVolume===0}const output=document.getElementById('coop-remote-volume-value');if(output)output.value=Math.round(coopRemoteVolume*100)+'%'}
 function toggleCoopMute(){coopMuted=!coopMuted;coopLocalStream?.getAudioTracks().forEach(track=>track.enabled=!coopMuted);renderCoopLive()}
