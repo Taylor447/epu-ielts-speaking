@@ -2920,7 +2920,7 @@ try{
 
 function coopEndpoint(){return String(st.coop?.endpoint||'').replace(/\/+$/,'')}
 function coopMessengerPanel(){
- return '<section class="c coop-messenger-panel"><p class="eyebrow">TRAO ĐỔI QUA FACEBOOK</p><h2>Messenger Web</h2><p>Dùng Messenger để nhắn tin hoặc gọi cho bạn học. Sao chép mã phòng ở thẻ phía trên, gửi cho bạn học qua Messenger, rồi quay lại EPU để luyện nói và góp ý theo lượt.</p><a class="coop-messenger-link" href="https://www.facebook.com/messages/" target="_blank" rel="noopener noreferrer">Mở Messenger trên web ↗</a><p class="mu">Messenger mở ở thẻ mới. Bạn tự chọn người nhận và đăng nhập Facebook nếu được yêu cầu; EPU không đọc hay đồng bộ tin nhắn/cuộc gọi Messenger.</p></section>';
+ return '<section class="c coop-messenger-panel"><p class="eyebrow">TRAO ĐỔI QUA FACEBOOK</p><h2>Messenger Web</h2><p>Dùng Messenger để nhắn tin hoặc gọi cho bạn học. Sao chép mã phòng ở thẻ phía trên, gửi cho bạn học qua Messenger, rồi quay lại EPU để luyện nói và góp ý theo lượt.</p><a class="coop-messenger-link" href="https://www.facebook.com/messages/t" target="_blank" rel="noopener noreferrer">Mở Messenger trên web ↗</a><p class="mu">Messenger mở ở thẻ mới. Bạn tự chọn người nhận và đăng nhập Facebook nếu được yêu cầu; EPU không đọc hay đồng bộ tin nhắn/cuộc gọi Messenger.</p></section>';
 }
 function coopRecordingPanel(maxSeconds){
  const busy=['opening','processing','transcribing'].includes(coopRecordState),recording=coopRecordState==='recording',transcribing=coopRecordState==='transcribing';
