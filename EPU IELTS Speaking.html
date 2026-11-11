@@ -881,6 +881,10 @@ body > nav button.on { background: color-mix(in srgb,var(--pr) 17%,transparent);
 
 
 /* Topic-inspired interface themes */
+:root[data-skin="custom"] { --pr:var(--user-pr); --action:var(--user-action); --action-hover:var(--user-hover); --on:var(--user-on); --wave-line:var(--user-pr); --mesh-a:color-mix(in srgb,var(--bg) 82%,var(--user-pr) 18%); --mesh-b:color-mix(in srgb,var(--bg) 90%,#7654c8 10%); --mesh-c:color-mix(in srgb,var(--bg) 90%,#37a890 10%); }
+.theme-custom-wrap { display:flex; gap:6px; min-width:0; }
+.theme-custom-wrap .theme-choice { flex:1; }
+.theme-delete-button { flex:0 0 42px; min-width:42px; min-height:42px; padding:4px; font-size:20px; }
 :root[data-skin="electricity"][data-theme="light"] { --pr:#126c86; --action:#187b96; --action-hover:#126980; --wave-line:#126c86; --mesh-a:#d4eff9; --mesh-b:#e4e6ff; --mesh-c:#d0f2e8; }
 :root[data-skin="electricity"][data-theme="dark"] { --pr:#91def1; --action:#17677d; --action-hover:#12566a; --wave-line:#91def1; --mesh-a:#123f5d; --mesh-b:#29294f; --mesh-c:#10443f; }
 :root[data-skin="solar"][data-theme="light"] { --pr:#99500b; --action:#b95f0c; --action-hover:#974907; --wave-line:#99500b; --mesh-a:#ffebc7; --mesh-b:#f7e2d0; --mesh-c:#e8eccd; }
@@ -917,10 +921,10 @@ body > nav button.on { background: color-mix(in srgb,var(--pr) 17%,transparent);
 .theme-premium-top strong { color:var(--tx); }
 .theme-premium-card h3 { margin:8px 0 4px; font-size:18px; }
 .theme-premium-card>p { color:var(--mu); font-size:13px; line-height:1.55; }
-.theme-premium-fields { display:grid; grid-template-columns:1fr 64px; gap:9px; margin:12px 0; opacity:.58; }
+.theme-premium-fields { display:grid; grid-template-columns:1fr 64px; gap:9px; margin:12px 0; }
 .theme-premium-fields input { min-width:0; width:100%; padding:10px 12px; border:1px solid var(--bd); border-radius:12px; background:var(--bg); color:var(--mu); }
 .theme-premium-fields input[type="color"] { padding:5px; height:42px; }
-.theme-premium-button { border-color:#d8a640; color:var(--tx); }
+.theme-premium-button { border:1px solid color-mix(in srgb,var(--action) 65%,var(--bd)); border-radius:13px; padding:11px 15px; background:var(--action); color:var(--on); font-weight:800; cursor:pointer; }
 .theme-premium-status { margin:9px 0 0; font-size:12px!important; }
 @media(max-width:560px) { .theme-options { grid-template-columns:1fr; } .theme-picker-shell { padding:17px; } }
 @media(prefers-reduced-transparency:reduce) { #theme-picker { background:var(--cd); } }
@@ -963,7 +967,7 @@ body > nav button.on { background: color-mix(in srgb,var(--pr) 17%,transparent);
   </div>
   <div class="head-actions"><button type="button" class="g head-link" data-head-route="library" onclick="go('library')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10m-10 4h4m-4 4h4m3-4h3v4h-3z"/></svg><span>Thư viện</span></button><button type="button" class="g head-link" data-head-route="review" onclick="go('review')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4H6a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-3"/><rect x="9" y="2" width="6" height="4" rx="1"/><path d="m8 13 3 3 5-6"/></svg><span>Ôn Thi</span></button><button type="button" class="theme-toggle" id="themes" onclick="openThemePicker()" aria-label="Chủ đề giao diện" aria-haspopup="dialog" aria-controls="theme-picker" title="Chọn chủ đề giao diện"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18h1.2a2 2 0 0 0 1.4-3.4 1.7 1.7 0 0 1 1.2-2.9H18a3 3 0 0 0 3-3c0-4.8-4-8.7-9-8.7Z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7.5" r="1"/><circle cx="17" cy="11" r="1"/></svg><span>Themes</span></button><button type="button" class="theme-toggle" id="theme" onclick="toggleTheme()">Giao diện sáng/tối</button></div>
 </header>
-<dialog id="theme-picker" aria-labelledby="theme-picker-title"><div class="theme-picker-shell"><div class="theme-picker-heading"><div><span class="theme-picker-kicker">EPU IELTS SPEAKING</span><h2 id="theme-picker-title">Chủ đề giao diện</h2></div><button type="button" class="g theme-picker-close" onclick="closeThemePicker()" aria-label="Đóng">×</button></div><p class="theme-picker-intro">Chọn bảng màu lấy cảm hứng từ các chủ đề bài học. Lựa chọn được lưu trên thiết bị này.</p><div id="theme-options" class="theme-options"></div><section class="theme-premium-card" aria-labelledby="theme-premium-title"><div class="theme-premium-top"><span class="theme-premium-tag">PREMIUM</span><strong>10.000đ</strong></div><h3 id="theme-premium-title">Tự tạo chủ đề của bạn</h3><p>Đặt tên và chọn màu nhấn riêng. Tính năng sẽ mở sau khi thanh toán MoMo được xác nhận.</p><div class="theme-premium-fields" aria-disabled="true"><input type="text" placeholder="Tên chủ đề riêng" disabled aria-label="Tên chủ đề riêng"><input type="color" value="#426de0" disabled aria-label="Màu nhấn riêng"></div><button type="button" class="g theme-premium-button" onclick="showThemePaymentStatus()">Mở khóa · 10.000đ</button><p id="theme-premium-status" class="theme-premium-status" role="status" aria-live="polite">Thanh toán MoMo Merchant chưa được thiết lập. Cần tài khoản Merchant và khóa API để xác minh tự động.</p></section></div></dialog>
+<dialog id="theme-picker" aria-labelledby="theme-picker-title"><div class="theme-picker-shell"><div class="theme-picker-heading"><div><span class="theme-picker-kicker">EPU IELTS SPEAKING</span><h2 id="theme-picker-title">Chủ đề giao diện</h2></div><button type="button" class="g theme-picker-close" onclick="closeThemePicker()" aria-label="Đóng">×</button></div><p class="theme-picker-intro">Chọn bảng màu lấy cảm hứng từ các chủ đề bài học. Lựa chọn được lưu trên thiết bị này.</p><div id="theme-options" class="theme-options"></div><section class="theme-premium-card" aria-labelledby="theme-premium-title"><div class="theme-premium-top"><span class="theme-premium-tag">MỞ TẠM ĐỂ HOÀN THIỆN</span><strong>Giá dự kiến: 10.000đ</strong></div><h3 id="theme-premium-title">Tự tạo chủ đề của bạn</h3><p>Tạo và lưu bảng màu riêng trong trình duyệt này. Hiện đang mở miễn phí để hoàn thiện tính năng; xác nhận MoMo sẽ được tích hợp sau.</p><div class="theme-premium-fields"><input id="theme-custom-name" type="text" maxlength="28" placeholder="Tên chủ đề riêng" aria-label="Tên chủ đề riêng"><input id="theme-custom-color" type="color" value="#426de0" aria-label="Màu nhấn riêng"></div><button type="button" class="theme-premium-button" onclick="addCustomTheme()">Thêm chủ đề của tôi</button><p id="theme-premium-status" class="theme-premium-status" role="status" aria-live="polite">Các chủ đề riêng chỉ lưu trên thiết bị này. Trong lúc thử nghiệm, mọi người dùng trang đều có thể tạo chủ đề.</p></section></div></dialog>
 <main id="m" tabindex="-1"></main>
 <nav id="n" aria-label="Điều hướng chính"></nav>
 <script type="text/plain" id="whisper-licenses">Transformers.js 3.0.0 (Apache-2.0): https://github.com/huggingface/transformers.js/tree/3.0.0
@@ -1502,8 +1506,9 @@ if(!Array.isArray(st.c))st.c=[];
 if(!st.p||typeof st.p!=='object'||Array.isArray(st.p))st.p={};
 if(!st.coop||typeof st.coop!=='object'||Array.isArray(st.coop))st.coop={};
 if(typeof st.coop.endpoint!=='string')st.coop.endpoint='';
-if(!['epu','electricity','solar','wind','ai','campus','environment','travel'].includes(st.themeSkin))st.themeSkin='epu';
 if(!Array.isArray(st.customThemes))st.customThemes=[];
+st.customThemes=st.customThemes.filter(theme=>theme&&typeof theme.id==='string'&&/^custom-[a-z0-9]{8}$/.test(theme.id)&&typeof theme.name==='string'&&theme.name.trim()&&theme.name.length<=28&&typeof theme.color==='string'&&/^#[0-9a-f]{6}$/i.test(theme.color)).slice(0,16).map(theme=>({id:theme.id,name:theme.name.trim(),color:theme.color.toLowerCase()}));
+if(!['epu','electricity','solar','wind','ai','campus','environment','travel'].includes(st.themeSkin)&&!st.customThemes.some(theme=>theme.id===st.themeSkin))st.themeSkin='epu';
 const sv=(sync=true)=>{
  ensureProgressIds();
  st.learningV1=mergeLearning(st.learningV1,storedEpu()?.learningV1);
@@ -3646,8 +3651,10 @@ const THEME_PRESETS=[
 ];
 function renderThemeOptions(){
  const box=$('#theme-options');if(!box)return;
- const selected=THEME_PRESETS.some(theme=>theme.id===st.themeSkin)?st.themeSkin:'epu';
- box.innerHTML=THEME_PRESETS.map(theme=>'<button type="button" class="theme-choice" aria-pressed="'+(selected===theme.id?'true':'false')+'" onclick="selectThemeSkin(\''+theme.id+'\')"><span class="theme-choice-swatch" style="--swatch-a:'+theme.a+';--swatch-b:'+theme.b+';--swatch-c:'+theme.c+';--swatch-accent:'+theme.accent+'" aria-hidden="true"></span><span class="theme-choice-copy"><strong>'+esc(theme.name)+'</strong><small>'+esc(theme.topics)+'</small></span></button>').join('');
+ const selected=st.themeSkin||'epu';
+ const presetMarkup=THEME_PRESETS.map(theme=>'<button type="button" class="theme-choice" aria-pressed="'+(selected===theme.id?'true':'false')+'" onclick="selectThemeSkin(\''+theme.id+'\')"><span class="theme-choice-swatch" style="--swatch-a:'+theme.a+';--swatch-b:'+theme.b+';--swatch-c:'+theme.c+';--swatch-accent:'+theme.accent+'" aria-hidden="true"></span><span class="theme-choice-copy"><strong>'+esc(theme.name)+'</strong><small>'+esc(theme.topics)+'</small></span></button>').join('');
+ const customMarkup=st.customThemes.map(theme=>'<div class="theme-custom-wrap"><button type="button" class="theme-choice" aria-pressed="'+(selected===theme.id?'true':'false')+'" onclick="selectThemeSkin(\''+theme.id+'\')"><span class="theme-choice-swatch" style="--swatch-a:'+theme.color+';--swatch-b:'+theme.color+';--swatch-c:'+theme.color+';--swatch-accent:'+theme.color+'" aria-hidden="true"></span><span class="theme-choice-copy"><strong>'+esc(theme.name)+'</strong><small>Chủ đề riêng của bạn</small></span></button><button type="button" class="g theme-delete-button" onclick="removeCustomTheme(\''+theme.id+'\')" aria-label="Xóa chủ đề '+esc(theme.name)+'" title="Xóa chủ đề">×</button></div>').join('');
+ box.innerHTML=presetMarkup+customMarkup;
 }
 function openThemePicker(){
  const dialog=$('#theme-picker');if(!dialog)return;
@@ -3660,24 +3667,70 @@ function closeThemePicker(){
  if(typeof dialog.close==='function'&&dialog.open)dialog.close();else dialog.removeAttribute('open');
 }
 function selectThemeSkin(id){
- if(!THEME_PRESETS.some(theme=>theme.id===id))return;
+ if(!THEME_PRESETS.some(theme=>theme.id===id)&&!st.customThemes.some(theme=>theme.id===id))return;
  st.themeSkin=id;sv(false);updateTheme();renderThemeOptions();
 }
-function showThemePaymentStatus(){
- const status=$('#theme-premium-status');
- if(status)status.textContent='Chưa thể nhận thanh toán tự động: cần đăng ký MoMo Merchant, hoàn tất kích hoạt và cấu hình khóa API bí mật trên máy chủ. Mã QR cá nhân không xác minh được đơn hàng.';
+function addCustomTheme(){
+ const nameField=$('#theme-custom-name'),colorField=$('#theme-custom-color'),status=$('#theme-premium-status');
+ const name=String(nameField?.value||'').trim(),color=String(colorField?.value||'').toLowerCase();
+ if(!name){if(status)status.textContent='Hãy nhập tên cho chủ đề của bạn.';nameField?.focus();return}
+ if(!/^#[0-9a-f]{6}$/.test(color)){if(status)status.textContent='Hãy chọn một màu hợp lệ.';return}
+ if(st.customThemes.length>=16){if(status)status.textContent='Bạn đã có 16 chủ đề riêng. Hãy xóa một chủ đề trước khi tạo thêm.';return}
+ const id='custom-'+(Math.random().toString(36).slice(2,10)+'00000000').slice(0,8);
+ st.customThemes.unshift({id,name:name.slice(0,28),color});st.themeSkin=id;sv(false);updateTheme();renderThemeOptions();
+ if(nameField)nameField.value='';
+ if(status)status.textContent='Đã thêm và áp dụng chủ đề “'+name.slice(0,28)+'”. Chủ đề được lưu trên thiết bị này.';
+}
+function removeCustomTheme(id){
+ const theme=st.customThemes.find(item=>item.id===id);if(!theme||!confirm('Xóa chủ đề “'+theme.name+'”?'))return;
+ st.customThemes=st.customThemes.filter(item=>item.id!==id);
+ if(st.themeSkin===id)st.themeSkin='epu';
+ sv(false);updateTheme();renderThemeOptions();
+}
+function themeRgb(hex){
+ const value=String(hex||'').replace('#','');
+ return [0,2,4].map(index=>parseInt(value.slice(index,index+2),16)/255);
+}
+function themeLuminance(hex){
+ return themeRgb(hex).map(value=>value<=.04045?value/12.92:((value+.055)/1.055)**2.4).reduce((sum,value,index)=>sum+value*[.2126,.7152,.0722][index],0);
+}
+function themeContrast(a,b){
+ const first=themeLuminance(a),second=themeLuminance(b);
+ return (Math.max(first,second)+.05)/(Math.min(first,second)+.05);
+}
+function blendThemeColor(color,target,amount){
+ const a=themeRgb(color),b=themeRgb(target);
+ return '#'+a.map((value,index)=>Math.round((value+(b[index]-value)*amount)*255).toString(16).padStart(2,'0')).join('');
+}
+function customThemeTokens(color,dark){
+ const background=dark?'#0c1428':'#ffffff',primaryTarget=dark?'#ffffff':'#101a30';
+ let primary=color;
+ for(let i=0;i<24&&themeContrast(primary,background)<4.5;i++)primary=blendThemeColor(primary,primaryTarget,.08);
+ let action=color,buttonText=themeContrast(color,'#ffffff')>=themeContrast(color,'#10213f')?'#ffffff':'#10213f';
+ const other=buttonText==='#ffffff'?'#000000':'#ffffff';
+ for(let i=0;i<24&&themeContrast(action,buttonText)<4.5;i++)action=blendThemeColor(action,other,.08);
+ return {primary,action,hover:blendThemeColor(action,buttonText==='#ffffff'?'#000000':'#ffffff',.12),buttonText};
 }
 const themeMedia=matchMedia('(prefers-color-scheme: dark)');
 const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)');
 function updateTheme(){
  const root=document.documentElement;
- root.dataset.skin=THEME_PRESETS.some(theme=>theme.id===st.themeSkin)?st.themeSkin:'epu';
  if(root.dataset.themeMode==='system')root.dataset.theme=themeMedia.matches?'dark':'light';
  const dark=root.dataset.theme==='dark';
+ const custom=st.customThemes.find(theme=>theme.id===st.themeSkin);
+ root.dataset.skin=custom?'custom':THEME_PRESETS.some(theme=>theme.id===st.themeSkin)?st.themeSkin:'epu';
+ ['--user-pr','--user-action','--user-hover','--user-on'].forEach(property=>root.style.removeProperty(property));
+ if(custom){
+  const colors=customThemeTokens(custom.color,dark);
+  root.style.setProperty('--user-pr',colors.primary);
+  root.style.setProperty('--user-action',colors.action);
+  root.style.setProperty('--user-hover',colors.hover);
+  root.style.setProperty('--user-on',colors.buttonText);
+ }
  const label=dark?'Bật giao diện sáng':'Bật giao diện tối';
  const b=$('#theme');
  b.setAttribute('aria-label',label);b.title=label;
- b.innerHTML=icon(dark?'sun':'moon')+`<span>${dark?'Chế độ sáng':'Chế độ tối'}</span>`;
+ b.innerHTML=icon(dark?'sun':'moon')+'<span>'+(dark?'Chế độ sáng':'Chế độ tối')+'</span>';
 }
 function toggleTheme(){
  const root=document.documentElement;
