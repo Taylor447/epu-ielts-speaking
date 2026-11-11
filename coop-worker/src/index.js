@@ -61,6 +61,9 @@ function cleanCallSignal(value) {
       usernameFragment: typeof value.candidate.usernameFragment === 'string' ? value.candidate.usernameFragment.slice(0, 128) : null
     } };
   }
+  if (value.kind === 'restart-request') {
+    return { kind: 'restart-request', reason: typeof value.reason === 'string' ? value.reason.slice(0, 100) : '' };
+  }
   if (['hangup', 'reject'].includes(value.kind)) return { kind: value.kind };
   return null;
 }

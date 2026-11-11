@@ -2910,7 +2910,7 @@ const COOP_AUDIO_LIMIT=550*1024;
 let coopCapture=null,coopRecording=null,coopRecordState='idle',coopRecordStatus='Chưa ghi âm câu trả lời.',coopRecordSeconds=0,coopRecordInterval=null,coopTranscriptionController=null,coopTranscriptProgress=0;
 let coopAnswerDraft='',coopAnswerPending=false,coopChatDraft='',coopChatPinnedToBottom=true;
 const coopAudioByTurn=new Map();
-let coopPeer=null,coopLocalStream=null,coopRemoteStream=null,coopRemoteAudioElement=null,coopIncomingOffer=null,coopCallTarget='',coopCallState='idle',coopVoiceStatus='Chưa có cuộc gọi.',coopPendingIce=[],coopMuted=false,coopRemoteTrackState='idle',coopRemoteAudioPlaying=false,coopRemoteAudioRequested=false,coopRemoteVolume=.9,coopCallMediaTimer=null,coopIceTimer=null,coopIceServersCache=null,coopIceConfigState='unknown';
+let coopPeer=null,coopLocalStream=null,coopRemoteStream=null,coopRemoteAudioElement=null,coopIncomingOffer=null,coopCallTarget='',coopCallInitiator='',coopCallState='idle',coopVoiceStatus='Chưa có cuộc gọi.',coopPendingIce=[],coopQueuedSignals=[],coopMuted=false,coopRemoteTrackState='idle',coopRemoteAudioPlaying=false,coopRemoteAudioRequested=false,coopRemoteVolume=.9,coopCallMediaTimer=null,coopIceTimer=null,coopIceRestartTimer=null,coopIceRestartInFlight=false,coopIceRestartPending=false,coopIceRestartAttempts=0,coopLastIceRestartAt=0,coopLastRestartRequestAt=0,coopIceServersCache=null,coopIceConfigState='unknown';
 try{
  const saved=JSON.parse(sessionStorage.getItem(COOP_SESSION_KEY)||'null');
  if(saved&&typeof saved.endpoint==='string'&&typeof saved.roomCode==='string'&&typeof saved.playerId==='string'&&typeof saved.playerToken==='string')coopSession=saved;
@@ -2941,7 +2941,7 @@ function coopCallPanel(state){
  const people=active?`<div class="coop-call-people"><div class="coop-call-person"><span class="coop-call-avatar" aria-hidden="true">🎙</span><span><small>Bạn · micro</small><strong>${localMic}</strong></span></div><div class="coop-call-person"><span class="coop-call-avatar" aria-hidden="true">🔊</span><span><small>${esc(peer?.name||'Bạn học')} · âm thanh</small><strong>${remoteAudio}</strong></span></div></div><div class="coop-remote-audio-slot" aria-label="Điều khiển âm thanh từ bạn học"></div>`:'';
  const stepMic=coopLocalStream?'is-done':'is-current',stepConnection=coopCallState==='connected'?'is-done':coopLocalStream?'is-current':'',stepAudio=coopRemoteTrackState==='live'&&coopRemoteAudioPlaying?'is-done':coopCallState==='connected'?'is-current':'';
  const steps=`<div class="coop-call-steps" aria-label="Tiến trình cuộc gọi"><span class="${stepMic}">Micro</span><span class="${stepConnection}">Kết nối</span><span class="${stepAudio}">Âm thanh hai chiều</span></div>`;
- const networkNote=active&&coopIceConfigState==='stun-only'?'<p class="coop-call-network-note">Đang dùng STUN miễn phí để kết nối trực tiếp. STUN không chuyển tiếp âm thanh; nếu cuộc gọi không nối được, hãy thử để cả hai người chuyển sang mạng khác hoặc 4G.</p>':coopIceConfigState==='loading'?'<p class="coop-call-network-note">Đang chuẩn bị đường truyền thoại…</p>':'';
+ const networkNote=active&&coopIceConfigState==='stun-only'?'<p class="coop-call-network-note">Đang dùng STUN miễn phí và sẽ tự thử nối lại khi mạng đổi. Một số mạng di động dùng NAT nhà mạng chặn kết nối trực tiếp; nếu vẫn lỗi thì cần TURN hoặc đổi nhà mạng/Wi‑Fi.</p>':coopIceConfigState==='loading'?'<p class="coop-call-network-note">Đang chuẩn bị đường truyền thoại…</p>':'';
  return `<section class="coop-call-panel" data-state="${coopCallState}"><div class="coop-call-heading"><div><p class="eyebrow">HỌC CÙNG BẠN</p><h2>Gọi thoại trực tiếp</h2><p class="coop-call-subtitle">${active?'Kiểm tra micro và âm thanh của cả hai người tại đây.':'Gọi trực tiếp trong phòng học coop.'}</p></div><span class="coop-call-pill" data-state="${coopCallState}">${pill}</span></div>${active?steps:''}${people}<div class="coop-call-actions">${actions}</div>${liveControls}${networkNote}<p class="coop-notice mu" role="status" aria-live="polite">${status}</p></section>`;
 }
 function coopRecordingPanel(maxSeconds){
@@ -3052,14 +3052,14 @@ function connectCoopSocket(){
  try{
   coopLastConnectAt=Date.now();
   coopSocket=new WebSocket(socketUrl.href);
-  coopSocket.addEventListener('open',()=>{coopReconnects=0;coopStatus='Đã kết nối trực tiếp với phòng.';renderCoopLive()});
+  coopSocket.addEventListener('open',()=>{coopReconnects=0;coopStatus='Đã kết nối trực tiếp với phòng.';flushCoopSignals();if(coopIceRestartPending)scheduleCoopIceRestart('Mạng đã kết nối lại',250);renderCoopLive()});
   coopSocket.addEventListener('message',event=>{let message;try{message=JSON.parse(event.data)}catch{return}
    if(message.type==='state'&&message.state){coopSession.state=message.state;try{sessionStorage.setItem(COOP_SESSION_KEY,JSON.stringify(coopSession))}catch{};const turnSpeaker=message.state.players?.[message.state.turn%2],ownAnswer=message.state.phase==='review'&&message.state.currentAnswer?.playerId===coopSession.playerId;if(message.state.phase!=='answer'||turnSpeaker?.id!==coopSession.playerId)coopAnswerPending=false;if(ownAnswer){coopAnswerDraft='';if(coopRecording){coopAudioByTurn.set(String(message.state.turn),coopRecording.url);coopRecording=null;coopRecordState='idle';coopRecordStatus='Bản ghi đã gửi cho bạn học.'}}else if(turnSpeaker?.id!==coopSession.playerId)coopAnswerDraft='';coopStatus=message.state.phase==='waiting'?'Đang chờ bạn học tham gia…':'Đang đồng bộ trực tiếp.';renderCoopLive()}
    else if(message.type==='audio'&&Number.isInteger(message.turn)&&typeof message.audio==='string'&&message.audio.startsWith('data:audio/')){coopAudioByTurn.set(String(message.turn),message.audio);renderCoopLive()}
    else if(message.type==='signal'){void handleCoopSignal(message)}
-   else if(message.type==='error'||message.type==='expired'){coopStatus=message.error||message.message||'Phòng đã kết thúc.';coopAnswerPending=false;if(message.type==='expired'){coopSession.state={...coopSession.state,phase:'expired'};endCoopCall(false,'Phòng đã hết hạn.')}else if(coopCallState!=='idle'&&/Tín hiệu cuộc gọi|Bạn học chưa kết nối/.test(coopStatus))endCoopCall(false,coopStatus);renderCoopLive()}
+    else if(message.type==='error'||message.type==='expired'){coopStatus=message.error||message.message||'Phòng đã kết thúc.';coopAnswerPending=false;if(message.type==='expired'){coopSession.state={...coopSession.state,phase:'expired'};endCoopCall(false,'Phòng đã hết hạn.')}else if(coopCallState!=='idle'&&/Tín hiệu cuộc gọi|Bạn học chưa kết nối/.test(coopStatus)){if(coopIceRestartPending||coopIceRestartAttempts>0){coopVoiceStatus='Đang chờ bạn học kết nối lại để tiếp tục cuộc gọi…';renderCoopLive()}else endCoopCall(false,coopStatus)}else renderCoopLive()}
   });
-  coopSocket.addEventListener('close',()=>{coopSocket=null;if(coopPageLeaving||!coopSession||coopSession.state?.phase==='expired')return;coopStatus='Mất kết nối. Đang thử kết nối lại…';renderCoopLive();if(coopReconnects<5){const delay=Math.min(12000,1000*2**coopReconnects++);clearTimeout(coopReconnectTimer);coopReconnectTimer=setTimeout(connectCoopSocket,delay)}});
+   coopSocket.addEventListener('close',()=>{coopSocket=null;if(coopPageLeaving||!coopSession||coopSession.state?.phase==='expired')return;coopStatus='Mất kết nối. Đang tự kết nối lại…';renderCoopLive();const delay=Math.min(30000,1000*2**Math.min(coopReconnects++,5));clearTimeout(coopReconnectTimer);coopReconnectTimer=setTimeout(connectCoopSocket,delay)});
   coopSocket.addEventListener('error',()=>{coopStatus='Không kết nối được Worker. Kiểm tra địa chỉ hoặc thử tải lại.';renderCoopLive()});
  }catch{coopStatus='Không tạo được kết nối WebSocket.'}
 }
@@ -3162,7 +3162,12 @@ async function sendCoopAnswer(form){
  coopAnswerPending=true;coopStatus='Đã gửi. Đang chờ bạn học nhận câu trả lời…';renderCoopLive();
 }
 function sendCoopChat(form){const text=form.elements.text.value.trim();if(!text){coopStatus='Hãy nhập tin nhắn trước khi gửi.';renderCoopLive();return}if(sendCoopMessage({type:'chat',text})){form.elements.text.value='';coopChatDraft='';coopChatPinnedToBottom=true;renderCoopLive()}}
-function sendCoopSignal(targetPlayerId,signal){return sendCoopMessage({type:'signal',targetPlayerId,signal})}
+function sendCoopSignal(targetPlayerId,signal){
+ const message={type:'signal',targetPlayerId,signal};
+ if(coopSocket?.readyState===WebSocket.OPEN){try{coopSocket.send(JSON.stringify(message));return true}catch{}}
+ if(['candidate','offer','answer','restart-request'].includes(signal?.kind)&&coopQueuedSignals.length<96){coopQueuedSignals.push(message);coopStatus='Đang giữ tín hiệu gọi cho đến khi phòng kết nối lại…';return true}
+ return false;
+}
 function attachCoopRemoteAudio(stream){
  coopRemoteStream=stream;coopRemoteTrackState='waiting';coopRemoteAudioPlaying=false;
  let audio=coopRemoteAudioElement||document.getElementById('coop-peer-audio');
@@ -3186,26 +3191,77 @@ function createCoopPeer(targetPlayerId,iceServers=coopIceServersCache||[{urls:'s
  coopLocalStream?.getAudioTracks().forEach(track=>{track.enabled=!coopMuted;pc.addTrack(track,coopLocalStream)});
  pc.onicecandidate=event=>{if(event.candidate&&coopCallTarget)sendCoopSignal(coopCallTarget,{kind:'candidate',candidate:event.candidate.toJSON()})};
  pc.ontrack=event=>attachCoopRemoteAudio(event.streams?.[0]||new MediaStream([event.track]));
- pc.onconnectionstatechange=()=>{if(pc!==coopPeer)return;if(pc.connectionState==='connected'){clearTimeout(coopIceTimer);coopIceTimer=null;coopCallState='connected';coopVoiceStatus=coopRemoteTrackState==='live'?'Đã nối và nhận được tiếng bạn học.':'Đã kết nối; đang kiểm tra âm thanh hai chiều…';clearTimeout(coopCallMediaTimer);coopCallMediaTimer=setTimeout(()=>{if(pc===coopPeer&&coopCallState==='connected'&&coopRemoteTrackState!=='live'){coopVoiceStatus='Đã nối nhưng chưa nhận tiếng. Kiểm tra micro của cả hai người và bật âm lượng tab/trình duyệt.';renderCoopLive()}},7000);renderCoopLive()}else if(pc.connectionState==='failed'){endCoopCall(false,'STUN không tìm được đường kết nối trực tiếp. Hãy thử để cả hai người chuyển sang mạng Wi‑Fi khác hoặc 4G.')}else if(pc.connectionState==='disconnected'){coopVoiceStatus='Mạng vừa gián đoạn; đang thử nối lại…';renderCoopLive();clearTimeout(coopIceTimer);coopIceTimer=setTimeout(()=>{if(pc===coopPeer&&pc.connectionState==='disconnected')endCoopCall(false,'Cuộc gọi mất kết nối. Hãy kiểm tra mạng của cả hai người rồi gọi lại.')},12000)}};
- pc.oniceconnectionstatechange=()=>{if(pc!==coopPeer)return;if(pc.iceConnectionState==='checking'){coopVoiceStatus='Đang tìm đường truyền trực tiếp qua STUN…';renderCoopLive()}else if(pc.iceConnectionState==='connected'||pc.iceConnectionState==='completed'){clearTimeout(coopIceTimer);coopIceTimer=null}else if(pc.iceConnectionState==='failed'){coopVoiceStatus='STUN không tìm được đường trực tiếp. Thử chuyển sang mạng Wi‑Fi khác hoặc 4G.';renderCoopLive();clearTimeout(coopIceTimer);coopIceTimer=setTimeout(()=>{if(pc===coopPeer&&pc.iceConnectionState==='failed')endCoopCall(false,coopVoiceStatus)},3500)}};
+ pc.onconnectionstatechange=()=>{if(pc!==coopPeer)return;if(pc.connectionState==='connected'){clearTimeout(coopIceTimer);coopIceTimer=null;coopIceRestartPending=false;coopIceRestartAttempts=0;coopCallState='connected';coopVoiceStatus=coopRemoteTrackState==='live'?'Đã nối và nhận được tiếng bạn học.':'Đã kết nối; đang kiểm tra âm thanh hai chiều…';clearTimeout(coopCallMediaTimer);coopCallMediaTimer=setTimeout(()=>{if(pc===coopPeer&&coopCallState==='connected'&&coopRemoteTrackState!=='live'){coopVoiceStatus='Đã nối nhưng chưa nhận tiếng. Kiểm tra micro của cả hai người và bật âm lượng tab/trình duyệt.';renderCoopLive()}},7000);renderCoopLive()}else if(pc.connectionState==='failed'||pc.connectionState==='disconnected'){coopVoiceStatus='Mạng vừa đổi hoặc bị gián đoạn. Đang thử thiết lập lại cuộc gọi…';renderCoopLive();scheduleCoopIceRestart('Kết nối mạng bị gián đoạn',pc.connectionState==='failed'?250:1800)}};
+ pc.oniceconnectionstatechange=()=>{if(pc!==coopPeer)return;if(pc.iceConnectionState==='checking'){coopVoiceStatus='Đang tìm đường truyền trực tiếp qua STUN…';renderCoopLive()}else if(pc.iceConnectionState==='connected'||pc.iceConnectionState==='completed'){clearTimeout(coopIceTimer);coopIceTimer=null;coopIceRestartPending=false;coopIceRestartAttempts=0}else if(pc.iceConnectionState==='disconnected'||pc.iceConnectionState==='failed'){coopVoiceStatus='Đang thử tìm lại đường truyền sau khi mạng đổi…';renderCoopLive();scheduleCoopIceRestart('Đường truyền STUN bị gián đoạn',pc.iceConnectionState==='failed'?250:1800)}};
  pc.onicecandidateerror=event=>{if(pc!==coopPeer)return;coopVoiceStatus='Máy chủ STUN chưa phản hồi; đang tiếp tục thử kết nối trực tiếp.';if(event.errorCode===701)coopIceConfigState='stun-only'};
  return pc;
 }
+function scheduleCoopIceRestart(reason='Mạng thay đổi',delay=900){
+ if(coopCallState==='idle'||!coopPeer||!coopCallTarget)return;
+  if(coopSession?.playerId!==coopCallInitiator){
+   coopIceRestartPending=true;
+   if(Date.now()-coopLastRestartRequestAt>5000){coopLastRestartRequestAt=Date.now();sendCoopSignal(coopCallTarget,{kind:'restart-request',reason:String(reason).slice(0,100)})}
+  coopVoiceStatus='Đang nhờ thiết bị kia làm mới kết nối sau khi mạng đổi…';renderCoopLive();return;
+ }
+ if(coopIceRestartInFlight)return;
+ coopIceRestartPending=true;clearTimeout(coopIceRestartTimer);
+ coopIceRestartTimer=setTimeout(()=>{coopIceRestartTimer=null;void restartCoopIce(reason)},delay);
+}
+async function restartCoopIce(reason='Mạng thay đổi'){
+ const pc=coopPeer,target=coopCallTarget;if(!pc||!target||coopCallState==='idle')return;
+ if(coopIceRestartInFlight)return;
+ if(Date.now()-coopLastIceRestartAt<5000){coopIceRestartPending=true;clearTimeout(coopIceRestartTimer);coopIceRestartTimer=setTimeout(()=>{coopIceRestartTimer=null;void restartCoopIce(reason)},5000-(Date.now()-coopLastIceRestartAt));return}
+ if(!coopSocket||coopSocket.readyState!==WebSocket.OPEN){coopIceRestartPending=true;coopVoiceStatus='Đang chờ kết nối phòng trở lại để gọi tiếp…';renderCoopLive();return}
+ if(pc.signalingState!=='stable'){
+  coopIceRestartPending=true;clearTimeout(coopIceRestartTimer);
+  if(pc.signalingState==='have-local-offer')coopIceRestartTimer=setTimeout(()=>{coopIceRestartTimer=null;if(pc===coopPeer&&pc.signalingState==='have-local-offer')endCoopCall(false,'Bạn học chưa phản hồi yêu cầu nối lại. Hãy kiểm tra kết nối phòng rồi gọi lại.')},15000);
+  else coopIceRestartTimer=setTimeout(()=>{coopIceRestartTimer=null;void restartCoopIce(reason)},900);
+  return;
+ }
+ if(coopIceRestartAttempts>=2){endCoopCall(false,'Đã thử khôi phục kết nối STUN nhưng mạng di động vẫn chặn kết nối trực tiếp. Cần mạng khác hoặc máy chủ TURN để gọi qua NAT nhà mạng.');return}
+ coopIceRestartInFlight=true;coopIceRestartPending=false;coopIceRestartAttempts++;coopLastIceRestartAt=Date.now();clearTimeout(coopIceTimer);
+ coopVoiceStatus=`${reason}. Đang làm mới đường truyền trực tiếp…`;renderCoopLive();
+ try{
+  if(typeof pc.restartIce==='function')pc.restartIce();
+  const offer=typeof pc.restartIce==='function'?await pc.createOffer():await pc.createOffer({iceRestart:true});
+  await pc.setLocalDescription(offer);
+  if(!sendCoopSignal(target,{kind:'offer',description:pc.localDescription.toJSON(),iceRestart:true}))throw new Error('Chưa gửi được yêu cầu kết nối lại.');
+  coopIceTimer=setTimeout(()=>{if(pc===coopPeer&&pc.iceConnectionState!=='connected'&&pc.iceConnectionState!=='completed')scheduleCoopIceRestart('Lần thử kết nối lại chưa thành công',250)},16000);
+ }catch(error){coopVoiceStatus='Chưa thể làm mới kết nối. Hãy giữ trang mở để ứng dụng thử lại khi mạng ổn định.';coopIceRestartPending=true;renderCoopLive()}
+ finally{coopIceRestartInFlight=false}
+}
+function flushCoopSignals(){
+ if(!coopSocket||coopSocket.readyState!==WebSocket.OPEN||!coopQueuedSignals.length)return;
+ const queued=coopQueuedSignals.splice(0);
+ for(let index=0;index<queued.length;index++){
+  try{coopSocket.send(JSON.stringify(queued[index]))}catch{coopQueuedSignals.unshift(...queued.slice(index));break}
+ }
+}
+function handleCoopNetworkChange(online=true){
+ if(coopCallState==='idle'||!coopPeer)return;
+ if(!online){coopVoiceStatus='Mạng tạm ngắt. Cuộc gọi sẽ thử nối lại khi có mạng.';renderCoopLive();return}
+ coopVoiceStatus='Đã có mạng trở lại. Đang thử làm mới cuộc gọi…';renderCoopLive();
+ if(!coopSocket||coopSocket.readyState>=2){coopReconnects=0;clearTimeout(coopReconnectTimer);connectCoopSocket()}
+ scheduleCoopIceRestart('Thiết bị vừa đổi mạng',300);
+}
+window.addEventListener('offline',()=>handleCoopNetworkChange(false));
+window.addEventListener('online',()=>handleCoopNetworkChange(true));
+if(navigator.connection?.addEventListener)navigator.connection.addEventListener('change',()=>handleCoopNetworkChange(true));
 async function flushCoopIce(){if(!coopPeer?.remoteDescription)return;const queued=coopPendingIce.splice(0);for(const candidate of queued){try{await coopPeer.addIceCandidate(new RTCIceCandidate(candidate))}catch(error){coopVoiceStatus='Một tín hiệu mạng chưa nhận được; đang tiếp tục thử đường truyền.'}}}
 async function startCoopCall(){
  if(['opening','recording','processing','transcribing'].includes(coopRecordState)){coopVoiceStatus='Hãy dừng hoặc bỏ qua chép lời trước khi gọi để tránh tranh chấp micro.';renderCoopLive();return}
  const state=coopSession?.state,peer=state?.players?.find(item=>item.id!==coopSession.playerId);
  if(!peer?.online){coopVoiceStatus='Đợi bạn học kết nối vào phòng trước khi gọi.';renderCoopLive();return}
  if(!window.isSecureContext||!navigator.mediaDevices?.getUserMedia||typeof RTCPeerConnection!=='function'){coopVoiceStatus='Gọi thoại cần HTTPS, micro được cấp quyền và trình duyệt hỗ trợ WebRTC.';renderCoopLive();return}
- coopCallTarget=peer.id;coopCallState='outgoing';coopVoiceStatus='Đang chuẩn bị micro và đường truyền…';coopPendingIce=[];coopIncomingOffer=null;coopRemoteAudioRequested=false;coopRemoteTrackState='waiting';coopIceConfigState='loading';clearTimeout(coopIceTimer);renderCoopLive();
+ coopCallTarget=peer.id;coopCallInitiator=coopSession.playerId;coopCallState='outgoing';coopVoiceStatus='Đang chuẩn bị micro và đường truyền…';coopPendingIce=[];coopIncomingOffer=null;coopRemoteAudioRequested=false;coopRemoteTrackState='waiting';coopIceConfigState='loading';clearTimeout(coopIceTimer);renderCoopLive();
  try{const [iceServers,stream]=await Promise.all([coopGetIceServers(),navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:false})]);coopLocalStream=stream;coopVoiceStatus='Đang thử kết nối trực tiếp qua STUN miễn phí…';const pc=createCoopPeer(peer.id,iceServers);const offer=await pc.createOffer();await pc.setLocalDescription(offer);if(!sendCoopSignal(peer.id,{kind:'offer',description:pc.localDescription.toJSON()}))throw new Error('Chưa gửi được lời mời gọi. Kiểm tra kết nối phòng.');coopVoiceStatus='Đang đợi bạn học nhận cuộc gọi…';coopCallMediaTimer=setTimeout(()=>{if(pc===coopPeer&&coopCallState==='outgoing'&&!pc.remoteDescription)endCoopCall(false,'Bạn học chưa nhận cuộc gọi. Hãy kiểm tra cả hai người đang ở trong phòng rồi thử lại.')},30000);renderCoopLive()}
  catch(error){endCoopCall(false,error?.name==='NotAllowedError'?'Bạn chưa cho phép micro. Hãy cấp quyền rồi gọi lại.':error?.name==='NotFoundError'?'Không tìm thấy micro trên thiết bị.':error?.name==='NotReadableError'?'Micro đang được ứng dụng khác sử dụng. Hãy đóng ứng dụng đó rồi thử lại.':error.message||'Không bắt đầu được cuộc gọi.')}
 }
 async function acceptCoopCall(){
  const offer=coopIncomingOffer,target=coopCallTarget;if(!offer||!target)return;
  if(['opening','recording','processing','transcribing'].includes(coopRecordState)){coopVoiceStatus='Dừng ghi âm hoặc bỏ qua chép lời trước khi nhận cuộc gọi để tránh tranh chấp micro.';renderCoopLive();return}
- coopCallState='outgoing';coopVoiceStatus='Đang chuẩn bị micro và đường truyền…';coopRemoteAudioRequested=false;coopRemoteTrackState='waiting';coopIceConfigState='loading';clearTimeout(coopIceTimer);renderCoopLive();
- try{const [iceServers,stream]=await Promise.all([coopGetIceServers(),navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:false})]);coopLocalStream=stream;const pc=createCoopPeer(target,iceServers);await pc.setRemoteDescription(new RTCSessionDescription(offer));await flushCoopIce();const answer=await pc.createAnswer();await pc.setLocalDescription(answer);if(!sendCoopSignal(target,{kind:'answer',description:pc.localDescription.toJSON()}))throw new Error('Chưa gửi được phản hồi cuộc gọi.');coopIncomingOffer=null;coopVoiceStatus='Đang thử kết nối trực tiếp qua STUN miễn phí…';coopIceTimer=setTimeout(()=>{if(pc===coopPeer&&coopCallState==='outgoing'&&pc.iceConnectionState!=='connected'&&pc.iceConnectionState!=='completed')endCoopCall(false,'STUN không tìm được đường trực tiếp. Hãy thử để cả hai người chuyển sang mạng Wi‑Fi khác hoặc 4G.')},20000);renderCoopLive()}
+ coopCallInitiator=target;coopCallState='outgoing';coopVoiceStatus='Đang chuẩn bị micro và đường truyền…';coopRemoteAudioRequested=false;coopRemoteTrackState='waiting';coopIceConfigState='loading';clearTimeout(coopIceTimer);renderCoopLive();
+ try{const [iceServers,stream]=await Promise.all([coopGetIceServers(),navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:false})]);coopLocalStream=stream;const pc=createCoopPeer(target,iceServers);await pc.setRemoteDescription(new RTCSessionDescription(offer));await flushCoopIce();const answer=await pc.createAnswer();await pc.setLocalDescription(answer);if(!sendCoopSignal(target,{kind:'answer',description:pc.localDescription.toJSON()}))throw new Error('Chưa gửi được phản hồi cuộc gọi.');coopIncomingOffer=null;coopVoiceStatus='Đang thử kết nối trực tiếp qua STUN miễn phí…';coopIceTimer=setTimeout(()=>{if(pc===coopPeer&&coopCallState==='outgoing'&&pc.iceConnectionState!=='connected'&&pc.iceConnectionState!=='completed')scheduleCoopIceRestart('Cuộc gọi chưa tìm được đường STUN',250)},20000);renderCoopLive()}
  catch(error){sendCoopSignal(target,{kind:'reject'});endCoopCall(false,error?.name==='NotAllowedError'?'Bạn chưa cấp quyền micro nên chưa thể nhận cuộc gọi.':error?.name==='NotFoundError'?'Không tìm thấy micro trên thiết bị.':error?.name==='NotReadableError'?'Micro đang được ứng dụng khác sử dụng. Hãy đóng ứng dụng đó rồi thử lại.':error.message||'Không nhận được cuộc gọi.')}
 }
 function rejectCoopCall(){if(coopCallTarget)sendCoopSignal(coopCallTarget,{kind:'reject'});endCoopCall(false,'Bạn đã từ chối cuộc gọi.')}
@@ -3213,8 +3269,15 @@ async function handleCoopSignal(message){
  const from=message.from,signal=message.signal;if(!from||!signal)return;
  try{
   if(signal.kind==='offer'){
-   if(coopCallState!=='idle'){sendCoopSignal(from,{kind:'reject'});return}
-   coopCallTarget=from;coopIncomingOffer=signal.description;coopCallState='incoming';coopVoiceStatus='Có cuộc gọi thoại đến.';renderCoopLive();return;
+   if(coopCallState!=='idle'){
+    if(!coopPeer||from!==coopCallTarget){sendCoopSignal(from,{kind:'reject'});return}
+    await coopPeer.setRemoteDescription(new RTCSessionDescription(signal.description));await flushCoopIce();
+    const answer=await coopPeer.createAnswer();await coopPeer.setLocalDescription(answer);
+    if(!sendCoopSignal(from,{kind:'answer',description:coopPeer.localDescription.toJSON(),iceRestart:true}))throw new Error('Chưa gửi được phản hồi nối lại.');
+    clearTimeout(coopIceRestartTimer);coopIceRestartTimer=null;
+    coopVoiceStatus='Đang hoàn tất kết nối lại sau khi mạng đổi…';renderCoopLive();return;
+   }
+   coopCallTarget=from;coopCallInitiator=from;coopIncomingOffer=signal.description;coopCallState='incoming';coopVoiceStatus='Có cuộc gọi thoại đến.';renderCoopLive();return;
   }
   if(signal.kind==='candidate'&&coopCallState==='idle'&&!coopCallTarget){
    const roomPeer=coopSession?.state?.players?.find(player=>player.id===from);
@@ -3222,9 +3285,11 @@ async function handleCoopSignal(message){
    return;
   }
   if(from!==coopCallTarget)return;
-  if(signal.kind==='answer'&&coopPeer){await coopPeer.setRemoteDescription(new RTCSessionDescription(signal.description));await flushCoopIce();clearTimeout(coopCallMediaTimer);coopCallMediaTimer=null;coopVoiceStatus='Bạn học đã nhận cuộc gọi; đang thử nối trực tiếp qua STUN…';const pc=coopPeer;coopIceTimer=setTimeout(()=>{if(pc===coopPeer&&coopCallState==='outgoing'&&pc.iceConnectionState!=='connected'&&pc.iceConnectionState!=='completed')endCoopCall(false,'STUN không tìm được đường trực tiếp. Hãy thử để cả hai người chuyển sang mạng Wi‑Fi khác hoặc 4G.')},20000);renderCoopLive()}
+  if(signal.kind==='restart-request'&&coopPeer&&coopSession?.playerId===coopCallInitiator){scheduleCoopIceRestart('Bạn học vừa đổi mạng',250)}
+  else if(signal.kind==='answer'&&coopPeer){await coopPeer.setRemoteDescription(new RTCSessionDescription(signal.description));await flushCoopIce();clearTimeout(coopIceRestartTimer);coopIceRestartTimer=null;clearTimeout(coopCallMediaTimer);coopCallMediaTimer=null;coopVoiceStatus='Bạn học đã nhận cuộc gọi; đang thử nối trực tiếp qua STUN…';const pc=coopPeer;coopIceTimer=setTimeout(()=>{if(pc===coopPeer&&coopCallState==='outgoing'&&pc.iceConnectionState!=='connected'&&pc.iceConnectionState!=='completed')scheduleCoopIceRestart('Cuộc gọi chưa tìm được đường STUN',250)},20000);renderCoopLive()}
   else if(signal.kind==='candidate'){
-   if(coopPeer?.remoteDescription){try{await coopPeer.addIceCandidate(new RTCIceCandidate(signal.candidate))}catch{}}
+   const remoteUfrags=(coopPeer?.remoteDescription?.sdp||'').split(/\r?\n/).filter(line=>line.startsWith('a=ice-ufrag:')).map(line=>line.slice(12).trim());
+   if(coopPeer?.remoteDescription&&(!signal.candidate?.usernameFragment||remoteUfrags.includes(signal.candidate.usernameFragment))){try{await coopPeer.addIceCandidate(new RTCIceCandidate(signal.candidate))}catch{}}
    else if(coopPendingIce.length<40)coopPendingIce.push(signal.candidate);
   }else if(signal.kind==='reject')endCoopCall(false,'Bạn học đã từ chối cuộc gọi.');
   else if(signal.kind==='hangup')endCoopCall(false,'Bạn học đã kết thúc cuộc gọi.');
@@ -3235,7 +3300,7 @@ function setCoopRemoteVolume(value){coopRemoteVolume=Math.max(0,Math.min(1,Numbe
 function toggleCoopMute(){coopMuted=!coopMuted;coopLocalStream?.getAudioTracks().forEach(track=>track.enabled=!coopMuted);renderCoopLive()}
 function endCoopCall(notifyPeer=true,status='Cuộc gọi đã kết thúc.'){
  const target=coopCallTarget;if(notifyPeer&&target&&coopSocket?.readyState===WebSocket.OPEN)sendCoopSignal(target,{kind:'hangup'});
- clearTimeout(coopCallMediaTimer);coopCallMediaTimer=null;clearTimeout(coopIceTimer);coopIceTimer=null;
+ clearTimeout(coopCallMediaTimer);coopCallMediaTimer=null;clearTimeout(coopIceTimer);coopIceTimer=null;clearTimeout(coopIceRestartTimer);coopIceRestartTimer=null;coopIceRestartInFlight=false;coopIceRestartPending=false;coopIceRestartAttempts=0;coopLastIceRestartAt=0;coopLastRestartRequestAt=0;coopCallInitiator='';coopQueuedSignals=[];
  coopPeer?.close();coopPeer=null;coopLocalStream?.getTracks().forEach(track=>track.stop());coopLocalStream=null;coopRemoteStream?.getTracks().forEach(track=>track.stop());coopRemoteStream=null;
  const audio=document.getElementById('coop-peer-audio');if(audio){audio.pause();audio.srcObject=null}
  coopIncomingOffer=null;coopCallTarget='';coopCallState='idle';coopVoiceStatus=status;coopPendingIce=[];coopMuted=false;coopRemoteTrackState='idle';coopRemoteAudioPlaying=false;coopRemoteAudioRequested=false;renderCoopLive();
