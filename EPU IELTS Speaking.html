@@ -3964,7 +3964,8 @@ try{
  if(saved&&typeof saved.endpoint==='string'&&typeof saved.roomCode==='string'&&typeof saved.playerId==='string'&&typeof saved.playerToken==='string')coopSession=saved;
 }catch{}
 
-function coopEndpoint(){return String(st.coop?.endpoint||'').replace(/\/+$/,'')}
+const COOP_DEFAULT_ENDPOINT='https://epu-speaking-coop.nductai2444.workers.dev';
+function coopEndpoint(){return String(st.coop?.endpoint||COOP_DEFAULT_ENDPOINT).replace(/\/+$/,'')}
 function openArcadeOnline(form){
  const game=arcadeSelection;
  if(!game)return;
@@ -4219,22 +4220,19 @@ function renderCoopLive(){
 }
 function coopPage(){
  const endpoint=coopEndpoint();
- const setup=endpoint?'':`<section class="c"><h2>Thiết lập lần đầu</h2><p>Chỉ người quản lý cần làm bước này một lần. Không cần cài phần mềm hay dùng cửa sổ lệnh.</p>
-  <ol><li>Đăng nhập hoặc tạo tài khoản Cloudflare và GitHub khi trang yêu cầu.</li><li>Bấm nút bên dưới, giữ thiết lập Worker có sẵn rồi chọn triển khai.</li><li>Đợi Cloudflare báo hoàn tất và sao chép địa chỉ kết thúc bằng <code>.workers.dev</code>.</li><li>Dán địa chỉ đó vào ô bên dưới. Người học khác cũng cần nhập cùng địa chỉ trên thiết bị của họ.</li></ol>
-  <p><a class="g" href="https://deploy.workers.cloudflare.com/?url=https%3A%2F%2Fgithub.com%2FTaylor447%2Fepu-ielts-speaking%2Ftree%2Fmain%2Fcoop-worker" target="_blank" rel="noopener noreferrer">Thiết lập coop tự động trên Cloudflare ↗</a></p>
-  <p class="mu">Cloudflare có thể tạo một bản sao mã nguồn trong GitHub của bạn để quản lý Worker. Việc này không sửa trang EPU gốc.</p></section>`;
- const config=`${setup}<section class="c"><h2>Kết nối phòng học coop</h2><p>Dán địa chỉ Cloudflare Worker đã triển khai. Cả hai người cần dùng cùng một địa chỉ.</p>
-  <form class="row" onsubmit="event.preventDefault();saveCoopEndpoint(this)"><label class="grow">Địa chỉ Worker<input name="endpoint" type="text" inputmode="url" autocapitalize="none" spellcheck="false" value="${esc(endpoint)}" placeholder="ten-worker.ten-tai-khoan.workers.dev" required></label><button type="submit">Kiểm tra và lưu</button></form>
-  <p class="coop-notice mu" id="coop-endpoint-status" role="status" aria-live="polite">${endpoint?'Địa chỉ đã lưu trên thiết bị này. Hãy gửi cùng địa chỉ cho bạn học.':'Chưa kết nối backend coop.'}</p>
-  <p class="mu">Có thể dán tên miền Worker hoặc URL đầy đủ; app tự thêm <code>https://</code> nếu thiếu. Chỉ dán địa chỉ gốc, không thêm <code>/health</code>. Địa chỉ được lưu riêng trên thiết bị này. Coop cần mở EPU bằng HTTPS; mở file HTML offline không đồng bộ phòng.</p></section>`;
+ const config=`<details class="c"><summary>Nâng cao</summary><p>Phần này dành cho người quản lý. Người học thông thường không cần thay đổi gì ở đây.</p>
+  <form class="row" onsubmit="event.preventDefault();saveCoopEndpoint(this)"><label class="grow">Địa chỉ máy chủ<input name="endpoint" type="text" inputmode="url" autocapitalize="none" spellcheck="false" value="${esc(endpoint)}" placeholder="https://…" required></label><button type="submit">Kiểm tra và lưu</button></form>
+  <p class="coop-notice mu" id="coop-endpoint-status" role="status" aria-live="polite">Địa chỉ kết nối đã được cài sẵn. Có thể đổi tại đây nếu bạn tự quản lý máy chủ.</p>
+  <p class="mu">Coop trực tuyến dùng máy chủ chung đã được cấu hình sẵn. Nếu bạn muốn tự vận hành máy chủ, cần triển khai Worker riêng rồi nhập địa chỉ HTTPS gốc tại đây. Không thêm <code>/health</code>. Mở file HTML offline sẽ không đồng bộ phòng.</p>
+  <p><a class="g" href="https://deploy.workers.cloudflare.com/?url=https%3A%2F%2Fgithub.com%2FTaylor447%2Fepu-ielts-speaking%2Ftree%2Fmain%2Fcoop-worker" target="_blank" rel="noopener noreferrer">Hướng dẫn triển khai máy chủ riêng ↗</a></p></details>`;
  if(!coopSession&&coopGameSetup)return coopGameLanding(config);
  if(coopSession?.state?.mode==='game')return coopGamePage(coopSession.state);
- if(!coopSession)return `${pageIntro('HỌC CÙNG BẠN','Coop 2 người','Luyện theo cặp: một người trả lời, người kia góp ý theo tiêu chí rõ ràng. Không tự bịa band điểm cho phiên coop.')}${config}
+ if(!coopSession)return `${pageIntro('HỌC CÙNG BẠN','Coop 2 người','Tạo phòng, gửi mã 7 ký tự cho bạn học rồi cùng luyện. Không cần cài đặt hay thiết lập máy chủ.')}${config}
   <div class="coop-grid"><form class="c" onsubmit="event.preventDefault();createCoopRoom(this)"><h2>Tạo phòng mới</h2><label>Tên hiển thị<input name="name" maxlength="32" value="${esc(st.p.n||'Người nói 1')}" required></label>
    <div class="field-grid"><label>Part<select name="part"><option value="1">Part 1 · câu hỏi ngắn</option><option value="2">Part 2 · cue card</option><option value="3">Part 3 · thảo luận</option></select></label><label>Chủ đề<select name="topic">${TP.map((row,index)=>`<option value="${index}">${esc(TOPIC_LABELS[index]||row[0])}</option>`).join('')}</select></label></div>
    <button type="submit"${endpoint?'':' disabled'}>Tạo phòng coop</button></form>
   <form class="c" onsubmit="event.preventDefault();joinCoopRoom(this)"><h2>Tham gia phòng</h2><label>Tên hiển thị<input name="name" maxlength="32" value="${esc(st.p.n||'Người nói 2')}" required></label><label>Mã phòng<input name="code" maxlength="7" pattern="[A-HJ-NP-Z2-9a-hj-np-z]{7}" autocomplete="off" placeholder="7 ký tự" required></label><button type="submit"${endpoint?'':' disabled'}>Tham gia</button></form></div>
-  <p class="coop-notice mu" id="coop-status" role="status" aria-live="polite">${esc(coopStatus)}</p>
+  <p class="coop-notice mu" id="coop-status" role="status" aria-live="polite">${esc(coopStatus||'Tạo phòng hoặc nhập mã để bắt đầu. Hãy dùng kết nối Internet.')}</p>
   <article class="c"><h2>Cách hoạt động</h2><ol><li>Tạo phòng rồi gửi mã 7 ký tự cho bạn học.</li><li>Hai người luân phiên trả lời, Whisper tự chép tiếng Anh ngoại tuyến để bạn kiểm tra/sửa rồi gửi transcript và bản ghi cho bạn học góp ý.</li><li>Chat được đồng bộ trong phòng; gọi thoại truyền trực tiếp giữa hai thiết bị. Không có chấm band tự động.</li></ol><p>Tin nhắn và tiến độ phòng tự xóa sau 2 giờ. Bản ghi được Worker chuyển cho bạn học đang kết nối nhưng không lưu vào lịch sử phòng. Chỉ chia sẻ mã phòng với người bạn muốn mời.</p></article>`;
 
  const state=coopSession.state,players=state?.players||[];
@@ -4276,8 +4274,8 @@ async function saveCoopEndpoint(form){
 }
 async function coopPost(path,payload){
  const endpoint=coopEndpoint();if(!endpoint)throw new Error('Hãy nhập và lưu địa chỉ Worker trước.');
- const response=await fetch(endpoint+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
- const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||`Không kết nối được backend (${response.status}).`);return data;
+ let response;try{response=await fetch(endpoint+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})}catch(error){if(error?.name==='AbortError')throw new Error('Kết nối đang chậm. Hãy thử lại sau.');if(error instanceof TypeError)throw new Error('Không kết nối được lúc này. Hãy kiểm tra Internet rồi thử lại.');throw error}
+ const data=await response.json().catch(()=>({}));if(!response.ok){if(response.status===404)throw new Error('Dịch vụ học cùng bạn đang tạm thời chưa sẵn sàng. Hãy thử lại sau.');if(response.status>=500)throw new Error('Dịch vụ đang bận. Hãy thử lại sau ít phút.');throw new Error(data.error||'Chưa thực hiện được. Hãy kiểm tra thông tin rồi thử lại.')}return data;
 }
 async function coopGetIceServers(){
  const fallback=[{urls:'stun:stun.cloudflare.com:3478'},{urls:'stun:stun.l.google.com:19302'}];
@@ -4300,11 +4298,11 @@ async function createCoopRoom(form){
    const name=form.elements.name.value.trim(),setup=coopGameSetup;
    const response=await fetch(coopEndpoint()+'/health',{cache:'no-store',signal:AbortSignal.timeout(8000)});
    const health=await response.json();
-   if(!response.ok||!Array.isArray(health.games)||!health.games.includes(setup.id))throw Error('Worker chưa hỗ trợ trò này. Hãy triển khai bản Worker mới.');
+   if(!response.ok||!Array.isArray(health.games)||!health.games.includes(setup.id))throw Error('Trò chơi trực tuyến đang được cập nhật. Bạn có thể thử lại sau.');
    const data=await coopPost('/api/rooms',{displayName:name,mode:'game',gameId:setup.id,gameTopic:setup.topic});
    if(data.state?.mode!=='game')throw Error('Worker chưa tạo được phòng trò chơi.');
    coopSaveSession(data,coopEndpoint(),name);
-  }catch(error){coopStatus=error.message||'Không tạo được phòng trò chơi.';if(button)button.disabled=false;renderCoopLive()}
+  }catch(error){coopStatus=error?.name==='AbortError'?'Kết nối đang chậm. Hãy thử lại sau.':error instanceof TypeError?'Không kết nối được lúc này. Hãy kiểm tra Internet rồi thử lại.':/\b404\b/.test(error?.message||'')?'Dịch vụ học cùng bạn đang tạm thời chưa sẵn sàng. Hãy thử lại sau.':error.message||'Không tạo được phòng trò chơi.';if(button)button.disabled=false;renderCoopLive()}
   return;
  }
  try{const name=form.elements.name.value.trim(),part=Number(form.elements.part.value),topicIndex=Number(form.elements.topic.value),row=TP[topicIndex];if(!row)throw new Error('Chủ đề không hợp lệ.');
