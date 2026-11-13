@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EPU · Công cụ hiệu chuẩn điểm Speaking</title>
+<style>
+:root{color-scheme:dark;--bg:#071324;--panel:rgba(18,34,59,.9);--card:rgba(35,55,86,.72);--line:#344b70;--text:#eef4ff;--muted:#a9bbd8;--accent:#83aaff;--action:#2450c9;--bad:#ff9b9b;--good:#7edab7;font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}*{box-sizing:border-box}body{margin:0;color:var(--text);background:radial-gradient(ellipse at 10% 0%,#173663 0,transparent 43%),radial-gradient(ellipse at 90% 10%,#35244c 0,transparent 40%),var(--bg)}header{position:sticky;top:0;background:rgba(9,22,40,.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);padding:15px 5vw;z-index:2}header strong{font-size:1.05rem}main{width:min(1120px,92vw);margin:30px auto 80px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:24px;padding:24px;margin:18px 0;box-shadow:0 12px 36px #0002}.eyebrow{margin:0;color:var(--accent);font-size:.78rem;font-weight:800;letter-spacing:.12em}h1{font-size:clamp(1.7rem,4vw,2.5rem);line-height:1.15;margin:.45rem 0 .8rem}h2{font-size:1.28rem;margin:0 0 .7rem}h3{font-size:1rem;margin:0 0 .5rem}p{margin:.5rem 0;color:var(--muted)}.notice{border-left:4px solid #e6b65f;padding:12px 15px;background:#ffffff0b;border-radius:10px;color:var(--text)}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}button,.button{border:1px solid var(--line);border-radius:13px;background:var(--card);color:var(--text);padding:11px 15px;font:700 .95rem system-ui;cursor:pointer}button.primary{background:var(--action);border-color:#5277df}button:disabled{opacity:.45;cursor:not-allowed}button:hover:not(:disabled){filter:brightness(1.12)}input[type=file],textarea{max-width:100%;color:var(--text)}textarea{width:100%;min-height:180px;resize:vertical;border:1px solid var(--line);border-radius:14px;background:#0d1b30;color:var(--text);padding:14px;font:13px/1.5 ui-monospace,Consolas,monospace}small,.small{font-size:.86rem;color:var(--muted)}.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}.stat b{display:block;font-size:1.25rem;color:var(--accent)}.scroll{overflow:auto;border:1px solid var(--line);border-radius:14px}table{width:100%;border-collapse:collapse;min-width:640px}th,td{text-align:left;padding:10px 12px;border-bottom:1px solid #344b7066;vertical-align:top}th{background:#233756;position:sticky;top:0}td{font-size:.91rem}tr:last-child td{border-bottom:0}.pass{color:var(--good)}.fail{color:var(--bad)}.chip{display:inline-block;padding:3px 9px;border:1px solid var(--line);border-radius:99px;background:var(--card);font-size:.8rem;color:var(--muted)}code{color:#c9d9ff;background:#0b1a2e;padding:2px 5px;border-radius:5px}.hidden-frame{position:fixed;width:1px;height:1px;left:-10px;bottom:0;opacity:0;pointer-events:none;border:0}details{border-top:1px solid var(--line);padding-top:14px}summary{cursor:pointer;font-weight:700}.status{min-height:1.5em}#matrix table{min-width:0}#matrix th,#matrix td{text-align:center;padding:6px;font-size:.8rem}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}@media(max-width:640px){.panel{padding:18px;border-radius:18px}header{padding:13px 4vw}.actions button{width:100%}}
+</style>
+</head>
+<body>
+<header><strong>EPU · Công cụ hiệu chuẩn điểm Speaking</strong></header>
+<main>
+ <section class="panel">
+  <p class="eyebrow">BỘ KIỂM TRA CỤC BỘ · SCORE_VERSION 9</p>
+  <h1>Hiệu chuẩn theo bài nói mẫu</h1>
+  <p>Công cụ này gọi đúng hàm <code>score()</code> của bản EPU nằm cạnh file để chạy các bài mẫu. Không gửi dữ liệu ra mạng.</p>
+  <p class="notice"><strong>40 bài dựng sẵn chỉ là dữ liệu tổng hợp</strong>, mô phỏng dải năng lực theo mô tả band công khai. Chúng không phải điểm giáo viên và MAE của chúng không chứng minh độ chính xác ngoài thực tế. Khi có bộ giáo viên, nhập JSON để xem báo cáo kiểm định riêng.</p>
+  <div class="row"><span class="chip">40 bài tổng hợp</span><span class="chip">8 chủ đề · Part 1–3</span><span class="chip">Pronunciation cần dữ liệu âm thanh</span></div>
+  <div class="actions"><button id="run-synthetic" class="primary">Chạy 40 bài tổng hợp</button><button id="download-template">Tải mẫu JSON cho bài giáo viên</button></div>
+  <p id="status" class="status" role="status" aria-live="polite">Chưa chạy. Khi bấm chạy, công cụ sẽ mở bản EPU cục bộ trong khung ẩn để dùng score() thật.</p>
+ </section>
+
+ <section class="panel">
+  <h2>Nhập bộ bài giáo viên</h2>
+  <p>Dán JSON hoặc chọn tệp JSON. Mỗi bài có câu hỏi, văn bản, Part, thời lượng nếu có và điểm chuẩn. Chỉ bài có <code>source:"teacher"</code> được tính là dữ liệu giáo viên.</p>
+  <textarea id="teacher-json" spellcheck="false" aria-label="Dữ liệu bài nói giáo viên" placeholder='Dán mảng JSON tại đây. Có thể tải tệp mẫu để xem cấu trúc.'></textarea>
+  <div class="actions"><input id="teacher-file" type="file" accept="application/json,.json"><button id="load-teacher">Đọc JSON</button><button id="run-teacher" class="primary" disabled>Chạy bộ giáo viên</button></div>
+  <p id="teacher-status" class="small" role="status" aria-live="polite">Chưa nhập dữ liệu.</p>
+  <details><summary>Quy tắc nhập và an toàn</summary><p>Mỗi bản ghi chỉ được có <code>id, source, part, question, topic, text, duration, scores</code>. Nội dung tối đa 3.600 ký tự; điểm 0–9 theo nấc 0,5. Từ chối trường lạ, URL, thẻ HTML, mẫu trùng ID hoặc sai kiểu dữ liệu. Mốc hiệu chuẩn chỉ được tạo khi có ít nhất 40 bài giáo viên hợp lệ.</p></details>
+ </section>
+
+ <section class="panel" id="report" aria-live="polite">
+  <h2>Báo cáo</h2><p>Chạy một bộ dữ liệu để xem thống kê.</p>
+ </section>
+ <section class="panel" id="candidate" hidden>
+  <h2>Mốc hiệu chỉnh đề xuất</h2><p class="notice">Đây là ánh xạ đơn điệu trên điểm dự đoán của từng tiêu chí, tạo từ phần huấn luyện. Xem kết quả trên tập giữ lại trước khi cân nhắc đóng băng thành hằng số trong app.</p>
+  <textarea id="candidate-json" readonly aria-label="Mốc hiệu chỉnh đề xuất"></textarea>
+  <div class="actions"><button id="copy-candidate">Sao chép JSON</button></div>
+ </section>
+ <iframe class="hidden-frame" id="scorer" title="Bộ chấm cục bộ EPU" aria-hidden="true"></iframe>
+</main>
+<script>
+'use strict';
+const $=selector=>document.querySelector(selector), bands=[3.5,4,4.5,5,5.5,6,6.5,7,7.5,8,8.5,9];
+const profileByLevel=[{fluency:4,lexical:4,grammar:4.5,pronunciation:null},{fluency:5,lexical:4.5,grammar:5,pronunciation:null},{fluency:6,lexical:5.5,grammar:6,pronunciation:null},{fluency:7,lexical:6.5,grammar:6.5,pronunciation:null},{fluency:8,lexical:7.5,grammar:7.5,pronunciation:null}];
+const topics=[
+ {part:1,topic:'Electricity',question:'What electrical devices do you use every day?',base:'I use a laptop and a phone every day',benefit:'they help me study and contact my classmates',example:'I prepare reports on my laptop and check class messages on my phone',challenge:'notifications can distract me',reflection:'I try to use each device for a clear purpose'},
+ {part:1,topic:'Food',question:'What kind of food do you enjoy?',base:'I enjoy simple meals with rice, vegetables and fish',benefit:'they are familiar and give me energy for class',example:'I often have lunch with my family at the weekend',challenge:'I sometimes choose snacks when I am busy',reflection:'a balanced meal is easier to maintain than a strict diet'},
+ {part:2,topic:'Travel',question:'Describe a trip that you remember well.',base:'I remember a short trip to a quiet coastal town',benefit:'it gave me time to relax after a demanding semester',example:'I walked along the beach with two friends and tried local food',challenge:'the journey took longer than expected because of traffic',reflection:'the trip taught me that a simple plan can still become memorable'},
+ {part:2,topic:'Study',question:'Describe a useful skill you learned.',base:'I learned how to explain a technical idea more clearly',benefit:'it helps me work with classmates on engineering projects',example:'during a laboratory assignment I used a simple diagram to explain a circuit',challenge:'at first I included too many details',reflection:'I now organise the main point before giving an example'},
+ {part:2,topic:'Family and Friends',question:'Describe a person who has helped you.',base:'I would like to describe a friend who supported me at university',benefit:'their calm advice helped me handle a difficult assignment',example:'we reviewed the instructions together and divided the work fairly',challenge:'we had different schedules during exam week',reflection:'the experience showed me how practical support can build confidence'},
+ {part:3,topic:'Environment',question:'How can individuals help protect the environment?',base:'Individuals can reduce waste and make more careful daily choices',benefit:'small habits become useful when many households follow them',example:'people can carry reusable bags and sort recyclable materials',challenge:'convenient disposable products are still common',reflection:'communities and local services should make sustainable choices easier'},
+ {part:3,topic:'Health and Exercise',question:'Why is it difficult for some people to exercise regularly?',base:'Many people struggle to exercise because their schedules are busy',benefit:'short routines are more realistic than demanding plans',example:'a student can walk between classes or take the stairs',challenge:'bad weather and limited safe spaces can interrupt a routine',reflection:'schools and local authorities can provide accessible places to be active'},
+ {part:3,topic:'Technology',question:'How has technology changed the way people learn?',base:'Technology has made learning resources easier to access',benefit:'students can review lessons and ask questions at flexible times',example:'a short video can clarify a difficult point after class',challenge:'online distractions and unreliable information remain concerns',reflection:'digital tools work best when learners check sources and set limits'}
+];
+function answerFor(topic,level){
+ const frames=[
+  `${topic.base}. It is useful for me. It help me often. I like it because it is good.`,
+  `${topic.base}. I find it useful because ${topic.benefit}. For example, ${topic.example}.`,
+  `${topic.base}, mainly because ${topic.benefit}. For instance, ${topic.example}. Although ${topic.challenge}, I still think it is a practical choice.`,
+  `${topic.base}, which is particularly helpful because ${topic.benefit}. A good example is that ${topic.example}. While ${topic.challenge}, I have learned to ${topic.reflection}.`,
+  `${topic.base}, and its main value is that ${topic.benefit}. To give a specific example, ${topic.example}. Admittedly, ${topic.challenge}; nevertheless, I have found that ${topic.reflection}. This balance makes the experience useful in everyday life.`
+ ];
+ let text=frames[level];
+ if(topic.part===2){
+  const story=[
+   `It happened during a busy period, when I wanted a change of routine. I went with someone I know, and we kept the plan simple.`,
+   `Before we started, I expected an ordinary day. The place was comfortable, and the people around us were friendly. We had enough time to talk instead of rushing from one activity to another.`,
+   `One detail I remember is how the experience changed my mood. I had been thinking about deadlines, but concentrating on the activity helped me switch off. We also took a few photos and discussed what we had enjoyed most.`,
+   `Looking back, the experience was valuable for more than one reason. It gave me a concrete example of how planning and cooperation can make a difficult or unfamiliar situation easier. I would like to repeat it when I have a suitable opportunity.`,
+   `If I could improve anything, I would allow more time and prepare a backup plan. Even so, the unexpected parts made the day feel genuine rather than perfectly arranged. That is why I still remember it clearly.`
+  ];
+  const count=[0,1,2,4,5][level];for(let i=0;i<count;i++)text+=' '+story[i];
+ }
+ if(topic.part===3&&level>=2)text+=' This is not only a personal issue; it can also affect the wider community. A balanced response should consider cost, access and long-term results.';
+ return text;
+}
+const synthetic=topics.flatMap((topic,topicIndex)=>profileByLevel.map((scores,level)=>({id:`syn-${topicIndex+1}-${level+4}`,source:'synthetic',part:topic.part,question:topic.question,topic:topic.topic,text:answerFor(topic,level),duration:topic.part===2?[35,50,70,95,115][level]:[25,35,45,55,65][level],scores:{...scores}})));
+let teacherSamples=[],activeSamples=synthetic,scorerLoaded=false,pendingRun=null,teacherResults=null;
+function isBand(value){return value==null||(Number.isFinite(value)&&value>=0&&value<=9&&Math.round(value*2)===value*2)}
+function rejectHtmlOrUrl(value){return /[<>]|(?:https?:\/\/|www\.)/i.test(value)}
+function validateTeacherJson(raw){
+ const data=JSON.parse(raw);if(!Array.isArray(data)||data.length<1||data.length>200)throw Error('JSON phải là một mảng gồm 1–200 bài.');
+ const allowed=new Set(['id','source','part','question','topic','text','duration','scores']),ids=new Set();
+ return data.map((row,index)=>{
+  if(!row||typeof row!=='object'||Array.isArray(row)||Object.keys(row).some(key=>!allowed.has(key)))throw Error(`Bài ${index+1}: có trường lạ hoặc không phải đối tượng.`);
+  if(typeof row.id!=='string'||! /^[A-Za-z0-9_-]{1,40}$/.test(row.id)||ids.has(row.id))throw Error(`Bài ${index+1}: mã ID phải hợp lệ và không trùng.`);ids.add(row.id);
+  if(row.source!=='teacher'||![1,2,3].includes(row.part)||typeof row.question!=='string'||!row.question.trim()||row.question.length>240||typeof row.topic!=='string'||row.topic.length>120||typeof row.text!=='string'||!row.text.trim()||row.text.length>3600)throw Error(`Bài ${index+1}: thiếu trường hoặc sai kiểu dữ liệu.`);
+  if([row.question,row.topic,row.text].some(rejectHtmlOrUrl))throw Error(`Bài ${index+1}: không nhận URL hoặc thẻ HTML.`);
+  if(row.duration!==null&&(!Number.isFinite(row.duration)||row.duration<0||row.duration>900))throw Error(`Bài ${index+1}: thời lượng phải từ 0 đến 900 giây hoặc null.`);
+  if(!row.scores||typeof row.scores!=='object'||Array.isArray(row.scores)||Object.keys(row.scores).some(key=>!['fluency','lexical','grammar','pronunciation'].includes(key))||!['fluency','lexical','grammar','pronunciation'].every(key=>Object.hasOwn(row.scores,key))||!Object.values(row.scores).every(isBand))throw Error(`Bài ${index+1}: cần đủ bốn điểm 0–9 theo nấc 0,5 (Pronunciation có thể là null).`);
+  return {id:row.id,source:'teacher',part:row.part,question:row.question.trim(),topic:row.topic.trim(),text:row.text.trim(),duration:row.duration,scores:{fluency:row.scores.fluency,lexical:row.scores.lexical,grammar:row.scores.grammar,pronunciation:row.scores.pronunciation}};
+ });
+}
+function loadTeacher(){
+ try{teacherSamples=validateTeacherJson($('#teacher-json').value);teacherResults=null;$('#teacher-status').textContent=`Đã nhận ${teacherSamples.length} bài giáo viên. ${teacherSamples.length>=40?'Có thể chạy báo cáo và tạo mốc đề xuất.':'Cần ít nhất 40 bài để bật hiệu chuẩn mốc.'}`;$('#run-teacher').disabled=false;return true}
+ catch(error){$('#teacher-status').textContent='Không nhận JSON: '+error.message;$('#run-teacher').disabled=true;return false}
+}
+$('#teacher-file').addEventListener('change',async event=>{const file=event.target.files?.[0];if(!file)return;if(file.size>2*1024*1024){$('#teacher-status').textContent='Tệp JSON quá lớn (giới hạn 2 MB).';return}$('#teacher-json').value=await file.text();loadTeacher()});
+$('#load-teacher').addEventListener('click',loadTeacher);
+function ensureScorer(callback){
+ if(scorerLoaded){callback();return}
+ if(pendingRun){pendingRun.push(callback);return}
+ pendingRun=[callback];$('#status').textContent='Đang mở bản EPU cục bộ để gọi score() thật; thời gian mở tùy kích thước file và thiết bị. Không gửi dữ liệu ra mạng.';
+ const frame=$('#scorer');frame.onload=()=>{scorerLoaded=true;const callbacks=pendingRun||[];pendingRun=null;for(const run of callbacks)run()};frame.onerror=()=>{pendingRun=null;$('#status').textContent='Không mở được EPU cạnh công cụ. Hãy để score_calibration.html cùng thư mục với EPU IELTS Speaking.html.'};
+ frame.src='EPU IELTS Speaking.html?score-calibration=1';
+}
+let requestId=0;
+function runWithSamples(samples,label,isTeacher){
+ if(!scorerLoaded){ensureScorer(()=>runWithSamples(samples,label,isTeacher));return}
+ const id=String(++requestId)+'-'+Date.now();$('#status').textContent=`Đang chạy ${samples.length} bài bằng score() trong app…`;let responseTimer;
+ const listener=event=>{
+  if(event.source!==$('#scorer').contentWindow||event.data?.type!=='EPU_SCORE_CALIBRATION_RESULT'||event.data.requestId!==id)return;
+  clearTimeout(responseTimer);window.removeEventListener('message',listener);const results=event.data.rows||[];$('#status').textContent=`Đã chạy ${results.length} mẫu bằng SCORE_VERSION ${event.data.scoreVersion}.`;
+  renderReport(samples,results,label,isTeacher);
+  if(isTeacher){teacherResults=results;$('#candidate').hidden=true;if(samples.length>=40)fitAndReport(samples,results)}
+  else fitSyntheticSplit(samples,results);
+ };
+ window.addEventListener('message',listener);
+ responseTimer=setTimeout(()=>{window.removeEventListener('message',listener);$('#status').textContent='Bản EPU chưa phản hồi. Hãy tải lại công cụ và kiểm tra rằng hai file nằm cùng thư mục.'},120000);
+ $('#scorer').contentWindow.postMessage({type:'EPU_SCORE_CALIBRATION_RUN',requestId:id,samples},'*');
+}
+function valuesFor(samples,results,key){return samples.map((sample,index)=>({actual:sample.scores?.[key]??null,predicted:results[index]?.scores?.[key]??null,id:sample.id})).filter(row=>Number.isFinite(row.actual)&&Number.isFinite(row.predicted))}
+const mae=values=>values.length?values.reduce((sum,row)=>sum+Math.abs(row.predicted-row.actual),0)/values.length:null;
+function average(values){return values.length?values.reduce((a,b)=>a+b,0)/values.length:null}
+function rank(values){const order=values.map((value,index)=>({value,index})).sort((a,b)=>a.value-b.value),ranks=Array(values.length);for(let i=0;i<order.length;){let j=i+1;while(j<order.length&&order[j].value===order[i].value)j++;const mean=(i+1+j)/2;for(let k=i;k<j;k++)ranks[order[k].index]=mean;i=j}return ranks}
+function calibrationSplit(samples,folds){const order=samples.map((sample,index)=>{let hash=2166136261;for(const char of String(sample.id||index))hash=Math.imul(hash^char.charCodeAt(0),16777619);return {index,hash:hash>>>0}}).sort((a,b)=>a.hash-b.hash||a.index-b.index).map(item=>item.index),train=[],heldout=[];order.forEach((index,position)=>(position%folds===0?heldout:train).push(index));return {train,heldout}}
+function spearman(rows){if(rows.length<2)return null;const a=rank(rows.map(row=>row.actual)),b=rank(rows.map(row=>row.predicted)),ma=average(a),mb=average(b);let num=0,da=0,db=0;for(let i=0;i<a.length;i++){const x=a[i]-ma,y=b[i]-mb;num+=x*y;da+=x*x;db+=y*y}return da&&db?num/Math.sqrt(da*db):null}
+function criterionReport(samples,results,key){const rows=valuesFor(samples,results,key),err=mae(rows),within=rows.length?rows.filter(row=>Math.abs(row.actual-row.predicted)<=.5).length/rows.length:null;return {rows,mae:err,within,spearman:spearman(rows)}}
+function expectedOverall(sample){return average(['fluency','lexical','grammar'].map(key=>sample.scores?.[key]).filter(Number.isFinite))}
+function predictedOverall(result){return result?.scores?average([result.scores.fluency,result.scores.lexical,result.scores.grammar].filter(Number.isFinite)):null}
+function el(tag,content,className){const node=document.createElement(tag);if(content!==undefined)node.textContent=String(content);if(className)node.className=className;return node}
+function renderReport(samples,results,label,isTeacher){
+ const root=$('#report');root.replaceChildren(el('h2','Báo cáo · '+label),el('p',isTeacher?'Điểm dự đoán lấy từ score() thật. Tổng so sánh được tính từ 3 tiêu chí văn bản; Pronunciation được ghi “chưa đo” nếu thiếu dữ liệu âm thanh tương ứng.':'Bộ tổng hợp dùng để kiểm tra đường chạy và tính đơn điệu; đây không phải phép đo độ chính xác giáo viên.'));
+ const grid=el('div');grid.className='stat-grid';const overall=samples.map((sample,index)=>({actual:expectedOverall(sample),predicted:predictedOverall(results[index])})).filter(row=>Number.isFinite(row.actual)&&Number.isFinite(row.predicted)),overallReport={rows:overall,mae:mae(overall),within:overall.length?overall.filter(row=>Math.abs(row.actual-row.predicted)<=.5).length/overall.length:null,spearman:spearman(overall)};
+ const keys=[['Tổng (3 tiêu chí)',overallReport],['Fluency & Coherence',criterionReport(samples,results,'fluency')],['Lexical Resource',criterionReport(samples,results,'lexical')],['Grammar',criterionReport(samples,results,'grammar')],['Pronunciation',criterionReport(samples,results,'pronunciation')]];
+ for(const [name,stat] of keys){const card=el('div');card.className='stat';card.append(el('h3',name),el('b',stat.mae==null?'Chưa đo':stat.mae.toFixed(2)+' MAE'),el('small',stat.rows?`${stat.rows.length} bài · ±0,5: ${Math.round((stat.within||0)*100)}% · Spearman: ${stat.spearman==null?'—':stat.spearman.toFixed(2)}`:'Không có điểm dự đoán và điểm chuẩn đối chiếu.'));grid.append(card)}root.append(grid);
+ const teacherMae=keys.slice(0,4).map(item=>item[1].mae).filter(Number.isFinite),maxMae=teacherMae.length?Math.max(...teacherMae):null;
+ root.append(el('p',isTeacher?(maxMae==null?'Chưa đủ cặp điểm để tính MAE.':maxMae>.6?`CẢNH BÁO: có MAE tiêu chí > 0,6 band (cao nhất ${maxMae.toFixed(2)}).`: `MAE lớn nhất hiện tại ${maxMae.toFixed(2)} band; cần xem đủ tập độc lập trước khi kết luận.`):'MAE tổng hợp không phải kết quả kiểm định độ chính xác thực tế.',isTeacher&&maxMae>.6?'fail':isTeacher?'pass':'notice'));
+ const matrix=buildMatrix(overall);root.append(el('h3','Ma trận nhầm lẫn · tổng 3 tiêu chí'));const matrixBox=el('div');matrixBox.id='matrix';matrixBox.className='scroll';matrixBox.append(matrix);root.append(matrixBox);
+ const table=el('table'),thead=el('thead'),head=el('tr');['ID','Part / chủ đề','Điểm chuẩn','Điểm score()','Sai số tuyệt đối','Bám đề','Số từ / lỗi ngữ pháp'].forEach(text=>head.append(el('th',text)));thead.append(head);table.append(thead);const body=el('tbody');
+ samples.forEach((sample,index)=>{const prediction=results[index],actual=expectedOverall(sample),predicted=predictedOverall(prediction),row=el('tr');[sample.id,`Part ${sample.part} · ${sample.topic}`,actual==null?'—':actual.toFixed(1),predicted==null?'Không chấm':predicted.toFixed(1),actual==null||predicted==null?'—':Math.abs(actual-predicted).toFixed(1),prediction?.metrics?.relevance||'—',prediction?.metrics?`${prediction.metrics.wordCount} từ · ${prediction.metrics.errors} lỗi`:(prediction?.error||'—')].forEach(value=>row.append(el('td',value)));body.append(row)});table.append(body);const scroll=el('div');scroll.className='scroll';scroll.append(table);root.append(el('h3','Kết quả từng bài'),scroll);
+}
+function buildMatrix(rows){const items=rows.filter(row=>Number.isFinite(row.actual)&&Number.isFinite(row.predicted)),found=[...new Set(items.flatMap(row=>[Math.round(row.actual*2)/2,Math.round(row.predicted*2)/2]))].sort((a,b)=>a-b),table=el('table'),thead=el('thead'),header=el('tr');header.append(el('th','Chuẩn ↓ / Chấm →'));found.forEach(value=>header.append(el('th',value.toFixed(1))));thead.append(header);table.append(thead);const body=el('tbody');for(const actual of found){const tr=el('tr');tr.append(el('th',actual.toFixed(1)));for(const predicted of found){const count=items.filter(row=>Math.round(row.actual*2)/2===actual&&Math.round(row.predicted*2)/2===predicted).length;tr.append(el('td',count||''))}body.append(tr)}table.append(body);return table}
+function fitIsotonic(rows,key){
+ const pairs=valuesFor(rows.samples,rows.results,key).sort((a,b)=>a.predicted-b.predicted);if(pairs.length<4)return null;
+ const grouped=[];for(const pair of pairs){let last=grouped[grouped.length-1];if(!last||last.x!==pair.predicted)grouped.push(last={x:pair.predicted,sum:0,n:0});last.sum+=pair.actual;last.n++}
+ const blocks=[];for(const group of grouped){blocks.push({lo:group.x,hi:group.x,sum:group.sum,n:group.n});while(blocks.length>1){const a=blocks.at(-2),b=blocks.at(-1);if(a.sum/a.n<=b.sum/b.n)break;blocks.splice(-2,2,{lo:a.lo,hi:b.hi,sum:a.sum+b.sum,n:a.n+b.n})}}
+ return blocks.map(block=>[block.lo,Math.round((block.sum/block.n)*2)/2]);
+}
+function mapBand(value,anchors){if(!Number.isFinite(value)||!anchors?.length)return value;if(value<=anchors[0][0])return anchors[0][1];for(let i=1;i<anchors.length;i++)if(value<=anchors[i][0]){const [x0,y0]=anchors[i-1],[x1,y1]=anchors[i],ratio=(value-x0)/Math.max(.001,x1-x0);return Math.round((y0+(y1-y0)*ratio)*2)/2}return anchors.at(-1)[1]}
+function applyMaps(results,maps){return results.map(result=>{const scores={...result.scores};for(const [key,map] of Object.entries(maps)){const runtimeKey={fluency:'fluency',lexical:'lexical',grammar:'grammar',pronunciation:'pronunciation'}[key];if(Number.isFinite(scores[runtimeKey]))scores[runtimeKey]=mapBand(scores[runtimeKey],map)}return {...result,scores}})}
+function fitAndReport(samples,results){
+ if(samples.filter(row=>row.source==='teacher').length<40)return;
+  const {train,heldout}=calibrationSplit(samples,5);if(heldout.length<8)return;
+ const maps={};for(const key of ['fluency','lexical','grammar','pronunciation']){const pairs={samples:train.map(index=>samples[index]),results:train.map(index=>results[index])};const fit=fitIsotonic(pairs,key);if(fit)maps[key]=fit}
+ if(!Object.keys(maps).length)return;
+ const before=heldout.map(index=>results[index]),after=applyMaps(before,maps),heldSamples=heldout.map(index=>samples[index]);
+ const beforeMae=mae(heldSamples.map((sample,index)=>({actual:expectedOverall(sample),predicted:predictedOverall(before[index])})).filter(row=>Number.isFinite(row.actual)&&Number.isFinite(row.predicted)));
+ const afterMae=mae(heldSamples.map((sample,index)=>({actual:expectedOverall(sample),predicted:predictedOverall(after[index])})).filter(row=>Number.isFinite(row.actual)&&Number.isFinite(row.predicted)));
+ const candidate={scoreVersion:9,method:'isotonic monotonic score remapping; fit 80%, held out 20%',maps};
+ $('#candidate-json').value=JSON.stringify(candidate,null,2);$('#candidate').hidden=false;
+ const root=$('#report'),delta=beforeMae!=null&&afterMae!=null?afterMae-beforeMae:null;
+ root.append(el('h3','Trước / sau trên tập giữ lại (20%)'),el('p',`Trước: ${beforeMae==null?'—':beforeMae.toFixed(2)} MAE · Sau ánh xạ đơn điệu: ${afterMae==null?'—':afterMae.toFixed(2)} MAE${delta==null?'':` · chênh lệch ${delta>0?'+':''}${delta.toFixed(2)}`}. Mốc đề xuất chỉ được xuất ra để xem xét, chưa tự thay đổi app.`),el('small','Ngưỡng cảnh báo MAE > 0,6 band áp dụng cho bộ giáo viên. Kết quả tốt trên tập này chưa chứng minh sẽ tổng quát cho mọi câu hỏi.'));
+}
+function fitSyntheticSplit(samples,results){
+  const {train,heldout}=calibrationSplit(samples,2),maps={};
+ for(const key of ['fluency','lexical','grammar']){const pairs={samples:train.map(index=>samples[index]),results:train.map(index=>results[index])};const fit=fitIsotonic(pairs,key);if(fit)maps[key]=fit}
+ const before=heldout.map(index=>results[index]),after=applyMaps(before,maps),heldSamples=heldout.map(index=>samples[index]);
+ const calc=values=>mae(values.map((result,index)=>({actual:expectedOverall(heldSamples[index]),predicted:predictedOverall(result)})).filter(row=>Number.isFinite(row.actual)&&Number.isFinite(row.predicted)));
+ $('#report').append(el('h3','Minh họa trước / sau · chia đôi bộ tổng hợp'),el('p',`Trước: ${calc(before)?.toFixed(2)||'—'} MAE · Sau ánh xạ đơn điệu: ${calc(after)?.toFixed(2)||'—'} MAE trên nửa giữ lại. Đây chỉ là phép tự kiểm với nhãn tổng hợp; không dùng để sửa mốc thật trong EPU.`));
+}
+$('#run-synthetic').addEventListener('click',()=>{activeSamples=synthetic;runWithSamples(synthetic,'40 bài tổng hợp',false)});
+$('#run-teacher').addEventListener('click',()=>{if(loadTeacher())runWithSamples(teacherSamples,`${teacherSamples.length} bài giáo viên`,true)});
+$('#download-template').addEventListener('click',()=>{const sample=[{id:'teacher-001',source:'teacher',part:1,question:'What do you enjoy about your studies?',topic:'Study',text:'I enjoy...',duration:35,scores:{fluency:5.5,lexical:5,grammar:5.5,pronunciation:null}}];const blob=new Blob([JSON.stringify(sample,null,2)],{type:'application/json'}),link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download='epu-score-teacher-template.json';link.click();setTimeout(()=>URL.revokeObjectURL(link.href),1000)});
+$('#copy-candidate').addEventListener('click',async()=>{try{await navigator.clipboard.writeText($('#candidate-json').value)}catch{$('#candidate-json').focus();$('#candidate-json').select()}});
+</script>
+</body>
+</html>

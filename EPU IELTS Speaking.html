@@ -741,6 +741,20 @@ body > nav button.on { background: color-mix(in srgb,var(--pr) 17%,transparent);
 .result-confetti { position: fixed; inset: 0; z-index: 50; pointer-events: none; width: 100%; height: 100%; }
 .result-feedback { margin: 14px 0; padding: 12px; background: var(--sf); border: 1px solid var(--bd); border-radius: 12px; }
 .result-feedback h3 { margin: 0 0 6px; }
+.score-evidence-text { padding: 12px 14px; border-left: 3px solid var(--pr); border-radius: 8px; background: color-mix(in srgb,var(--cd) 78%,transparent); line-height: 1.75; overflow-wrap: anywhere; }
+.score-evidence-text mark { padding: 1px 3px; border-radius: 4px; color: inherit; background: transparent; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.score-evidence--topic { background: color-mix(in srgb,#22a06b 26%,var(--cd)); outline: 1px solid color-mix(in srgb,#22a06b 46%,transparent); }
+.score-evidence--connector { background: color-mix(in srgb,var(--pr) 24%,var(--cd)); outline: 1px solid color-mix(in srgb,var(--pr) 42%,transparent); }
+.score-evidence--grammar,.score-evidence--spelling { background: color-mix(in srgb,#e78b42 30%,var(--cd)); outline: 1px solid color-mix(in srgb,#d87a26 52%,transparent); text-decoration: underline wavy; text-decoration-color: #d87a26; }
+.score-evidence-legend { display: flex; flex-wrap: wrap; gap: 6px 12px; color: var(--mu); font-size: .88em; }
+.score-evidence-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.score-evidence-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; background: color-mix(in srgb,var(--pr) 24%,var(--cd)); }
+.score-evidence-legend .topic i { background: color-mix(in srgb,#22a06b 30%,var(--cd)); }
+.score-evidence-legend .error i { background: color-mix(in srgb,#e78b42 34%,var(--cd)); }
+.score-warning { padding: 12px; border: 1px solid color-mix(in srgb,#d58d24 55%,var(--bd)); border-radius: 12px; background: color-mix(in srgb,#d58d24 10%,var(--cd)); }
+.score-tips { padding-left: 20px; }
+.score-tips li + li { margin-top: 6px; }
+.score-warning button { margin: 7px 6px 0 0; }
 .game-home { margin: 16px 0; }
 .game-home progress { width: 100%; accent-color: var(--pr); }
 .game-ring { flex: 0 0 64px; width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center;
@@ -1019,6 +1033,55 @@ body.page-hidden::before,body.page-hidden .theme-bg { animation-play-state:pause
 @supports not ((backdrop-filter:blur(8px)) or (-webkit-backdrop-filter:blur(8px))) {
   .theme-bg { opacity:.3; }
   #theme-picker,.theme-custom-card,.theme-choice-card { background:var(--cd); }
+}
+
+/* Sảnh trò chơi */
+.arcade-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:clamp(8px,2vw,16px); }
+.arcade-tile { margin:0; display:flex; flex-direction:column; align-items:flex-start; gap:9px; }
+.arcade-tile > p { margin:0; }
+.arcade-tile > button { margin-top:auto; }
+.arcade-icon { display:grid; place-items:center; flex:none; width:44px; height:44px; border:1px solid var(--bd); border-radius:15px; background:var(--sf); color:var(--pr); }
+.arcade-icon svg { width:25px; height:25px; }
+.arcade-entry { display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:12px; }
+.arcade-entry h2,.arcade-entry p { margin:0; }
+.arcade-meta { display:flex; flex-wrap:wrap; gap:5px; }
+.arcade-chip { border:1px solid var(--bd); border-radius:999px; padding:3px 9px; background:var(--sf); color:var(--tx); font-size:.82rem; }
+.arcade-setup { display:grid; gap:12px; max-width:32rem; }
+.arcade-setup select { display:block; box-sizing:border-box; width:100%; padding:9px; color:var(--tx); border:1px solid var(--bd); border-radius:12px; background:var(--cd); font:inherit; }
+.arcade-hud { display:flex; align-items:center; flex-wrap:wrap; gap:12px; }
+.arcade-online-players { display:flex; flex-wrap:wrap; gap:8px; list-style:none; padding:0; }
+.arcade-online-players li { display:flex; flex-wrap:wrap; align-items:center; gap:6px; max-width:100%; overflow-wrap:anywhere; }
+.arcade-online-players button { padding:5px 8px; min-height:36px; }
+.arcade-online-chat { max-height:14rem; overflow:auto; }
+.arcade-sr { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+.arcade-clock { position:relative; display:grid; place-items:center; width:60px; height:60px; color:var(--tx); font-weight:800; font-variant-numeric:tabular-nums; }
+.arcade-clock svg { position:absolute; inset:0; width:100%; height:100%; fill:none; stroke:var(--bd); stroke-width:4; }
+.arcade-clock svg circle+circle { stroke:var(--pr); stroke-linecap:round; }
+.arcade-rounds { display:flex; flex-wrap:wrap; gap:6px; }
+.arcade-rounds span { width:9px; height:9px; border-radius:50%; border:1px solid var(--pr); }
+.arcade-rounds .done { background:var(--pr); }
+.arcade-rounds .current { box-shadow:0 0 0 2px var(--cd),0 0 0 3px var(--pr); }
+.arcade-prompt { display:grid; gap:8px; margin:12px 0; padding:clamp(14px,4vw,30px); border:1px solid var(--bd); border-radius:var(--radius); background:linear-gradient(135deg,var(--sf),var(--cd)); overflow-wrap:anywhere; }
+.arcade-prompt h2,.arcade-prompt p { margin:0; }
+.arcade-prompt ul,.arcade-prompt ol { margin:4px 0; padding-inline-start:22px; }
+.arcade-answer { display:grid; gap:8px; }
+.arcade-answer textarea { display:block; width:100%; margin:5px 0 0; }
+.arcade-answer audio { width:100%; max-width:28rem; }
+.arcade-feedback { overflow-wrap:anywhere; }
+.arcade-feedback:empty { margin:0; }
+.arcade-story { display:grid; gap:7px; padding-inline-start:23px; }
+.arcade-story li { overflow-wrap:anywhere; }
+.arcade-panel { animation:arcade-appear .22s ease-out both; }
+@keyframes arcade-appear { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
+@media(max-width:460px) {
+  .arcade-entry { grid-template-columns:auto minmax(0,1fr); }
+  .arcade-entry > button { grid-column:1/-1; justify-self:start; }
+  .arcade-tile { padding:10px; }
+  .arcade-tile > button { width:100%; padding-inline:6px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .arcade-panel { animation:none; }
+  .arcade-entry button:active,.arcade-tile button:active,.arcade-panel button:active { transform:none; }
 }
 </style>
 <script type="application/json" id="offline-dictionary-meta">{"shards":["_","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"],"count":195393,"bilingual":119032}</script>
@@ -1603,9 +1666,11 @@ st.theme=normalizeThemeState(st.theme,st.customThemes,st.themeSkin);
 delete st.customThemes;delete st.themeSkin;
 const sv=(sync=true)=>{
  ensureProgressIds();
- st.learningV1=mergeLearning(st.learningV1,storedEpu()?.learningV1);
- st.game=mergeGame(st.game,storedEpu()?.game);
- st.learningPath=mergeLearningPath(st.learningPath,storedEpu()?.learningPath);
+ const saved=storedEpu();
+ st.learningV1=mergeLearning(st.learningV1,saved?.learningV1);
+ st.game=mergeGame(st.game,saved?.game);
+ st.games=mergeArcadeHistory(st.games,saved?.games);
+ st.learningPath=mergeLearningPath(st.learningPath,saved?.learningPath);
  try{localStorage.setItem('epu',JSON.stringify(st))}catch{}
  if(sync)queueCloud();
 };
@@ -1773,8 +1838,8 @@ D.push(...TOPIC_WORD_DATA);
 // Điểm IELTS ước tính từ bản chép lời
 
 const G=[/\bif\b/,/\b(which|who|where|that)\b/,/\b(have|has|had) (\w+ )?(been|\w+ed|done|gone|seen|made|taken)\b/,/\b(would|could|should|might|may|must)\b/,/\b(was|were|did|\w+ed)\b/,/\b(is|are|was|were|been) \w+ed\b/,/\b(will|going to)\b/,/\b(\w+er|more|less) (\w+ )?than\b/,/\b(because|although|though|while|when|since|unless)\b/];
-const SCORE_VERSION=7;
-const SCORE_CONNECTORS=/\b(on the other hand|as a result|for example|for instance|in my opinion|so that|because|however|although|moreover|firstly|besides|actually|which|while)\b/g;
+const SCORE_VERSION=9;
+const SCORE_CONNECTORS=/\b(on the other hand|as a result|for example|for instance|in my opinion|so that|because|however|although|moreover|firstly|besides|actually|which|while)\b/gi;
 const SCORE_STOP=new Set(('a an the and or but if then so as of to in on at by for from with is are was were am be been being '+
  'i me my mine you your he him his she her it its we us our they them their this that these those there here '+
  'do does did have has had would could should can will may might not no yes very really just um uh er erm hmm').split(' '));
@@ -1782,45 +1847,72 @@ const RELEVANCE_STOP=new Set(('a an the and or but if then so as of to in on at 
  'i me my mine you your he him his she her it its we us our they them their this that these those there here '+
  'do does did have has had would could should can will may might not no yes very really just um uh er erm hmm '+
  'what when where who whom whose why how which describe tell say give talk about usually often sometimes every each day time thing something someone anything reason people like likes love loved enjoy enjoyed prefer preferred think thought feel felt want wanted need needed use used try tried most favorite favourite kind kinds type types sort advantage advantages benefit benefits disadvantage disadvantages important importance special young older old more less best better favourite').split(' '));
-const RELEVANCE_GROUPS=[
- 'clean cleanliness tidy neat dirty dirt dust litter rubbish trash pollution polluted mess',
- 'area place location neighbourhood neighborhood community locality street district town city village hometown region house home apartment flat',
- 'weather climate rain rainy sunny sunshine snow temperature hot cold warm cool season forecast',
- 'electrical electric electronic device appliance gadget equipment phone smartphone laptop computer tablet charger television',
- 'hobby pastime leisure free weekend activity sport football basketball swimming dance games exercise music song instrument book reading novel story literature',
- 'travel trip journey holiday vacation visit visited tourism tourist destination sightseeing',
- 'study education school university college course subject class major degree learn learning lecture',
- 'work job career employment profession office colleague workplace salary',
- 'friend friendship family relative parent mother father sibling brother sister child person teacher influence admire respect rolemodel',
- 'food meal cuisine dish cooking cook eat restaurant',
- 'transport transportation commute traffic vehicle car bus bicycle train motorbike walk',
- 'technology digital internet online ai artificial intelligence robot robotics application app shopping shop purchase buy store market product',
- 'change improve improvement develop development future plan goal hope wish',
- 'environment nature green energy renewable climate sustainable electricity solar wind',
- 'health healthy illness exercise sleep stress doctor'
-].map(group=>group.split(' '));
-const RELEVANCE_CANONICAL=new Map();
-RELEVANCE_GROUPS.forEach((group,index)=>group.forEach(word=>{if(!RELEVANCE_CANONICAL.has(word))RELEVANCE_CANONICAL.set(word,new Set());RELEVANCE_CANONICAL.get(word).add(index)}));
-function relevanceStem(word){return word.toLowerCase().replace(/ies$/,'y').replace(/(ing|ed)$/,'').replace(/s$/,'')}
-function analyzeAnswerRelevance(answer,question,topic=''){
- const prompt=String(question||'').trim(),title=String(topic||'').trim();
- if(!prompt&&!title)return {checked:false,allowed:true,status:'not-checked',anchors:[],matched:[],missing:[],ceiling:Infinity};
- const anchors=[...new Set((prompt+' '+title).toLowerCase().match(/[a-z]+/g)||[])].filter(word=>word.length>2&&!RELEVANCE_STOP.has(word));
- if(!anchors.length)return {checked:false,allowed:true,status:'not-checked',anchors:[],matched:[],missing:[],ceiling:Infinity};
- const answerWords=new Set((String(answer||'').toLowerCase().match(/[a-z]+(?:'[a-z]+)*/g)||[]).map(relevanceStem));
- const concepts=word=>RELEVANCE_CANONICAL.get(word)||RELEVANCE_CANONICAL.get(relevanceStem(word))||new Set(['token:'+relevanceStem(word)]);
- const related=(left,right)=>[...concepts(left)].some(concept=>concepts(right).has(concept));
- const matched=anchors.filter(word=>answerWords.has(relevanceStem(word))||[...answerWords].some(token=>related(token,word)));
- const coverage=matched.length/anchors.length;
- const allowed=matched.length>0;
- const status=!allowed?'off-topic':coverage<.25&&anchors.length>=4?'weak':coverage<.45?'partial':'relevant';
- const ceiling=status==='weak'?4.5:status==='partial'?5.5:Infinity;
- return {checked:true,allowed,status,anchors,matched,missing:anchors.filter(word=>!matched.includes(word)),coverage,ceiling};
+const RELEVANCE_CONCEPTS=[
+ {id:'people',label:'cá nhân/con người',words:'individual individuals person people citizen public everyone household family resident student consumer neighbour neighbor community'},
+  {id:'help',label:'hành động/giải pháp',words:'help aid assist support contribute facilitate enable take action do something make an effort encourage choose switch join volunteer'},
+  {id:'protect',label:'bảo vệ/bảo tồn',words:'protect protection protective preserve preservation conserve conservation safeguard save defend prevent guard secure shield maintain'},
+  {id:'environment',label:'môi trường/tự nhiên',words:'environment environmental nature natural ecosystem planet earth wildlife habitat forest green ecology sustainable sustainability eco ecological'},
+ {id:'pollution',label:'ô nhiễm/khí thải',words:'pollution pollute polluted pollutant emission emissions exhaust smog carbon litter'},
+ {id:'waste',label:'rác thải/tái sử dụng',words:'waste rubbish trash garbage plastic packaging landfill reuse recycle recycling recyclable compost'},
+ {id:'climate',label:'khí hậu',words:'climate global warming temperature greenhouse drought flood weather'},
+ {id:'energy',label:'năng lượng',words:'energy electricity power renewable solar wind turbine fuel coal oil'},
+ {id:'transport',label:'giao thông/di chuyển',words:'transport transportation commute traffic vehicle car bus bicycle bike train motorbike walk cycle'},
+ {id:'home',label:'nhà ở/nơi sống',words:'home house hometown neighbourhood neighborhood area place location city town village street apartment housing'},
+ {id:'clean',label:'sạch sẽ/vệ sinh',words:'clean cleanliness tidy neat dirty dirt dust mess'},
+ {id:'weather',label:'thời tiết',words:'weather climate rain rainy sunny sunshine snow temperature hot cold warm cool season forecast'},
+ {id:'devices',label:'thiết bị điện tử',words:'device appliance gadget phone smartphone laptop computer tablet charger television electronics'},
+ {id:'technology',label:'công nghệ',words:'technology digital internet online artificial intelligence ai robot robotics application app software platform'},
+ {id:'study',label:'học tập',words:'study education school university college course subject class major degree learn learning lecture campus'},
+ {id:'work',label:'công việc/nghề nghiệp',words:'work job career employment profession office colleague workplace salary internship'},
+ {id:'family',label:'gia đình/bạn bè',words:'friend friendship family relative parent mother father sibling brother sister child teacher relationship'},
+ {id:'food',label:'đồ ăn/nấu nướng',words:'food meal cuisine dish cooking cook eat restaurant ingredient recipe'},
+ {id:'travel',label:'du lịch',words:'travel trip journey holiday vacation visit tourism tourist destination sightseeing'},
+ {id:'health',label:'sức khỏe',words:'health healthy illness exercise sleep stress doctor fitness'},
+ {id:'sport',label:'thể thao',words:'sport football basketball swimming dance game exercise gym training'},
+ {id:'hobby',label:'sở thích/giải trí',words:'hobby pastime leisure free weekend activity music song instrument book reading novel story film movie'},
+  {id:'change',label:'thay đổi/phát triển',words:'change changed changing develop development transform grow growth alter modify shift evolve adapt'},
+  {id:'reduce',label:'giảm/tiết kiệm',words:'reduce reduction lower cut decrease minimize limit save economize lessen curb mitigate diminish shrink'},
+  {id:'increase',label:'tăng/thúc đẩy/cải thiện',words:'increase raise boost expand promote improve improvement enhance strengthen upgrade better'},
+ {id:'reason',label:'lý do/lợi ích',words:'reason because benefit advantage useful helpful important'},
+ {id:'experience',label:'trải nghiệm/kỷ niệm',words:'experience memory memorable remember occasion event'},
+ {id:'opinion',label:'quan điểm',words:'opinion think believe feel prefer'},
+ {id:'frequency',label:'tần suất/thói quen',words:'usually often sometimes daily everyday routine habit'},
+ {id:'time',label:'thời gian',words:'time day today yesterday recently future past'},
+ {id:'people',label:'đối tượng/quan hệ',words:'friend friendship family relative parent mother father sibling brother sister child teacher influence admire respect rolemodel'}
+];
+const RELEVANCE_LEMMA=new Map();
+for(const concept of RELEVANCE_CONCEPTS)for(const word of concept.words.split(/\s+/)){if(!RELEVANCE_LEMMA.has(word))RELEVANCE_LEMMA.set(word,new Set());RELEVANCE_LEMMA.get(word).add(concept.id)}
+for(const [form,base] of Object.entries({protection:'protect',protective:'protect',protected:'protect',protects:'protect',preservation:'protect',conservation:'protect',conserve:'protect',conserving:'protect',environmental:'environment',ecosystems:'environment',nature:'environment',pollute:'pollution',polluted:'pollution',pollutants:'pollution',emissions:'pollution',recycling:'waste',recycled:'waste',recyclable:'waste',reuses:'waste',reusing:'waste',individuals:'people',citizens:'people',residents:'people',helps:'help',helping:'help',aids:'help',assists:'help',supports:'help',contributes:'help',improvement:'improve',improved:'improve',improving:'improve',reduction:'reduce',reducing:'reduce',reduced:'reduce',decreased:'reduce',lowering:'reduce',increases:'increase',increasing:'increase',changed:'change',changing:'change',developed:'change',developing:'change',transportation:'transport',commuting:'transport',devices:'devices',appliances:'devices',technology:'technology',studies:'study',studying:'study',jobs:'work',careers:'work',families:'family',children:'family',meals:'food',travelled:'travel',traveling:'travel',exercising:'health',hobbies:'hobby',memories:'experience',opinions:'opinion'})){
+ const ids=RELEVANCE_LEMMA.get(base);if(ids){RELEVANCE_LEMMA.set(form,new Set(ids))}
+}
+for(const [form,base] of Object.entries({protecting:'protect',preserving:'protect',mitigating:'reduce',curbing:'reduce',lessening:'reduce',enhancing:'increase',strengthening:'increase',upgrading:'increase',altering:'change',modifying:'change',shifting:'change',evolving:'change',adapting:'change',facilitating:'help',enabling:'help',buses:'transport',cycling:'transport',bicycles:'transport',driving:'transport',cars:'transport',vehicles:'transport',reusable:'waste',containers:'waste',sustainably:'environment'})){const ids=RELEVANCE_LEMMA.get(base);if(ids)RELEVANCE_LEMMA.set(form,new Set(ids))}
+const RELEVANCE_STOP_WORDS=new Set('a an the and or but if then so as of to in on at by for from with is are was were am be been being i me my mine you your he him his she her it its we us our they them their this that these those there here do does did have has had would could should can will may might not no yes very really just um uh er erm hmm what when where who whom whose why how which describe tell say give talk about usually often sometimes every each day time thing something someone anything kind types sort'.split(' '));
+const relevanceStem=word=>{let value=String(word||'').toLowerCase().replace(/ies$/,'y');if(RELEVANCE_LEMMA.has(value))return value;if(value.endsWith('ing')&&value.length>5)value=value.slice(0,-3);else if(value.endsWith('ed')&&value.length>4)value=value.slice(0,-2);else if(value.endsWith('s')&&value.length>3)value=value.slice(0,-1);return RELEVANCE_LEMMA.has(value)?value:value};
+const ENVIRONMENT_ACTION_WORDS=new Set('reduce recycle reuse compost save switch use join plant avoid conserve preserve prevent choose repair turn cut walk cycle sort dispose carry reuse replace drive insulate'.split(' '));
+const ENVIRONMENTAL_SIGNAL_WORDS=new Set('pollution pollute emission emissions exhaust smog carbon litter waste rubbish trash garbage plastic packaging landfill recycle recycling compost climate warming greenhouse drought flood energy electricity renewable solar wind turbine fuel coal oil nature natural ecosystem planet earth wildlife habitat forest green ecology sustainable sustainability transport bus bicycle bike car vehicle commute air reusable container'.split(' '));
+function relevanceConceptIds(value,{environmentContext=false}={}){
+ const tokens=(String(value||'').toLowerCase().match(/[a-z]+(?:'[a-z]+)*/g)||[]).map(relevanceStem),ids=new Set();
+ for(const token of tokens)for(const id of RELEVANCE_LEMMA.get(token)||[])ids.add(id);
+ if(environmentContext&&tokens.some(token=>ENVIRONMENTAL_SIGNAL_WORDS.has(token))){ids.add('environment');if(tokens.some(token=>ENVIRONMENT_ACTION_WORDS.has(token))){ids.add('help');ids.add('protect')}}
+ return {tokens,ids};
+}
+function analyzeAnswerRelevance(answer,question,topic='',options={}){
+ const prompt=(String(question||'')+' '+String(topic||'')).trim();
+ if(options.ignoreRelevance)return {checked:false,allowed:true,status:'skipped-by-user',anchors:[],matched:[],missing:[],coverage:null,penalty:0};
+ if(!prompt)return {checked:false,allowed:true,status:'not-checked',anchors:[],matched:[],missing:[],coverage:null,penalty:0};
+  const promptInfo=relevanceConceptIds(prompt),fallback=[...new Set((prompt.toLowerCase().match(/[a-z]+(?:'[a-z]+)*/g)||[]).map(relevanceStem).filter(word=>word.length>2&&!RELEVANCE_STOP_WORDS.has(word)))];
+ const anchorIds=promptInfo.ids.size?[...promptInfo.ids]:fallback.map(word=>'term:'+word);
+ const labels=new Map(RELEVANCE_CONCEPTS.map(item=>[item.id,item.label]));
+ const anchors=anchorIds.map(id=>labels.get(id)||id.slice(5));
+  const environmentalPrompt=/\b(environment|environmental|nature|natural|pollution|climate|wildlife|ecosystem|waste|recycl|carbon|emission|energy|forest|sustainab)\w*\b/i.test(prompt),answerInfo=relevanceConceptIds(answer,{environmentContext:environmentalPrompt}),answerText=' '+String(answer||'').toLowerCase().replace(/[^a-z]+/g,' ')+' ';
+ const matchedIds=anchorIds.filter(id=>id.startsWith('term:')?answerText.includes(' '+id.slice(5)+' '):answerInfo.ids.has(id));
+ const matched=matchedIds.map(id=>labels.get(id)||id.slice(5)),coverage=anchorIds.length?matchedIds.length/anchorIds.length:1;
+  const status=!matchedIds.length?'off-topic':coverage>=.5?'relevant':'partial';
+ const penalty=status==='off-topic'?1:status==='partial'?Math.min(1,Math.max(.25,(.5-coverage)*2)):0;
+ return {checked:true,allowed:true,status,anchors,matched,missing:anchors.filter((_,index)=>!matchedIds.includes(anchorIds[index])),matchedIds,coverage,penalty};
 }
 function answerScoringMessage(answer,question,topic=''){
  const language=analyzeAnswerLanguage(answer);if(!language.allowed)return answerLanguageMessage(language);
- const relevance=analyzeAnswerRelevance(answer,question,topic);
- if(!relevance.allowed)return 'Câu trả lời có vẻ chưa bám câu hỏi nên chưa được cấp điểm. Hãy trả lời trực tiếp và nêu một chi tiết liên quan đến: '+relevance.anchors.slice(0,5).join(', ')+'.';
  return 'Chưa đủ văn bản tiếng Anh để chấm; hãy nhập ít nhất 5 từ tiếng Anh.';
 }
 const VIETNAMESE_UNACCENTED=new Set(('toi khong nguoi thich hoc sinh vien truong nha duong pho sach dep khu vuc rat nhieu nhung vi nen duoc lam se da dang hon van con khi roi tren duoi tai boi cac cai ngay dem tieng viet anh tra loi hoi cau bang cho den mot minh chung toi muon moi thuong xuyen du lich cong nghe moi truong phat am nhin chung nay kha lai co xe qua va bui bam o gang giu gon them nua').split(' '));
@@ -1865,13 +1957,69 @@ const SCORE_GRAMMAR_RULES=[
 const SCORE_FINITE=/\b(?:am|is|are|was|were|be|been|being|have|has|had|do|does|did|can|could|will|would|should|might|may|must|like|likes|liked|love|loves|loved|enjoy|enjoys|enjoyed|prefer|prefers|preferred|use|uses|used|live|lives|lived|study|studies|studied|work|works|worked|go|goes|went|make|makes|made|help|helps|helped|feel|feels|felt|think|thinks|thought|provide|provides|provided|give|gives|gave|improve|improves|improved|become|becomes|became|change|changes|changed|visit|visits|visited|watch|watches|watched|play|plays|played|keep|keeps|kept|try|tries|tried|say|says|said|want|wants|wanted|need|needs|needed|learn|learns|learned|create|creates|created|encourage|encourages|encouraged|remain|remains|remained|bring|brings|brought|support|supports|supported|affect|affects|affected|protect|protects|protected|offer|offers|offered)\b/;
 const SCORE_TOPIC_TERMS=[...new Set(D.flatMap(row=>[row[0],row[4]]).filter(value=>typeof value==='string'&&/[a-z]/i.test(value)).map(value=>value.toLowerCase().trim()))];
 const SCORE_COLLOCATIONS=[...new Set(D.map(row=>row[4]).filter(value=>typeof value==='string'&&value.includes(' ')).map(value=>value.toLowerCase().trim()))];
+// Các mốc đơn điệu là quy tắc tĩnh theo mô tả công khai, chưa thay thế hiệu chuẩn bằng bài giáo viên chấm.
+const SCORE_MAPS={
+ accuracy:[[0,3.5],[.35,4],[.5,5],[.68,6],[.82,7],[.93,8],[1,8.5]],
+ complexity:[[0,4],[.12,4.5],[.25,5],[.45,6],[.68,7],[.86,8],[1,8.5]],
+ errorRate:[[0,8.5],[.04,8],[.1,7],[.18,6],[.3,5],[.45,4],[.7,3.5]],
+ lexicalDiversity:[[0,3.5],[.22,4],[.35,5],[.48,6],[.62,7],[.78,8],[.95,8.5]],
+ collocations:[[0,4],[.25,4.5],[.6,5.5],[1,6.5],[1.6,7.5],[2.5,8.5]],
+ curatedWords:[[0,4],[1,5],[2,6],[4,7],[6,8],[9,8.5]],
+ conceptRange:[[0,4],[1,5],[2,6],[3,7],[5,8],[7,8.5]],
+ connectors:[[0,4],[.2,4.5],[.45,5.5],[.7,6.5],[1,7.5],[1.4,8]],
+ fillerRate:[[0,8],[.01,7.5],[.025,6.5],[.05,5],[.09,4],[.15,3.5]],
+ repetition:[[0,8],[.15,7.5],[.3,6.5],[.42,5.5],[.55,4.5],[.7,3.5]],
+ paceDistance:[[0,8],[18,7.5],[35,6.5],[55,5.5],[80,4.5],[120,3.5]],
+ pauseRate:[[0,8],[1,7.5],[2,6.5],[3.5,5.5],[5,4.5],[8,3.5]],
+ relevance:[[0,3.5],[.2,4.5],[.4,5.5],[.6,6.5],[.8,7.5],[1,8.5]],
+ sequencing:[[0,4],[.15,4.5],[.3,5.5],[.5,6.5],[.7,7.5],[.9,8.5]]
+};
+function scoreMap(value,anchors){
+ const x=Math.max(anchors[0][0],Math.min(anchors.at(-1)[0],Number(value)||0));
+ for(let i=1;i<anchors.length;i++)if(x<=anchors[i][0]){const [x0,y0]=anchors[i-1],[x1,y1]=anchors[i],ratio=(x-x0)/Math.max(1e-9,x1-x0);return half(y0+(y1-y0)*ratio)}
+ return half(anchors.at(-1)[1]);
+}
+const scoreMean=values=>half(avg(values.filter(Number.isFinite)));
+function scoreFluencyBand(metrics){
+ const features=metrics.features||{},values=[features.connectors,features.fillers,features.repetition,features.runOn];
+ if(Number.isFinite(features.pace))values.push(features.pace);
+ if(Number.isFinite(metrics.pauseCount)&&Number.isFinite(metrics.duration)&&metrics.duration>0){
+  features.pauseRate=metrics.pauseCount/(metrics.duration/60);values.push(scoreMap(features.pauseRate,SCORE_MAPS.pauseRate));
+ }
+ return half(Math.max(3.5,scoreMean(values)-(metrics.connectorPenalty||0)-(metrics.runOnPenalty||0)-(metrics.repetitionPenalty||0)));
+}
+function refreshScoreTotals(s){
+ const m=s.metrics||{};s.f=Math.min(m.ceilings?.f??8,Math.max(3.5,half(avg([scoreFluencyBand(m),m.coherenceBand].filter(Number.isFinite))-(m.relevancePenalty||0))));
+ s.o=half(avg([s.f,s.l,s.g,audioBand(s)].filter(Number.isFinite)));return s;
+}
+function grammarSuggestion(label,example){
+ const value=String(example||'');
+ if(/“I is\/are”/.test(label))return value.replace(/\bI\s+(?:is|are)\b/i,'I am');
+ if(/“you\/we\/they is\/was”/.test(label))return value.replace(/\b(you|we|they)\s+(?:is|was)\b/i,'$1 are');
+ if(/“he\/she\/it”/.test(label))return value.replace(/\b(he|she|it)\s+(have|do|go|like|use|live|study|work|play|watch|enjoy|want|need|make|say|try|think|help|give|take|know|eat|drink|read|write|speak)\b/i,(_,subject,verb)=>subject+' '+({have:'has',do:'does',go:'goes',study:'studies',try:'tries'}[verb.toLowerCase()]||verb.toLowerCase()+'s'));
+ if(/do\/does/.test(label))return value.replace(/\b(he|she|it)\s+don't\b/i,'$1 doesn\'t').replace(/\b(i|you|we|they)\s+doesn't\b/i,'$1 don\'t');
+ if(/did\/does/.test(label))return value.replace(/\b(did|does)\s+(went|saw|made|ate|came|got|took|bought|visited|liked|played|worked|studied|goes)\b/i,(_,aux)=>aux+' go');
+ if(/“to”/.test(label))return value.replace(/\bto\s+([a-z]+)ing\b/i,'to $1');
+ if(/not\/are|There is/.test(label))return value.replace(/\bthere is\b/i,'there are').replace(/\bthere are\s+(?:a|one|each|every)\b/i,'there is');
+ if(/uncountable/.test(label))return value.replace(/informations|advices|furnitures|equipments|homeworks|knowledges/ig,word=>({informations:'information',advices:'advice',furnitures:'furniture',equipments:'equipment',homeworks:'homework',knowledges:'knowledge'})[word.toLowerCase()]||word);
+ if(/“am”/.test(label))return value.replace(/\bam\s+agree\b/i,'agree');
+  if(/“I think”/.test(label))return value.replace(/\bI think\s+(is|are|was|were|have|has|can|will|like|go|goes|went)\b/i,(_,verb)=>`I think ${({is:'it is',are:'they are',was:'it was',were:'they were',has:'it has',have:'I have',can:'it can',will:'it will',like:'I like',go:'I go',goes:'it goes',went:'I went'})[verb.toLowerCase()]||'it is'}`);
+ if(/So sánh kép/.test(label))return value.replace(/\bmore better\b/i,'better').replace(/\bmore easier\b/i,'easier').replace(/\bmore cheaper\b/i,'cheaper').replace(/\bmore bigger\b/i,'bigger').replace(/\bmost easiest\b/i,'easiest').replace(/\bmost best\b/i,'best');
+ if(/Thiếu chủ ngữ/.test(label))return 'Thêm chủ ngữ và động từ chính sau “I think”, ví dụ: “I think it is useful.”';
+ if(/Mệnh đề phụ/.test(label))return 'Nối mệnh đề với câu chính, ví dụ: “Although it is busy, I enjoy living there.”';
+ if(/Cụm ngắn/.test(label))return 'Viết thành câu có chủ ngữ và động từ, ví dụ: “I enjoy it because it is useful.”';
+  if(/Thiếu động từ “be”/.test(label))return value.replace(/\b(i|you|we|they|he|she|it)\s+(very|really|quite)\s+/i,(_,subject,adverb)=>`${subject} ${{i:'am',he:'is',she:'is',it:'is',you:'are',we:'are',they:'are'}[subject.toLowerCase()]} ${adverb} `);
+ return 'Kiểm tra lại cấu trúc câu và chia động từ theo chủ ngữ.';
+}
 function grammarDiagnostics(text){
  const findings=[];
  for(const rule of SCORE_GRAMMAR_RULES){
-  const matcher=new RegExp(rule.pattern.source,'gi');let match,count=0;
+  const matcher=rule.pattern;matcher.lastIndex=0;let match,count=0;
   while((match=matcher.exec(text))&&count<3&&findings.length<16){
-   findings.push({label:rule.label,example:match[0].replace(/\s+/g,' ').trim().slice(0,70),weight:rule.weight});count++;
+   const example=match[0].replace(/\s+/g,' ').trim().slice(0,70);
+   findings.push({label:rule.label,example,suggestion:grammarSuggestion(rule.label,example),weight:rule.weight});count++;
   }
+  matcher.lastIndex=0;
  }
  const sentences=text.split(/[.!?;\n]+/).map(value=>value.trim()).filter(Boolean);
  let completeSentences=0;
@@ -1879,60 +2027,97 @@ function grammarDiagnostics(text){
   const tokens=sentence.match(/[a-z]+(?:'[a-z]+)*/g)||[];
   if(SCORE_FINITE.test(sentence))completeSentences++;
   const dependent=/^(?:because|although|if|when|while|since|unless|which|who|that)\b/i.test(sentence);
-  if(dependent&&!sentence.includes(',')&&findings.length<16){findings.push({label:'Mệnh đề phụ có thể đang đứng riêng',example:sentence.slice(0,70),weight:.7});continue}
-  if(tokens.length>=2&&tokens.length<=4&&!SCORE_FINITE.test(sentence)&&findings.length<16){findings.push({label:'Cụm ngắn có thể chưa thành câu hoàn chỉnh',example:sentence.slice(0,70),weight:.65})}
+   if(dependent&&!sentence.includes(',')&&findings.length<16){const example=sentence.slice(0,70);const label='Mệnh đề phụ có thể đang đứng riêng';findings.push({label,example,suggestion:grammarSuggestion(label,example),weight:.7});continue}
+   if(tokens.length>=2&&tokens.length<=4&&!SCORE_FINITE.test(sentence)&&findings.length<16){const example=sentence.slice(0,70);const label='Cụm ngắn có thể chưa thành câu hoàn chỉnh';findings.push({label,example,suggestion:grammarSuggestion(label,example),weight:.65})}
  }
  return {findings,completeSentences,sentenceCount:sentences.length,sentenceVariety:new Set(sentences.map(sentence=>(sentence.match(/[a-z]+(?:'[a-z]+)*/g)||[]).length)).size};
 }
-function score(t,p,d,question='',topic=''){
- const original=String(t??'').replace(/’/g,"'");
- const language=analyzeAnswerLanguage(original),relevance=analyzeAnswerRelevance(original,question,topic);if(!language.allowed||!relevance.allowed)return null;
+const SCORE_RESULT_CACHE=new Map();
+function scoreHash(value){let a=2166136261,b=0x9e3779b9;for(let i=0;i<value.length;i++){const code=value.charCodeAt(i);a=Math.imul(a^code,16777619);b=Math.imul(b+code,2246822519)}return (a>>>0).toString(36)+'-'+(b>>>0).toString(36)+'-'+value.length.toString(36)}
+const copyScore=value=>value?JSON.parse(JSON.stringify(value)):null;
+function summarizeWordTimestamps(chunks,duration,text=''){
+ if(!Array.isArray(chunks)||!chunks.length)return null;
+ const spans=[];let wordCount=0;
+ for(const chunk of chunks){
+  const time=chunk?.timestamp||chunk?.timestamps||chunk;
+  const start=Array.isArray(time)?Number(time[0]):Number(time?.start),end=Array.isArray(time)?Number(time[1]):Number(time?.end);
+  if(!Number.isFinite(start)||!Number.isFinite(end)||end<=start)continue;
+  const count=(String(chunk?.text||'').match(/[a-z]+(?:['’][a-z]+)*/gi)||[]).length;
+  spans.push({start,end});wordCount+=count;
+ }
+ if(!spans.length)return null;
+ spans.sort((a,b)=>a.start-b.start||a.end-b.end);
+ let pauses=0,priorEnd=spans[0].end;
+ for(let i=1;i<spans.length;i++){
+  const gap=spans[i].start-priorEnd;if(gap>.5)pauses++;
+  priorEnd=Math.max(priorEnd,spans[i].end);
+ }
+ const first=spans[0].start,last=Math.max(...spans.map(span=>span.end)),spanSeconds=Math.max(0,last-first),timedWords=wordCount||((String(text).match(/[a-z]+(?:['’][a-z]+)*/gi)||[]).length);
+ const repairs=(String(text).match(/\b(?:sorry|I mean|rather|let me rephrase|what I mean is)\b/gi)||[]).length;
+ return {wordCount:timedWords,pauseCount:pauses,wpm:spanSeconds>0?Math.round(timedWords/spanSeconds*60):null,spanSeconds,repairHints:repairs,source:'Whisper word timestamps'};
+}
+function score(t,p,d,question='',topic='',options={}){
+ const original=String(t??'').replace(/’/g,"'"),timingKey=Array.isArray(options.wordTimings)?options.wordTimings.map(chunk=>{const time=chunk?.timestamp||chunk?.timestamps||chunk;return Array.isArray(time)?time:[time?.start,time?.end]}):null,cacheSource=JSON.stringify([SCORE_VERSION,original,p,d,question,topic,options.ignoreRelevance===true,timingKey]);
+ const cacheKey=scoreHash(cacheSource),cached=SCORE_RESULT_CACHE.get(cacheKey);
+ if(cached?.source===cacheSource){SCORE_RESULT_CACHE.delete(cacheKey);SCORE_RESULT_CACHE.set(cacheKey,cached);return copyScore(cached.value)}
+ const language=analyzeAnswerLanguage(original),relevance=analyzeAnswerRelevance(original,question,topic,options);if(!language.allowed)return null;
  const text=original.replace(ANSWER_TOKEN_PATTERN,word=>isVietnameseToken(word)?' ':word.toLowerCase());
  const words=text.match(/[a-z]+(?:'[a-z]+)*/g)||[],n=words.length;if(n<5)return null;
- const duration=Number.isFinite(d)&&d>3?d:null;
- const target=p===2?(duration==null?200:Math.min(250,Math.max(150,150+(duration-60)*100/60))):p===1?25:50;
- const wpm=duration==null?null:Math.round(n/duration*60),fillers=words.filter(word=>/^(?:um|uh|er|erm|hmm)$/.test(word)).length;
+ const duration=Number.isFinite(d)&&d>3?d:null,timing=summarizeWordTimestamps(options.wordTimings,duration,original),target=p===2?(duration==null?200:Math.min(250,Math.max(150,150+(duration-60)*100/60))):p===1?25:50;
+ const wpm=duration==null?(timing?.wpm??null):Math.round(n/duration*60),fillers=words.filter(word=>/^(?:um|uh|er|erm|hmm)$/.test(word)).length,fillerRatio=fillers/Math.max(1,n);
  const connectors=new Set(),countedSentences=[],sentenceParts=text.split(/([.!?;\n]+)/);
  for(let i=0;i<sentenceParts.length;i+=2){
-  const sentence=sentenceParts[i],delimiter=sentenceParts[i+1]||'';
-  const matches=[...sentence.matchAll(new RegExp(SCORE_CONNECTORS.source,'gi'))];
+  const sentence=sentenceParts[i],delimiter=sentenceParts[i+1]||'',matches=sentence.match(SCORE_CONNECTORS)||[];
   if(!matches.length){countedSentences.push(sentence+delimiter);continue}
-  const content=sentence.replace(new RegExp(SCORE_CONNECTORS.source,'gi'),' ').match(/[a-z]+(?:'[a-z]+)*/g)||[];
+  const content=sentence.replace(SCORE_CONNECTORS,' ').match(/[a-z]+(?:'[a-z]+)*/g)||[];
   const hasContent=content.length>=4&&new Set(content.filter(word=>!SCORE_STOP.has(word))).size>=2;
-  countedSentences.push(sentence.replace(new RegExp(SCORE_CONNECTORS.source,'gi'),match=>{if(!hasContent||connectors.has(match.toLowerCase()))return ' ';connectors.add(match.toLowerCase());return match})+delimiter);
+  countedSentences.push(sentence.replace(SCORE_CONNECTORS,match=>{if(!hasContent||connectors.has(match.toLowerCase()))return ' ';connectors.add(match.toLowerCase());return match})+delimiter);
  }
- const countedText=countedSentences.join(' '),countedWords=countedText.match(/[a-z]+(?:'[a-z]+)*/g)||[],counted=countedWords.length;
- const unique=[...new Set(countedWords)],effectiveWords=Math.min(counted,unique.length*2.5),scoringWpm=duration==null?null:Math.round(effectiveWords/duration*60);
- const contentWords=countedWords.filter(word=>word.length>2&&!SCORE_STOP.has(word)),uniqueContent=[...new Set(contentWords)];
- const diversity=Math.min(uniqueContent.length/24,1),typeToken=uniqueContent.length/Math.max(1,contentWords.length);
- const topicHits=SCORE_TOPIC_TERMS.filter(term=>term.includes(' ')?countedText.includes(term):uniqueContent.includes(term)).slice(0,8);
- const collocationHits=SCORE_COLLOCATIONS.filter(term=>countedText.includes(term)).slice(0,4);
- const grammar=grammarDiagnostics(countedText),grammarPenalty=Math.min(3.2,grammar.findings.reduce((sum,item)=>sum+item.weight,0));
- const structureCount=G.filter(pattern=>pattern.test(countedText)).length,connectorCount=connectors.size;
- const repeatedRatio=contentWords.length?1-uniqueContent.length/contentWords.length:0;
- const repetitionPenalty=Math.min(.6,Math.max(0,repeatedRatio-.45)*1.2);
- const paceCredit=wpm==null?0:wpm>=100&&wpm<=175?.45:wpm>=80&&wpm<100||wpm>175&&wpm<=190?.2:0;
- const fRaw=4+Math.min(connectorCount,4)*.34+Math.min(grammar.completeSentences,5)*.26+Math.min(grammar.sentenceVariety/3,1)*.4+paceCredit-Math.min(fillers,4)*.42-repetitionPenalty;
- const lexicalBase=4+diversity*2.2+Math.min(typeToken/.78,1)*.65+Math.min(topicHits.length,4)*.35+Math.min(collocationHits.length,2)*.25;
- const gRaw=4+Math.min(structureCount,6)*.62+Math.min(grammar.completeSentences,5)*.15+(grammar.sentenceVariety>=3?.25:0)-grammarPenalty;
- let ceilings={f:7.5,l:8.5,g:8};
- if(n<8)ceilings={f:4.5,l:4,g:4.5};
- else if(p===2&&effectiveWords<30)ceilings={f:4.5,l:4,g:4.5};
- else if(p===2&&effectiveWords<60)ceilings={f:5,l:4.5,g:5};
- else if(p===2&&effectiveWords<100)ceilings={f:5.5,l:5,g:5.5};
- else if(p===2&&effectiveWords<150)ceilings={f:6,l:5.5,g:6};
- else if((p===1&&n<15)||(p===3&&n<20))ceilings={f:5.5,l:5,g:5.5};
+ const countedText=countedSentences.join(' '),countedWords=countedText.match(/[a-z]+(?:'[a-z]+)*/g)||[],counted=countedWords.length,unique=[...new Set(countedWords)],effectiveWords=Math.min(counted,unique.length*2.5),scoringWpm=duration==null?null:Math.round(effectiveWords/duration*60);
+ const contentWords=countedWords.filter(word=>word.length>2&&!SCORE_STOP.has(word)),uniqueContent=[...new Set(contentWords)],typeToken=uniqueContent.length/Math.max(1,contentWords.length);
+ const topicHits=SCORE_TOPIC_TERMS.filter(term=>term.includes(' ')?(' '+countedText+' ').includes(' '+term+' '):uniqueContent.includes(term)).slice(0,8),collocationHits=SCORE_COLLOCATIONS.filter(term=>(' '+countedText+' ').includes(' '+term+' ')).slice(0,8);
+ const advancedVocabHits=[...new Set([...topicHits.filter(term=>term.replace(/\s+/g,'').length>=7),...collocationHits])].slice(0,8),grammar=grammarDiagnostics(countedText),grammarPenalty=Math.min(3.2,grammar.findings.reduce((sum,item)=>sum+item.weight,0));
+ let structureCount=0;for(const pattern of G){pattern.lastIndex=0;if(pattern.test(countedText))structureCount++;pattern.lastIndex=0}
+ const sentenceCount=Math.max(1,grammar.sentenceCount),sentenceAccuracy=Math.max(0,(grammar.completeSentences-Math.min(grammar.completeSentences,grammar.findings.length))/sentenceCount),complexityRate=structureCount/sentenceCount,errorRate=grammarPenalty/Math.max(1,grammar.completeSentences),
+  grammarBand=scoreMean([scoreMap(sentenceAccuracy,SCORE_MAPS.accuracy),scoreMap(complexityRate,SCORE_MAPS.complexity),scoreMap(errorRate,SCORE_MAPS.errorRate)]);
+ const answerConcepts=relevanceConceptIds(countedText,{environmentContext:/environment|nature|climate|pollution/i.test(String(question||'')+' '+String(topic||''))}).ids,
+  curatedWordSet=new Set(SCORE_TOPIC_TERMS.filter(term=>!term.includes(' '))),curatedWords=uniqueContent.filter(word=>curatedWordSet.has(word)).length,collocationDensity=collocationHits.length/Math.max(1,counted/100),
+  lexicalBand=scoreMean([scoreMap(typeToken,SCORE_MAPS.lexicalDiversity),scoreMap(collocationDensity,SCORE_MAPS.collocations),scoreMap(curatedWords,SCORE_MAPS.curatedWords),scoreMap(answerConcepts.size,SCORE_MAPS.conceptRange)]);
+ const repeatedRatio=contentWords.length?1-uniqueContent.length/contentWords.length:0,connectorDensity=connectors.size/Math.max(1,counted),connectorPerSentence=connectors.size/Math.max(1,grammar.sentenceCount),
+  connectorOveruse=connectorDensity>.14||connectorPerSentence>.85,runOnSentences=(countedText.match(/[^.!?;\n]{36,}/g)||[]).filter(sentence=>(sentence.match(/\b(?:and|but|so|because)\b/gi)||[]).length>=4).length,
+  runOnPenalty=Math.min(1.2,runOnSentences*.4),repetitionPenalty=Math.min(.6,Math.max(0,repeatedRatio-.42)*1.2),connectorPenalty=connectorOveruse?Math.min(.8,Math.max(.25,(connectorDensity-.14)*5)):0,styleWarnings=[];
+ if(runOnSentences)styleWarnings.push(runOnSentences+' câu rất dài nối bằng nhiều liên từ');
+ if(connectorOveruse)styleWarnings.push('mật độ từ nối cao; từ nối lặp không được thưởng thêm');
+ if(repeatedRatio>.42)styleWarnings.push('nhiều từ nội dung bị lặp');
+ const sentenceLengths=(countedText.match(/[^.!?;\n]+/g)||[]).map(sentence=>(sentence.match(/[a-z]+(?:'[a-z]+)*/g)||[]).length),meanSentenceLength=avg(sentenceLengths),formalMarkers=(countedText.match(/\b(furthermore|moreover|in conclusion|it is imperative|therefore|consequently|in today's society)\b/gi)||[]).length;
+ if(meanSentenceLength>28||formalMarkers>=3||/;.*;/.test(countedText))styleWarnings.push('văn bản có dấu hiệu giống văn viết/học thuộc; đây chỉ là cảnh báo, không cộng điểm');
+ const connectorBand=scoreMap(connectorPerSentence,SCORE_MAPS.connectors),fillerBand=scoreMap(fillerRatio,SCORE_MAPS.fillerRate),repetitionBand=scoreMap(repeatedRatio,SCORE_MAPS.repetition),runOnBand=7.5,paceBand=wpm==null?null:scoreMap(Math.abs(wpm-145),SCORE_MAPS.paceDistance),
+  relevanceBand=relevance.checked?scoreMap(relevance.coverage,SCORE_MAPS.relevance):5.5,sequenceMarkers=(countedText.match(/\b(first(?:ly)?|next|then|finally|for example|for instance|because|as a result|however|on the other hand)\b/gi)||[]).length,
+  sequenceBand=scoreMap(Math.min(1,sequenceMarkers/Math.max(1,grammar.sentenceCount)),SCORE_MAPS.sequencing),coherenceBand=scoreMean([relevanceBand,sequenceBand]),ceilings={f:8,l:8.5,g:8.5};
+ if(n<8){ceilings.f=4.5;ceilings.l=4;ceilings.g=4.5}
+ else if(p===2&&effectiveWords<30){ceilings.f=4.5;ceilings.l=4;ceilings.g=4.5}
+ else if(p===2&&effectiveWords<60){ceilings.f=5;ceilings.l=4.5;ceilings.g=5}
+ else if(p===2&&effectiveWords<100){ceilings.f=5.5;ceilings.l=5;ceilings.g=5.5}
+ else if(p===2&&effectiveWords<150){ceilings.f=6;ceilings.l=5.5;ceilings.g=6}
+ else if((p===1&&n<15)||(p===3&&n<20)){ceilings.f=5.5;ceilings.l=5;ceilings.g=5.5}
  const shortPart2Duration=p===2&&duration!=null&&duration<60;
- if(shortPart2Duration)ceilings={f:Math.min(ceilings.f,4.5),l:Math.min(ceilings.l,5),g:Math.min(ceilings.g,5)};
- let overallCeiling=Infinity;
- if(p===2){overallCeiling=effectiveWords<30?4.5:effectiveWords<60?5:effectiveWords<100?5.5:effectiveWords<150?6:Infinity;if(shortPart2Duration)overallCeiling=Math.min(overallCeiling,4.5)}
- overallCeiling=Math.min(overallCeiling,relevance.ceiling);
- const band=(value,ceiling)=>Math.min(ceiling,Math.max(3.5,half(value)));
- const longRatio=words.filter(word=>word.length>6).length/n,countedLongRatio=counted?countedWords.filter(word=>word.length>6).length/counted:0;
- const s={f:band(fRaw,ceilings.f),l:band(lexicalBase,ceilings.l),g:band(gRaw,ceilings.g),p:null,n,r:wpm,scoreVersion:SCORE_VERSION,
-  metrics:{part:p,target:Math.round(target),duration,englishRatio:Math.round(language.ratio*100),englishWords:language.english,vietnameseWords:language.vietnamese,effectiveWords,scoringWpm,connectorCount,longRatio,countedLongRatio,errors:grammar.findings.length,grammarPenalty,grammarFindings:grammar.findings,completeSentences:grammar.completeSentences,sentenceCount:grammar.sentenceCount,sentenceVariety:grammar.sentenceVariety,repetitionRatio:repeatedRatio,fillers,topicHits,relevance,spellingStatus:'pending',spellingChecked:0,spellingFindings:[],lexicalPenalty:0,lexicalBase,lexicalCeiling:ceilings.l,ceilings,overallCeiling,shortPart2Duration,shortPart2Length:p===2&&effectiveWords<150}};
- s.o=Math.min(overallCeiling,half(avg([s.f,s.l,s.g])));return s;
+ if(shortPart2Duration){ceilings.f=Math.min(ceilings.f,4.5);ceilings.l=Math.min(ceilings.l,5);ceilings.g=Math.min(ceilings.g,5)}
+ const relevancePenalty=relevance.checked?Math.min(1,relevance.penalty||0):0,features={connectors:connectorBand,fillers:fillerBand,repetition:repetitionBand,runOn:runOnBand,pace:paceBand,pauseRate:null},
+  lexicalCeiling=ceilings.l,lexicalBase=Math.min(lexicalCeiling,Math.max(3.5,lexicalBand)),longRatio=words.filter(word=>word.length>6).length/n,countedLongRatio=counted?countedWords.filter(word=>word.length>6).length/counted:0,
+   metrics={part:p,target:Math.round(target),duration,englishRatio:Math.round(language.ratio*100),englishWords:language.english,vietnameseWords:language.vietnamese,effectiveWords,scoringWpm:timing?.wpm??scoringWpm,timestampWordCount:timing?.wordCount??null,timestampPauseCount:timing?.pauseCount??null,timestampSpanSeconds:timing?.spanSeconds??null,timestampSource:timing?.source??null,selfRepairHints:timing?.repairHints??null,connectorCount:connectors.size,connectors:[...connectors],connectorDensity,longRatio,countedLongRatio,errors:grammar.findings.length,grammarPenalty,grammarFindings:grammar.findings,completeSentences:grammar.completeSentences,sentenceCount:grammar.sentenceCount,sentenceVariety:grammar.sentenceVariety,sentenceAccuracy,complexityRate,errorRate,repetitionRatio:repeatedRatio,fillers,fillerRatio,topicHits,collocationHits,advancedVocabHits,curatedWords,conceptCount:answerConcepts.size,collocationDensity,typeToken,relevance,relevancePenalty,fluencyBase:null,fluencyBand:null,coherenceBand,grammarBand,lexicalBand,features,runOnSentences,runOnPenalty,connectorPenalty,repetitionPenalty,styleWarnings,meanSentenceLength,formalMarkers,audioPausePenalty:0,pauseCount:timing?.pauseCount??null,spellingStatus:'pending',spellingChecked:0,spellingFindings:[],lexicalPenalty:0,lexicalBase,lexicalCeiling,ceilings,shortPart2Duration,shortPart2Length:p===2&&effectiveWords<150};
+ metrics.fluencyBand=scoreFluencyBand(metrics);metrics.fluencyBase=avg([metrics.fluencyBand,coherenceBand]);
+ const s={f:Math.min(ceilings.f,Math.max(3.5,half(metrics.fluencyBase-relevancePenalty))),l:lexicalBase,g:Math.min(ceilings.g,Math.max(3.5,grammarBand)),p:null,n,r:wpm,scoreVersion:SCORE_VERSION,metrics};
+ refreshScoreTotals(s);SCORE_RESULT_CACHE.set(cacheKey,{source:cacheSource,value:copyScore(s)});if(SCORE_RESULT_CACHE.size>80)SCORE_RESULT_CACHE.delete(SCORE_RESULT_CACHE.keys().next().value);return s;
 }
+if(new URLSearchParams(location.search).has('score-calibration'))window.addEventListener('message',event=>{
+ if(event.source!==parent||event.data?.type!=='EPU_SCORE_CALIBRATION_RUN'||typeof event.data.requestId!=='string'||!Array.isArray(event.data.samples)||event.data.samples.length>200)return;
+ const rows=event.data.samples.map(sample=>{
+  const valid=sample&&[1,2,3].includes(sample.part)&&typeof sample.text==='string'&&sample.text.length<=3600&&typeof sample.question==='string'&&sample.question.length<=240&&typeof sample.topic==='string'&&sample.topic.length<=120&&(sample.duration==null||(Number.isFinite(sample.duration)&&sample.duration>=0&&sample.duration<=900));
+  if(!valid)return {id:String(sample?.id||'').slice(0,64),error:'Dữ liệu mẫu không hợp lệ'};
+  try{const scored=score(sample.text,sample.part,sample.duration||0,sample.question,sample.topic);return {id:String(sample.id||'').slice(0,64),scores:scored?{fluency:scored.f,lexical:scored.l,grammar:scored.g,pronunciation:audioBand(scored),overall:scored.o}:null,metrics:scored?{wordCount:scored.n,wpm:scored.r,errors:scored.metrics.errors,relevance:scored.metrics.relevance?.status,matched:scored.metrics.relevance?.matched?.length||0,anchors:scored.metrics.relevance?.anchors?.length||0,spellingStatus:scored.metrics.spellingStatus}:null,error:scored?null:'Chưa đủ dữ liệu tiếng Anh để chấm'}}catch{return {id:String(sample.id||'').slice(0,64),error:'Không chấm được mẫu này'}}
+ });
+ parent.postMessage({type:'EPU_SCORE_CALIBRATION_RESULT',requestId:event.data.requestId,scoreVersion:SCORE_VERSION,rows},'*');
+});
 // Mười mẫu minh họa phát triển dần cùng một chủ đề; không phải bài chấm IELTS chính thức.
 const SCORE_EXAMPLE_PARTS=[
  'I like the park a lot.',
@@ -1946,18 +2131,52 @@ const SCORE_EXAMPLE_PARTS=[
  'However, those improvements have made the space accessible to older people and families who previously found it difficult to visit.',
  'In my opinion, protecting public spaces is essential because they encourage neighbours to meet and provide a welcome break from traffic and technology. As a result, even a short visit can improve my mood and help me concentrate on my studies afterwards. I believe that this community space, which brings different generations together, will remain more valuable than another shopping centre. Without places like it, residents would have fewer chances to relax outdoors or build friendships across the neighbourhood.'
 ];
-const SCORE_EXAMPLES=[];
-SCORE_EXAMPLE_PARTS.reduce((answer,part)=>{
- const next=answer?answer+' '+part:part;
- SCORE_EXAMPLES.push(next);
- return next;
-},'');
-SCORE_EXAMPLES[0]='I is there. I is happy. I is fine.';
-const SCORE_EXAMPLE_RESULTS=SCORE_EXAMPLES.map(answer=>score(answer,2,0));
-console.assert(SCORE_EXAMPLE_RESULTS.length===10&&SCORE_EXAMPLE_RESULTS.every(Boolean)&&
- SCORE_EXAMPLE_RESULTS[0].o<=4&&SCORE_EXAMPLE_RESULTS.at(-1).o>=8&&
- SCORE_EXAMPLE_RESULTS.every((result,index)=>index===0||result.o>=SCORE_EXAMPLE_RESULTS[index-1].o),
- 'score self-check: 10 mẫu phải có điểm không giảm');
+function runScoreSelfTests(){
+ const question='How can individuals help protect the environment?';
+ const relevantAnswers=[
+  'Individuals can help protect nature by recycling plastic and saving energy.',
+  'People can support conservation and preserve the natural world by planting trees.',
+  'Citizens can contribute to protecting the planet by using buses instead of cars.',
+  'Residents can safeguard local ecosystems by sorting rubbish and reusing bags.',
+  'Everyone can help prevent climate damage by cutting carbon emissions.',
+  'Households can protect wildlife by composting waste and choosing clean electricity.',
+  'Students can help conserve the environment by carrying reusable water bottles.',
+  'Communities can preserve forests by reducing paper use and planting native trees.',
+  'Consumers can help defend the planet by avoiding products with excess packaging.',
+  'People can protect the earth when they walk, cycle, or use public transport.',
+  'Individuals can support environmental protection through recycling and careful shopping.',
+  'Families can help save natural habitats by keeping parks clean.',
+  'Local residents can protect green spaces by joining clean-up activities.',
+  'The public can help reduce pollution and preserve nature by reusing containers.',
+  'Citizens can prevent harm to wildlife by disposing of rubbish responsibly.',
+  'People can help conserve natural resources by repairing appliances instead of replacing them.',
+  'Students can safeguard the environment by switching off lights and saving electricity.',
+  'Every person can contribute to protecting the climate by choosing renewable energy.',
+  'Neighbours can preserve the local environment by planting flowers for pollinators.',
+  'Individuals can help protect ecosystems by using less water and avoiding litter.'
+ ];
+ const unrelatedAnswers=[
+  'The violin melody sounds warm and the piano keeps a steady rhythm.',
+  'I usually prepare noodles with garlic, herbs, and fresh vegetables.',
+  'The film uses long camera shots and a very quiet soundtrack.',
+  'My office has a weekly meeting about deadlines and project budgets.',
+  'The novel follows a detective who solves a mystery in a small hotel.'
+ ];
+ const relevanceCases=[...relevantAnswers.map(text=>[text,'relevant']),...unrelatedAnswers.map(text=>[text,'off-topic'])];
+ const relevanceResults=relevanceCases.map(([answer])=>analyzeAnswerRelevance(answer,question,'Environment'));
+ console.assert(relevanceResults.length>=20&&relevanceResults.every((item,index)=>item.status===relevanceCases[index][1]),'score self-check: semantic relevance cases');
+ const scoreExamples=[];SCORE_EXAMPLE_PARTS.reduce((answer,part)=>{const next=answer?answer+' '+part:part;scoreExamples.push(next);return next},'');
+ const scoreResults=scoreExamples.map(answer=>score(answer,2,0,'Describe a place you enjoy visiting and explain why.','Hometown'));
+ console.assert(scoreResults.length===10&&scoreResults.every(Boolean)&&scoreResults.every((item,index)=>index===0||item.o>=scoreResults[index-1].o),'score self-check: 10 quality samples are non-decreasing');
+ console.assert(scoreResults.every(item=>item.o===half(avg([item.f,item.l,item.g,item.p].filter(Number.isFinite)))),'score self-check: overall is the mean of available criteria');
+ console.assert(scoreResults.every(item=>item.o>=Math.min(...[item.f,item.l,item.g,item.p].filter(Number.isFinite))),'score self-check: overall is not below the lowest available criterion');
+ const ignored=score('People can help protect nature by recycling and saving energy every day.',1,0,question,'Environment',{ignoreRelevance:true});
+ console.assert(ignored?.metrics.relevance.status==='skipped-by-user'&&ignored.metrics.relevancePenalty===0,'score self-check: relevance bypass is explicit');
+ const speedWords='community residents improve public facilities reliable transport electricity renewable energy study project useful because however example students families health work technology environment'.split(' '),speedText=Array.from({length:250},(_,index)=>speedWords[index%speedWords.length]).join(' '),speedStart=performance.now(),speedResult=score(speedText,3,0,question,'Environment',{ignoreRelevance:true}),speedMs=performance.now()-speedStart;
+ console.assert(speedResult&&speedMs<50,`score self-check: 250 words in under 50 ms (measured ${speedMs.toFixed(1)} ms)`);
+ console.info('EPU scoring self-test', {relevance:relevanceResults.length,positive:relevantAnswers.length,offTopic:unrelatedAnswers.length,samples:scoreResults.length,word250Ms:Number(speedMs.toFixed(1))});
+}
+if(typeof location!=='undefined'&&new URLSearchParams(location.search).has('selftest'))runScoreSelfTests();
 const TIP={f:'Nói dài hơn, dùng từ nối (because, however, for example) và hạn chế um/uh.',l:'Dùng từ cụ thể, đa dạng hơn và thêm 1–2 từ mới từ Bộ sưu tập.',g:'Thêm câu phức (if, although, which) và trộn các thì.',p:'Nói chậm hơn, rõ âm cuối, nhấn từ khóa; luyện shadowing.'};
 const tip=s=>{const k=K.filter(k=>s[k[0]]!=null).sort((a,b)=>s[a[0]]-s[b[0]])[0];return 'Nên ưu tiên luyện '+k[1]+'. '+TIP[k[0]]};
 const band=()=>{const newer=st.h.filter(x=>x?.scoreVersion===SCORE_VERSION),h=(newer.length?newer:st.h).slice(-5).filter(x=>practiceBand(x)!=null);if(!h.length)return null;const m={p:avg(h.map(audioBand)),n:h.length,legacy:!newer.length};for(const k of ['f','l','g'])m[k]=avg(h.map(x=>x[k]));m.o=half(avg(h.map(practiceBand)));return m};
@@ -2152,6 +2371,7 @@ const V={
  library:libraryPage,
   review:reviewPage,
   coop:()=>coopPage(),
+  games:arcadePage,
  home:()=>{
   const m=band();
   return `<section class="hero">${heroMotif}<div class="hero-copy">
@@ -2160,9 +2380,10 @@ const V={
   <div class="hero-actions"><button onclick="go('prac')">Bắt đầu luyện ${icon('arrow')}</button><button class="g" onclick="go('les')">Xem bài học</button></div></div>
   <div class="hero-score"><small>ĐIỂM ƯỚC TÍNH</small><div class="big">${bandNumber(m?.o)}</div><small>${m?'Trung bình '+m.n+' lượt gần nhất'+(m.legacy?' · dữ liệu theo nguồn điểm trước':''):'Chấm một câu để xem điểm'}</small></div></section>
    ${pathContinueButton()}
-   <button class="g w quick-entry" type="button" onclick="go('coop')">Học coop 2 người · Luyện cùng bạn</button>
+   <button class="g w quick-entry" type="button" onclick="openSpeakingCoop()">Học coop 2 người · Luyện cùng bạn</button>
   <div class="pwa-install-box"><button type="button" class="g" id="pwa-install" onclick="addToHomeScreen()">${pwaButtonLabel()}</button><small id="pwa-status" role="status">${pwaStatusMessage()}</small></div>
   <button class="w quick-entry" type="button" onclick="startQuick()">Nói nhanh 60 giây · một câu ngẫu nhiên</button>
+  ${arcadeEntry('home')}
   ${gameHome()}
   ${progressHome(m)}
   <section class="home-overview"><div class="c criteria-card"><h2>Bốn tiêu chí bài nói</h2>${bars(m)}</div>
@@ -2172,8 +2393,9 @@ const V={
  },
  prac:()=>S?(S.mode==='exam'?examView():sess()):`${pageIntro('LUYỆN TẬP','Luyện nói theo chủ đề','Chọn một phần và chủ đề, hoặc luyện cả ba phần theo thứ tự.')}
  ${examEntry()}
+  ${arcadeEntry('prac')}
   <button class="g w quick-entry" type="button" onclick="startQuick()">Nói nhanh 60 giây · một câu ngẫu nhiên</button>
-  <button class="g w quick-entry" type="button" onclick="go('coop')">Học coop 2 người · Luyện cùng bạn</button>
+  <button class="g w quick-entry" type="button" onclick="openSpeakingCoop()">Học coop 2 người · Luyện cùng bạn</button>
  <button class="w" onclick="startExam(123)">${icon('prac')} Thi thử IELTS Speaking · Part 1–2–3</button>`+
  PART_NAMES.map((title,i)=>`<article class="c part-card part-${i+1}">${partMotif(i)}<span class="part-index">PART 0${i+1}</span><h2>${title}</h2><p>${PI[i]}</p><div class="chips">${TP.map(([name],t)=>`<button class="g topic-badge topic-${t}" onclick="start([${i+1}],${t})" title="${TOPIC_LABELS[t]}">${icon(TOPIC_ICONS[t],'topic-icon')} ${name}</button>`).join('')}</div></article>`).join('')+freq(),
  les:pathLessonsPage,
@@ -2204,6 +2426,659 @@ function freq(){
  (st.h.length?`<div class="c"><h2>Câu trả lời gần đây</h2>${st.h.slice(-5).reverse().map(x=>`<div class="r"><span>${new Date(x.d).toLocaleDateString('vi-VN')} · Part ${esc(x.pt)} · ${esc(x.t)}</span><b>${practiceBand(x)==null?"—":bandRange(practiceBand(x))}</b></div>`).join('')}</div>`:'');
 }
 
+// Luật và dữ liệu của Sảnh trò chơi
+const ARCADE_MODES=['solo','pass'];
+const ARCADE_XP=5,ARCADE_DAILY_CAP=30,ARCADE_TEXT_LIMIT=280;
+const arcadeWordKey=word=>word.toLowerCase().trim();
+const ARCADE_TOPICS=[
+ ['Hometown','Giao thông và đô thị'],['Study & Work','Học tập đại học'],['Technology','Công nghệ số và AI'],
+ ['Food','Ẩm thực và mua sắm'],['Travel','Du lịch và trải nghiệm'],['Environment','Năng lượng và môi trường'],
+ ['Electricity','Điện và kỹ thuật'],['Campus Life','Đời sống sinh viên'],['Future Careers','Công việc và nghề nghiệp'],
+ ['Family','Gia đình và bạn bè'],['Hobbies','Sở thích và giao tiếp'],['Sports','Sức khỏe và vận động'],['Weather','Thiên nhiên và thời tiết']
+].flatMap(([name,group])=>{
+ const topic=TP.findIndex(row=>row[0]===name);
+ const words=[...new Set(D.filter(row=>row[5]===group).map(row=>arcadeWordKey(row[0])))].filter(word=>/^[a-z]{3,24}$/.test(word));
+ return topic<0||words.length<4?[]:[{topic,words}];
+});
+const ARCADE_RIDDLES=[
+ ['landmark','A place or structure that is easy to recognise and helps identify an area.','famous','building'],
+ ['deadline','The latest time by which a task must be finished.','date','finish'],
+ ['password','A secret string of characters used to prove that you may access an account.','account','secret'],
+ ['recipe','A set of instructions that explains how to prepare a dish.','cook','ingredients'],
+ ['souvenir','An object you keep to remember a place you visited.','trip','gift'],
+ ['turbine','A machine whose blades turn when air, water or steam moves past them.','wind','blades'],
+ ['battery','A device that stores energy and supplies electricity to equipment.','charge','power'],
+ ['roommate','A person who shares your room or living space.','room','share'],
+ ['interview','A meeting in which someone asks you questions to assess you for a role.','job','questions'],
+ ['friendship','A relationship based on affection and trust between people.','friend','relationship'],
+ ['concert','A live event at which musicians perform for an audience.','music','live'],
+ ['exercise','Physical activity that helps keep your body fit.','fitness','workout'],
+ ['sunshine','The light that reaches us directly from the sun.','light','sun']
+].flatMap(([word,definition,...blocked])=>{
+ const row=D.find(entry=>arcadeWordKey(entry[0])===word);
+ return row?[{word,definition,blocked:[word,...blocked],collocation:row[4],example:row[3]}]:[];
+});
+const ARCADE_STORY_OPENERS=[
+ 'On the way to class, Maya found a small key beside an empty bicycle rack.',
+ 'Just before sunset, Linh noticed a light flashing from an empty classroom.',
+ 'Alex opened a library book and a tiny map fell out.'
+];
+const ARCADE_STORY_RULES=[
+ {label:'Dùng từ “message”',example:'She found a message under the bench.',check:text=>arcadeHasPhrase(text,'message')},
+ {label:'Dùng từ nối “because”',example:'She called a friend because the message looked unusual.',check:text=>arcadeConnector(text,'because')},
+ {label:'Dùng một động từ ở quá khứ đơn',example:'They walked back to the school together.',check:text=>arcadePast(text)},
+ {label:'Dùng “will” + động từ để nói về điều sắp tới',example:'We will ask the teacher for help.',check:text=>/\bwill\s+(?:not\s+)?(?!(?:the|a|an|will|not)\b)[a-z]+\b/i.test(text)},
+ {label:'Dùng từ “window”',example:'A light appeared in the window upstairs.',check:text=>arcadeHasPhrase(text,'window')},
+ {label:'Dùng từ nối “so” để nêu kết quả',example:'The door was locked, so they walked around the building.',check:text=>arcadeConnector(text,'so')}
+];
+const ARCADE_STORY_REPLIES=[
+ 'For a moment, everything went quiet.',
+ 'Someone nearby stopped and listened.',
+ 'A few seconds later, footsteps echoed in the distance.'
+];
+const GAMES=[
+ {
+  id:'letter-link',name:'Bắt nhịp chữ cuối',desc:'Tìm một từ cùng chủ đề bắt đầu bằng chữ cái cuối của từ trước.',difficulty:'Khởi động',duration:'1–2 phút',modes:ARCADE_MODES,topics:true,
+  icon:'<path d="M3 5h7v7H3zM14 12h7v7h-7zM13 7h4l2 2m0 0-2 2m2-2h-6M11 17H7l-2-2m0 0 2-2m-2 2h6"/>',
+  start:arcadeChainStart,act:arcadeChainAct,view:arcadeChainView,score:arcadeRoundScore
+ },
+ {
+  id:'word-lock',name:'Giải khóa từ bí mật',desc:'Đoán từ qua manh mối, hoặc mô tả từ để bạn cùng chơi đoán.',difficulty:'Vừa sức',duration:'2–4 phút',modes:ARCADE_MODES,cooperative:true,
+  icon:'<rect x="3" y="4" width="13" height="11" rx="3"/><path d="m8 15-3 3v-3m2-6h5m-3 3h2m7 1a3 3 0 1 1-2 5.6L13 22h-2v-2l3.7-3.7A3 3 0 0 1 18 13Z"/>',
+  start:arcadeRiddleStart,act:arcadeRiddleAct,view:arcadeRiddleView,score:arcadeRoundScore
+ },
+ {
+  id:'story-relay',name:'Thêm một trang truyện',desc:'Nối tiếp câu chuyện bằng một câu tiếng Anh theo luật của lượt.',difficulty:'Thử thách',duration:'3–5 phút',modes:ARCADE_MODES,cooperative:true,
+  icon:'<path d="M12 6c-3-2-6-2-9-1v13c3-1 6-1 9 1m0-13c3-2 6-2 9-1v13c-3-1-6-1-9 1m0-13v13M6 9c1-.1 2 0 3 .5M6 13c1-.1 2 0 3 .5m6-4c1-.5 2-.6 3-.5m-3 4.5c1-.5 2-.6 3-.5"/>',
+  start:arcadeStoryStart,act:arcadeStoryAct,view:arcadeStoryView,score:arcadeRoundScore,
+  summary:arcadeStorySummary
+ }
+];
+const arcadeDictionaryCache=new Map();
+const arcadeAssetFiles=new Map();
+const arcadeWords=text=>String(text??'').toLowerCase().replace(/[’‘]/g,"'").match(/[a-z]+(?:'[a-z]+)*/g)||[];
+const arcadeText=text=>String(text??'').trim().slice(0,ARCADE_TEXT_LIMIT);
+const arcadePick=items=>items[Math.floor(Math.random()*items.length)];
+function arcadeRoundScore(rounds){return rounds.reduce((sum,row)=>sum+row.points,0)}
+const arcadeSvg=paths=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
+
+function arcadeLocalAsset(id,signal){
+ signal?.throwIfAborted();
+ const node=$(id);
+ if(!node)throw Error('assets-missing');
+ if(!node.dataset.src)return embeddedPhoneBlob(id,signal);
+ if(arcadeAssetFiles.has(id))return Promise.resolve(arcadeAssetFiles.get(id));
+ if(embeddedBlobCache.has(id))return embeddedBlobCache.get(id);
+ if(!window.caches?.match)throw Error('assets-missing');
+ const url=new URL(node.dataset.src,location.href);
+ if(url.origin!==location.origin||!['http:','https:'].includes(url.protocol))throw Error('assets-missing');
+ return caches.match(url.href).then(response=>{
+  signal?.throwIfAborted();
+  if(!response?.ok)throw Error('assets-missing');
+  return response.blob();
+ });
+}
+
+function arcadeImportAssets(input){
+ const files=new Map(Array.from(input.files||[],file=>[file.webkitRelativePath.replace(/^[^/]+\//,''),file]));
+ const nodes=[...document.querySelectorAll('[data-whisper-asset][data-src], [id^="offline-dictionary-"][data-src]')];
+ arcadeAssetFiles.clear();
+ let count=0;
+ for(const node of nodes){
+  const file=files.get(node.dataset.src.replace(/^assets\//,''));
+  if(file?.size>0&&file.size<=64*1024*1024){arcadeAssetFiles.set('#'+node.id,file);count++}
+ }
+ arcadeDictionaryCache.clear();
+ const status=$('#arcade-asset-status');
+ if(status)status.textContent=count?'Đã chọn '+count+' tệp cục bộ cho phiên này.':'Không tìm thấy dữ liệu phù hợp. Hãy chọn thư mục assets đi kèm bản EPU.';
+ input.value='';
+}
+
+async function arcadeLookup(word){
+ try{
+  const [entries,aliases]=await dictionaryShard(word,true);
+  const forms=Object.hasOwn(aliases,word)&&Array.isArray(aliases[word])?aliases[word]:[];
+  const key=[word,...forms].find(form=>Object.hasOwn(entries,form));
+  if(key)return dictionaryEntry(key,entries[key],true);
+ }catch{/* The curated offline lexicon covers the game's topic words. */}
+ const row=D.find(entry=>dictionaryKey(entry[0])===word);
+ return row?dictionaryEntry(word,[row[0],row[1]?[row[1].replace(/^\/|\/$/g,'')]:[],[['',row[2]]],[]],true):'';
+}
+
+function arcadeWordForms(word){
+ return [...new Set([word,word+'s',word+'es',word+'ed',word+'ing',word.replace(/e$/,'')+'ing',
+  word.replace(/y$/,'i')+'es',word.replace(/y$/,'i')+'ed',word.endsWith('e')?word+'d':word])];
+}
+function arcadeHasPhrase(text,phrase,inflect=false){
+ const tokens=arcadeWords(text),target=arcadeWords(phrase);
+ if(!target.length)return false;
+ const last=target.at(-1);
+ const forms=inflect?arcadeWordForms(last):[last];
+ return tokens.some((_,i)=>target.every((word,j)=>j===target.length-1?forms.includes(tokens[i+j]):tokens[i+j]===word));
+}
+
+function arcadePast(text){
+ return /\b(?:i|you|he|she|it|we|they|the [a-z]+|[a-z]+s)\s+(?:(?:then|finally|suddenly)\s+)?(?:was|were|did|had|went|saw|took|found|said|came|ran|made|left|got|read|wrote|felt|thought|stood|put|heard|spoke|bought|lost|told|kept|[a-z]{2,}ed)\b/i.test(text);
+}
+function arcadeConnector(text,word){
+ const parts=text.toLowerCase().split(new RegExp('\\b'+word+'\\b'));
+ return parts.length===2&&arcadeWords(parts[0]).length>=2&&arcadeWords(parts[1]).length>=3;
+}
+function arcadeIsSentence(text,min=5){
+ const words=arcadeWords(text);
+ return words.length>=min&&new Set(words).size>=4&&
+  /\b[a-z]+\s+(?:(?:often|usually|always|quickly|finally|not)\s+)?(?:am|is|are|was|were|have|has|had|do|does|did|can|could|will|would|went|found|saw|made|came|took|got|said|ran|left|put|read|wrote|felt|heard|thought|use[sd]?|go(?:es)?|like[sd]?|finds?|live[sd]?|want[sd]?|need[sd]?|work[sd]?|play[sd]?|keeps?|takes?|brings?|sees?|says?|reads?|walks?|[a-z]{2,}ed)\b/i.test(text);
+}
+
+function arcadeChainNext(data,letter){
+ return data.words.filter(word=>word[0]===letter&&!data.used.has(word));
+}
+function arcadeChainSeed(data){
+ const remaining=data.words.filter(word=>!data.used.has(word));
+ const starters=remaining.filter(word=>arcadeChainNext(data,word.at(-1)).some(next=>next!==word));
+ const word=arcadePick(starters);
+ if(word)data.used.add(word);
+ return word||'';
+}
+function arcadeChainStart(session,options){
+ const topic=ARCADE_TOPICS.find(item=>item.topic===options.topic)||arcadePick(ARCADE_TOPICS);
+ const data={topic:topic.topic,words:topic.words,used:new Set(),last:'',bot:false,played:[]};
+ data.last=arcadeChainSeed(data);
+ return {rounds:session.mode==='solo'?5:session.players*2,seconds:12,data};
+}
+function arcadeChainView(session){
+ const data=session.data,letter=data.last.at(-1);
+ return {tag:TOPIC_LABELS[data.topic],title:letter?'Tìm từ bắt đầu bằng '+letter.toUpperCase():'Chọn bất kỳ từ nào chưa dùng',
+  extra:`<p>${data.last?`${data.bot?'Máy vừa nối':'Từ trước'} <strong lang="en">${esc(data.last)}</strong>`:'Chuỗi mới trong cùng chủ đề.'} · ${data.used.size} từ đã dùng.</p>`,
+  hint:'Nhập từ trước. Nếu muốn thêm 2 điểm, viết tiếp một câu tiếng Anh dùng lại từ đó.'};
+}
+async function arcadeChainAct(session,text,action){
+ const data=session.data;
+ if(action==='next'){
+  if(session.turn+1>=session.rounds)return;
+  if(session.mode==='solo'&&data.last){
+   const choices=arcadeChainNext(data,data.last.at(-1));
+   const playable=choices.filter(word=>arcadeChainNext(data,word.at(-1)).some(next=>next!==word));
+   const bot=arcadePick(playable);
+   if(bot){data.used.add(bot);data.last=bot;data.bot=true;return}
+  }
+  if(!data.last||!arcadeChainNext(data,data.last.at(-1)).length||session.mode==='solo')data.last=arcadeChainSeed(data);
+  data.bot=false;
+  return;
+ }
+ if(action==='skip')return {points:0,message:'Lượt này chưa có từ hợp lệ.'};
+ const match=text.match(/^([a-z]+)(?=$|[\s.!?:,;–—])[\s.!?:,;–—]*(.*)$/is),word=match?.[1].toLowerCase(),example=match?.[2]||'';
+ if(!word)return {retry:'Hãy nhập một từ tiếng Anh trước.'};
+ if(data.last&&!word.startsWith(data.last.at(-1)))return {retry:'Từ cần bắt đầu bằng '+data.last.at(-1).toUpperCase()+'.'};
+ if(data.used.has(word))return {retry:'Từ này đã xuất hiện trong ván.'};
+ if(!data.words.includes(word))return {retry:'Từ này chưa nằm trong nhóm từ của chủ đề đang chơi.'};
+ const entry=await arcadeLookup(word);
+ if(!entry)return {retry:'Không tìm thấy mục từ trong kho từ điển đang có.'};
+ if(arcadeSession!==session||session.phase!=='active')return;
+ const bonus=arcadeHasPhrase(example,word)&&arcadeIsSentence(example);
+ data.used.add(word);data.last=word;data.bot=false;data.played.push(word);
+ return {accepted:true,points:bonus?12:10,detail:entry,message:bonus?'Từ đúng chủ đề và câu ví dụ có dùng lại từ. +2 điểm câu ví dụ.':'Từ hợp lệ. Câu ví dụ hợp lệ có thể cộng thêm 2 điểm.'};
+}
+
+function arcadeRiddleStart(session){
+ const remaining=ARCADE_RIDDLES.slice(),rounds=session.mode==='solo'?4:session.players;
+ const deck=Array.from({length:rounds},()=>remaining.splice(Math.floor(Math.random()*remaining.length),1)[0]);
+ return {rounds,seconds:30,data:{deck,stage:session.mode==='pass'?'describe':'guess',hints:1,description:'',penalty:0,blocked:[]}};
+}
+function arcadeMasked(text,word){
+ return text.replace(new RegExp('\\b(?:'+arcadeWordForms(word).join('|')+')\\b','gi'),'____');
+}
+function arcadeRiddleView(session){
+ const data=session.data,row=data.deck[session.turn];
+ if(data.stage==='describe')return {
+  tag:'LƯỢT MÔ TẢ',title:row.word,lang:'en',
+  extra:`<p>Từ cấm <strong lang="en">${row.blocked.map(esc).join(' · ')}</strong></p>`,
+  hint:'Nói hoặc nhập một câu mô tả tiếng Anh. Mỗi từ cấm xuất hiện làm mất 2 điểm của vòng. Sau đó chuyền máy.'
+ };
+ const clues=[row.definition,arcadeMasked(row.collocation,row.word),arcadeMasked(row.example,row.word)];
+ return {tag:'LƯỢT ĐOÁN',title:'Từ tiếng Anh nào đang ẩn?',
+  extra:`${data.description?`<p>Lời mô tả <strong lang="en">${esc(data.description)}</strong></p>`:''}
+   ${data.penalty?`<p class="mu">Trừ ${data.penalty} điểm vì lời mô tả có từ cấm.</p>`:''}
+   <ol>${clues.map((clue,i)=>`<li data-arcade-clue="${i+1}"${i>=data.hints?' hidden':''}><small>${['Định nghĩa','Cụm từ đi kèm','Câu ví dụ'][i]}</small><p lang="en">${esc(clue)}</p></li>`).join('')}</ol>`,
+  hint:'Nhập từ bí mật. Dùng ít manh mối và đoán nhanh để được thêm điểm.',hints:true
+ };
+}
+function arcadeRiddleAct(session,text,action){
+ const data=session.data,row=data.deck[session.turn];
+ if(action==='next'){
+  data.stage=session.mode==='pass'?'describe':'guess';data.hints=1;data.description='';data.penalty=0;data.blocked=[];
+  return;
+ }
+ if(data.stage==='describe'){
+  if(action!=='skip'&&arcadeWords(text).length<4)return {retry:'Hãy mô tả bằng ít nhất 4 từ tiếng Anh.'};
+  data.blocked=row.blocked.filter(word=>arcadeHasPhrase(text,word,true));
+  data.penalty=data.blocked.length*2;
+  data.description=text;
+  for(const word of data.blocked)data.description=arcadeMasked(data.description,word);
+  data.stage='guess';
+  return {handoff:true,message:data.penalty?`Phát hiện ${data.blocked.length} từ cấm. Các từ đó đã được che và vòng này bị trừ ${data.penalty} điểm.`:'Đã nhận lời mô tả. Chuyền máy cho người đoán.'};
+ }
+ if(action==='skip')return {points:0,message:`Đáp án là “${row.word}”.`};
+ if(dictionaryKey(text.replace(/[.!?]+$/,''))!==row.word)return {retry:'Chưa đúng. Bạn có thể thử lại hoặc mở thêm manh mối.'};
+ const quick=Math.floor(4*arcadeSeconds(session)/session.seconds);
+ const points=Math.max(0,12-(data.hints-1)*3+quick-data.penalty);
+ return {accepted:true,points,message:`Đúng rồi: “${row.word}”. Dùng ${data.hints}/3 manh mối${data.penalty?' · đã trừ '+data.penalty+' điểm':''}.`};
+}
+
+function arcadeStoryStart(session){
+ return {rounds:session.mode==='solo'?6:session.players*2,seconds:35,data:{
+  opening:arcadePick(ARCADE_STORY_OPENERS),offset:Math.floor(Math.random()*ARCADE_STORY_RULES.length),lines:[]
+ }};
+}
+function arcadeStoryRule(session){
+ return ARCADE_STORY_RULES[(session.data.offset+session.turn)%ARCADE_STORY_RULES.length];
+}
+function arcadeStoryView(session){
+ const data=session.data,rule=arcadeStoryRule(session);
+ return {tag:'LUẬT CỦA LƯỢT',title:rule.label,
+  extra:`<p><small>${data.lines.length?'Câu gần nhất':'Mở truyện'}</small></p><p lang="en">${esc(data.lines.at(-1)?.text||data.opening)}</p>
+   <details><summary>Xem cách dùng</summary><p lang="en">${esc(rule.example)}</p></details>`,
+  hint:'Thêm một câu tiếng Anh theo luật và nối tiếp tình huống. Dùng ít nhất 5 từ.'
+ };
+}
+function arcadeStoryAct(session,text,action){
+ if(action==='next'){
+  if(session.mode==='solo'&&session.turn%2===0&&session.turn+1<session.rounds&&session.results.at(-1)?.accepted){
+   session.data.lines.push({text:ARCADE_STORY_REPLIES[session.turn/2],author:'Máy'});
+  }
+  return;
+ }
+ if(action==='skip')return {points:0,message:'Chưa thêm câu ở lượt này.'};
+ const sentence=text.replace(/[.!?]+$/,'').trim();
+ const rule=arcadeStoryRule(session);
+ if(/[.!?]/.test(sentence)||!arcadeIsSentence(sentence))return {retry:'Hãy nhập một câu tiếng Anh có động từ và ít nhất 5 từ.'};
+ if(!rule.check(sentence))return {retry:'Câu chưa đạt luật: '+rule.label+'.'};
+ if([session.data.opening,...session.data.lines.map(row=>row.text)].some(line=>arcadeWords(line).join(' ')===arcadeWords(sentence).join(' '))){
+  return {retry:'Câu này đã có trong truyện. Hãy thêm một diễn biến mới.'};
+ }
+ const points=10+(new Set(arcadeWords(sentence)).size>=9?2:0);
+ session.data.lines.push({text:sentence+(/[!?]$/.test(text)?text.at(-1):'.'),author:arcadePlayer(session),points});
+ return {accepted:true,points,message:'Đã ghép câu vào truyện. Điểm dựa trên luật lượt và độ dài câu.'};
+}
+function arcadeStorySummary(session){
+ const {opening,lines}=session.data,playerLines=lines.filter(line=>line.points);
+ const last=playerLines.at(-1);
+ const best=playerLines.slice().sort((a,b)=>b.points-a.points||new Set(arcadeWords(b.text)).size-new Set(arcadeWords(a.text)).size).slice(0,2);
+ const storyLine=line=>`<li><small>${esc(line.author)}</small><p lang="en">${esc(line.text)}</p></li>`;
+ return `<section class="c"><h2>Tóm tắt câu chuyện</h2><p>${playerLines.length} câu của người chơi, ${lines.length-playerLines.length} câu của máy.</p>
+  <p>Mở đầu <span lang="en">${esc(opening)}</span></p>
+  ${last?`<p>Đoạn cuối <span lang="en">${esc(last.text)}</span></p>`:''}
+  ${best.length?`<h3>Câu nổi bật theo điểm luật chơi</h3><ol class="arcade-story">${best.map(storyLine).join('')}</ol>`:''}
+  <details><summary>Đọc toàn bộ truyện</summary><ol class="arcade-story">${[{author:'Mở truyện',text:opening},...lines].map(storyLine).join('')}</ol></details></section>`;
+}
+
+// Phiên chơi, giao diện và kết quả
+let arcadeOrigin='prac',arcadeSelection=null,arcadeSession=null,arcadeClock=null,arcadeCapture=null;
+const arcadeIcon=game=>`<span class="arcade-icon">${arcadeSvg(game.icon)}</span>`;
+const arcadePlayerIndex=session=>session.mode==='solo'?0:(session.turn+(session.data.stage==='guess'?1:0))%session.players;
+const arcadePlayer=session=>session.mode==='solo'?'Bạn':'Người '+(arcadePlayerIndex(session)+1);
+const arcadeMilliseconds=session=>session.pausedMs??session.reviewMs??(session.phase==='active'?Math.max(0,session.deadline-performance.now()):session.seconds*1000);
+const arcadeSeconds=session=>Math.ceil(arcadeMilliseconds(session)/1000);
+
+function cleanArcadeHistory(input){
+ const byId=new Map();
+ for(const round of Array.isArray(input?.runs)?input.runs:[]){
+  if(!validKey(round?.id)||!GAMES.some(game=>game.id===round.game&&(round.mode==='online'||game.modes.includes(round.mode)))||
+   !Number.isFinite(round.at)||round.at<0||round.at>Date.now()+DAY||
+   !Number.isInteger(round.points)||round.points<0||round.points>300)continue;
+  const row={id:round.id,game:round.game,mode:round.mode,at:round.at,points:round.points};
+  const old=byId.get(row.id);
+  if(!old||JSON.stringify(row)<JSON.stringify(old))byId.set(row.id,row);
+ }
+ return {version:1,runs:[...byId.values()].sort((a,b)=>a.at-b.at||a.id.localeCompare(b.id))};
+}
+function mergeArcadeHistory(local,other){
+ return cleanArcadeHistory({runs:[...(Array.isArray(local?.runs)?local.runs:[]),...(Array.isArray(other?.runs)?other.runs:[])]});
+}
+function arcadeRecords(game,mode){
+ const runs=st.games.runs.filter(row=>row.game===game&&(!mode||row.mode===mode));
+ return {count:runs.length,best:runs.reduce((best,row)=>Math.max(best,row.points),0)};
+}
+
+function arcadeEntry(origin){
+ return `<article class="c arcade-entry">${arcadeIcon(GAMES[0])}<div><h2>Góc chơi</h2><p class="mu">Luyện nói nhanh cùng máy hoặc chuyền máy cho bạn.</p></div>
+ <button type="button" class="g" onclick="openArcade('${origin}')">Vào sảnh trò chơi ${icon('arrow')}</button></article>`;
+}
+function openArcade(origin){
+ arcadeOrigin=origin==='home'?'home':'prac';
+ if(!$('#arcade-announcement')){
+  const node=document.createElement('div');
+  node.id='arcade-announcement';node.className='arcade-sr';
+  node.setAttribute('role','status');node.setAttribute('aria-live','polite');node.setAttribute('aria-atomic','true');
+  document.body.append(node);
+ }
+ go('games');
+}
+function leaveArcade(){
+ clearInterval(arcadeClock);arcadeClock=null;
+ arcadeReleaseAudio();
+ arcadeSession=null;arcadeSelection=null;
+ const notice=$('#arcade-announcement');if(notice)notice.textContent='';
+}
+function arcadeLobby(){
+ const cards=GAMES.map(game=>{
+  const stats=arcadeRecords(game.id);
+  return `<article class="c arcade-tile">${arcadeIcon(game)}<h2>${game.name}</h2><p>${game.desc}</p>
+   <div class="arcade-meta"><span class="arcade-chip">${game.difficulty}</span><span class="arcade-chip">${game.duration}</span></div>
+   <small>${stats.count} ván${stats.count?' · Kỷ lục '+stats.best+' điểm':''}</small>
+   <button type="button" onclick="arcadeSelect('${game.id}')">Chọn trò</button></article>`;
+ }).join('');
+ return `<section class="arcade-panel">
+  <button class="g" type="button" onclick="go(arcadeOrigin)">← ${arcadeOrigin==='home'?'Trang chủ':'Luyện tập'}</button>
+  ${pageIntro('GÓC CHƠI · EPU','Sảnh trò chơi','Chọn một trò và luyện tiếng Anh trong vài phút.')}
+  <div class="arcade-grid">${cards}</div>
+  <details class="c"><summary>Dữ liệu chép lời và từ điển ngoại tuyến</summary>
+   <p>Nếu bản này có thư mục <code>assets</code> riêng, bạn có thể chọn thư mục đó để sảnh đọc tệp ngay trên thiết bị. Chọn lại sau khi tải lại trang. Bạn luôn có thể chơi bằng cách gõ tay.</p>
+   <label>Chọn thư mục assets <input type="file" webkitdirectory multiple onchange="arcadeImportAssets(this)"></label>
+   <p id="arcade-asset-status" role="status">${arcadeAssetFiles.size?arcadeAssetFiles.size+' tệp cục bộ sẵn sàng.':''}</p>
+  </details></section>`;
+}
+function arcadeSelect(id){
+ if(tab!=='games')return;
+ leaveArcade();
+ arcadeSelection=GAMES.find(game=>game.id===id)||null;
+ openView();
+}
+function arcadePage(){
+ if(arcadeSession)return arcadeGameView(arcadeSession);
+ if(!arcadeSelection)return arcadeLobby();
+ const game=arcadeSelection;
+ const modes=[['solo','Một mình với máy'],['2','Chuyền máy · 2 người'],['3','Chuyền máy · 3 người'],['4','Chuyền máy · 4 người']];
+ const topicOptions=ARCADE_TOPICS.map(({topic})=>`<option value="${topic}">${esc(TOPIC_LABELS[topic])}</option>`).join('');
+ return `<section class="arcade-panel">
+  <button class="g" type="button" onclick="arcadeSelect()">← Về sảnh</button>
+  <article class="c">${arcadeIcon(game)}<h1>${game.name}</h1><p>${game.desc}</p>
+  <form class="arcade-setup" onsubmit="event.preventDefault();startArcade(this)">
+  <label>Cách chơi<select name="mode">${modes.filter(([id])=>game.modes.includes(id==='solo'?'solo':'pass')).map(([id,label])=>`<option value="${id}">${label}</option>`).join('')}</select></label>
+  ${game.topics?`<label>Chủ đề<select name="topic"><option value="">Ngẫu nhiên</option>${topicOptions}</select></label>`:''}
+  ${game.topics?'<details><summary>Gợi ý vốn từ theo chủ đề</summary>'+ARCADE_TOPICS.map(({topic,words})=>`<p><strong>${esc(TOPIC_LABELS[topic])}</strong> · <span lang="en">${esc(words.join(', '))}</span></p>`).join('')+'</details>':''}
+  <div class="row"><button type="submit">Bắt đầu chơi</button><button class="g" type="button" onclick="openArcadeOnline(this.form)">Chơi cùng bạn</button></div></form></article></section>`;
+}
+function startArcade(form){
+ const game=arcadeSelection;
+ if(tab!=='games'||!game||arcadeSession)return;
+ const choice=form?.elements?.mode?.value??'solo';
+ const mode=choice==='solo'?'solo':'pass',players=mode==='solo'?1:[2,3,4].includes(Number(choice))?Number(choice):2;
+ if(!game.modes.includes(mode))return;
+ const selectedTopic=form?.elements?.topic?.value;
+ const session={id:'arcade_'+newId(),game,mode,players,turn:0,phase:'ready',results:[],feedback:'',deadline:0,pausedMs:null};
+ Object.assign(session,game.start(session,{topic:selectedTopic?Number(selectedTopic):null}));
+ arcadeSession=session;
+ if(mode==='solo')arcadeBeginTurn();
+ else{openView();arcadeAnnounce(session)}
+}
+function arcadeGameView(session){
+ const {game,phase,results}=session,score=game.score(results);
+ const back='<button class="g" type="button" onclick="arcadeSelect()">← Về sảnh</button>';
+ if(phase==='done'){
+  const stats=arcadeRecords(game.id,session.mode);
+  const playerScores=Array.from({length:session.players},(_,i)=>`<li>Người ${i+1} · ${game.score(results.filter(row=>row.player===i))} điểm</li>`).join('');
+  return `<section class="arcade-panel">${back}<article class="c"><p class="eyebrow">KẾT QUẢ VÁN CHƠI</p><h1>${game.name}</h1>
+   <div class="arcade-meta"><span class="arcade-chip">${score} điểm</span><span class="arcade-chip">+${session.xp} XP</span></div>
+   <p>${results.filter(row=>row.accepted).length}/${session.rounds} lượt đạt · Kỷ lục chế độ này ${stats.best} điểm · ${stats.count} ván</p>
+   ${session.mode==='pass'?(game.cooperative?'<p>Điểm chung của cả nhóm.</p>':'<ul>'+playerScores+'</ul>'):''}
+   <button type="button" onclick="arcadeSelect('${game.id}')">Chơi lại</button></article>${game.summary?.(session)||''}</section>`;
+ }
+ const roundText='Vòng '+(session.turn+1)+'/'+session.rounds;
+ const hud=`<div class="arcade-hud"><div class="arcade-clock" aria-hidden="true"><svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="25"/>
+  <circle id="arcade-ring" cx="30" cy="30" r="25" pathLength="100" stroke-dasharray="100" stroke-dashoffset="${100*(1-arcadeSeconds(session)/session.seconds)}" transform="rotate(-90 30 30)"/></svg><span id="arcade-seconds">${arcadeSeconds(session)}s</span></div>
+  <span class="arcade-chip">${score} điểm</span><span class="arcade-chip">${roundText} · ${esc(arcadePlayer(session))}</span>
+  <div class="arcade-rounds" aria-hidden="true">${Array.from({length:session.rounds},(_,i)=>`<span class="${i<session.turn?'done':i===session.turn?'current':''}"></span>`).join('')}</div></div>`;
+ let body;
+ if(phase==='ready'){
+  const role=session.data.stage==='describe'?' để xem từ cần mô tả':session.data.stage==='guess'?' để đoán từ bí mật':' để nhận đề';
+  body=`<div class="arcade-prompt"><h2>Chuyền máy cho ${esc(arcadePlayer(session))}</h2>
+   <p>${esc(session.feedback||'Bấm sẵn sàng'+role+'.')}</p><div class="row"><button type="button" onclick="arcadeBeginTurn()">Sẵn sàng</button></div></div>`;
+ }else if(phase==='review'){
+  const row=results.at(-1);
+  body=`<div class="arcade-prompt"><h2>${row.points?'+'+row.points+' điểm':'Lượt đã khép lại'}</h2>
+   <p role="status">${esc(row.message)}</p>${row.detail?'<p>'+row.detail+'</p>':''}
+   <div class="row"><button type="button" onclick="arcadeAdvance()">${session.turn+1===session.rounds?'Xem kết quả':'Lượt tiếp theo'}</button></div></div>`;
+ }else{
+  const view=game.view(session);
+  body=`<div class="arcade-prompt"><p class="eyebrow">${esc(view.tag)}</p><h2${view.lang==='en'?' lang="en"':''}>${esc(view.title)}</h2>${view.extra||''}
+   ${view.hints?'<div class="row"><button class="g" type="button" id="arcade-hint" onclick="arcadeRevealHint()"'+(session.data.hints===3?' disabled':'')+'>Mở thêm manh mối</button></div>':''}</div>
+   <form class="arcade-answer" onsubmit="event.preventDefault();void arcadeSubmit()">
+    <label>Câu trả lời tiếng Anh<textarea id="arcade-answer" lang="en" rows="3" maxlength="${ARCADE_TEXT_LIMIT}" aria-describedby="arcade-hint-text" placeholder="Nói rồi kiểm tra bản chép, hoặc gõ ở đây"></textarea></label>
+    <small id="arcade-hint-text">${esc(view.hint)} Khi hết giờ, app sẽ kiểm tra phần đang có trong ô.</small>
+    <div class="row"><button type="submit" id="arcade-submit">Gửi câu trả lời</button><button class="g" type="button" id="arcade-mic" onclick="void arcadeMicrophone()">${icon('prac')} Ghi âm</button>
+    <button class="g" type="button" id="arcade-skip" onclick="void arcadeSubmit('skip')">Bỏ qua lượt</button></div>
+    <audio id="arcade-audio" controls hidden></audio>
+    <p class="mu arcade-feedback" id="arcade-audio-status" role="status"></p>
+    <p class="arcade-feedback" id="arcade-feedback" role="status"></p>
+   </form>`;
+ }
+ return `<section class="arcade-panel">${back}<article class="c"><p class="eyebrow">${game.name}</p>${hud}${body}</article></section>`;
+}
+
+function arcadeBeginTurn(){
+ const session=arcadeSession;
+ if(tab!=='games'||session?.phase!=='ready')return;
+ session.phase='active';session.feedback='';session.pausedMs=null;session.usedReviewTime=false;
+ session.deadline=performance.now()+session.seconds*1000;
+ clearInterval(arcadeClock);arcadeClock=setInterval(arcadeTick,125);
+ openView();arcadeAnnounce(session);arcadeTick();
+}
+function arcadeAnnounce(session){
+ const node=$('#arcade-announcement');
+ if(!node)return;
+ const prefix=session.phase==='ready'?'Chuyền máy cho ':'Đến lượt ';
+ node.textContent=prefix+arcadePlayer(session)+'. Vòng '+(session.turn+1)+' trên '+session.rounds+'.';
+}
+function arcadeRevealHint(){
+ const session=arcadeSession;
+ if(session?.phase!=='active'||session.data.stage!=='guess'||session.data.hints>=3)return;
+ session.data.hints++;
+ for(const node of document.querySelectorAll('[data-arcade-clue]'))node.hidden=Number(node.dataset.arcadeClue)>session.data.hints;
+ const button=$('#arcade-hint');if(button)button.disabled=session.data.hints===3;
+ arcadeFeedback('Đã mở manh mối '+session.data.hints+'/3.');
+}
+function arcadeFeedback(message){
+ const node=$('#arcade-feedback');if(node)node.textContent=message;
+}
+function arcadeTick(){
+ const session=arcadeSession;
+ if(tab!=='games'||session?.phase!=='active')return;
+ const seconds=arcadeSeconds(session),label=$('#arcade-seconds'),ring=$('#arcade-ring');
+ if(label)label.textContent=seconds+'s';
+ if(ring)ring.setAttribute('stroke-dashoffset',String(100*(1-seconds/session.seconds)));
+ if(session.data.stage==='guess'&&session.data.hints<3&&session.pausedMs==null&&seconds<=(session.data.hints===1?20:10))arcadeRevealHint();
+ if(seconds||session.busy)return;
+ if(arcadeCapture?.recorder?.state==='recording'){
+  arcadeCapture.expired=true;
+  arcadeStopRecording();
+  return;
+ }
+ if(arcadeCapture?.stopping||arcadeCapture?.controller)return;
+ void arcadeSubmit($('#arcade-answer')?.value.trim()?'time':'skip');
+}
+async function arcadeSubmit(action='answer'){
+ const session=arcadeSession;
+ if(tab!=='games'||session?.phase!=='active'||session.busy)return;
+ if(action==='answer'&&(arcadeCapture?.opening||arcadeCapture?.recorder||arcadeCapture?.controller)){
+  arcadeFeedback('Dừng ghi âm hoặc dùng nút Gõ tay trước khi gửi.');return;
+ }
+ if(action==='answer'&&!arcadeMilliseconds(session))action='time';
+ const text=action==='skip'?'':arcadeText($('#arcade-answer')?.value);
+ if(!text&&action==='answer'){arcadeFeedback('Hãy nói hoặc gõ câu trả lời trước.');return}
+ session.busy=true;
+ const button=$('#arcade-submit');if(button)button.disabled=true;
+ let result;
+ try{
+  result=await session.game.act(session,text,action);
+  if(result?.retry&&action==='time')result=await session.game.act(session,'','skip');
+ }catch{result={retry:'Chưa kiểm tra được câu này. Hãy thử lại hoặc bỏ qua lượt.'}}
+ if(arcadeSession!==session||session.phase!=='active')return;
+ session.busy=false;
+ if(button)button.disabled=false;
+ if(!result)return;
+ if(result.retry){
+  if(action==='time'){arcadeRecordRound(session,{points:0,message:'Đã hết thời gian cho lượt này.'});return}
+  arcadeFeedback(result.retry);return;
+ }
+ if(result.handoff){
+  clearInterval(arcadeClock);arcadeClock=null;arcadeReleaseAudio();
+  session.phase='ready';session.feedback=result.message;
+  openView();arcadeAnnounce(session);return;
+ }
+ arcadeRecordRound(session,result);
+}
+function arcadeRecordRound(session,result){
+ clearInterval(arcadeClock);arcadeClock=null;arcadeReleaseAudio();
+ session.reviewMs=arcadeMilliseconds(session);
+ session.results.push({...result,player:arcadePlayerIndex(session)});
+ session.phase='review';session.pausedMs=null;
+ openView();
+}
+async function arcadeAdvance(){
+ const session=arcadeSession;
+ if(session?.phase!=='review'||session.advancing)return;
+ if(session.turn+1===session.rounds){arcadeFinish(session);return}
+ session.advancing=true;
+ try{await session.game.act(session,'','next')}
+ catch{
+  session.results.at(-1).message='Chưa mở được lượt tiếp theo. Bạn có thể thử lại.';
+  if(arcadeSession===session)openView();
+  return;
+ }
+ finally{session.advancing=false}
+ if(arcadeSession!==session)return;
+ session.turn++;session.phase='ready';session.feedback='';session.reviewMs=null;
+ if(session.mode==='solo')arcadeBeginTurn();
+ else{openView();arcadeAnnounce(session)}
+}
+function arcadeFinish(session){
+ if(session.phase!=='review')return;
+ const saved=storedEpu();
+ const row={id:session.id,game:session.game.id,mode:session.mode,at:Date.now(),points:session.game.score(session.results)};
+ const before=mergeGame(st.game,saved?.game);
+ st.games=mergeArcadeHistory(mergeArcadeHistory(st.games,saved?.games),{runs:[row]});
+ const event={id:row.id,type:'game',at:row.at,xp:session.results.some(result=>result.accepted)?ARCADE_XP:0};
+ st.game=mergeGame(before,{events:[event]});
+ session.xp=gameTotal(st.game)-gameTotal(before);
+ session.phase='done';
+ sv(false);
+ openView();
+}
+
+function arcadeAudioStatus(message){
+ const node=$('#arcade-audio-status');if(node)node.textContent=message;
+}
+function arcadeMicLabel(message){
+ const node=$('#arcade-mic');if(node)node.textContent=message;
+}
+function arcadeReleaseAudio(){
+ const capture=arcadeCapture;
+ if(!capture)return;
+ arcadeCapture=null;
+ clearTimeout(capture.stopTimeout);clearTimeout(capture.transcriptTimeout);
+ capture.controller?.abort();
+ releaseRecorder(capture,true);
+ if(capture.url){
+  const audio=$('#arcade-audio');
+  if(audio?.getAttribute('src')===capture.url){
+   audio.pause();audio.removeAttribute('src');audio.load();audio.hidden=true;
+  }
+  URL.revokeObjectURL(capture.url);
+ }
+}
+async function arcadeMicrophone(){
+ const session=arcadeSession;
+ if(tab!=='games'||session?.phase!=='active'||session.busy)return;
+ if(arcadeCapture?.controller){arcadeCapture.controller.abort();return}
+ if(arcadeCapture?.stopping||arcadeCapture?.opening){
+  arcadeReleaseAudio();arcadeResumeClock(session);
+  arcadeMicLabel('Ghi âm');arcadeAudioStatus('Bạn có thể gõ câu trả lời.');return;
+ }
+ if(arcadeCapture?.recorder?.state==='recording'){arcadeStopRecording();return}
+ if(!navigator.mediaDevices?.getUserMedia||typeof MediaRecorder!=='function'){
+  arcadeAudioStatus('Trình duyệt chưa hỗ trợ ghi âm ở đây. Bạn vẫn có thể gõ câu trả lời.');return;
+ }
+ arcadeReleaseAudio();
+ const capture={opening:true,chunks:[]};
+ arcadeCapture=capture;
+ session.pausedMs=arcadeMilliseconds(session);
+ arcadeMicLabel('Gõ tay');arcadeAudioStatus('Đang mở micro. Hãy cho phép ghi âm nếu trình duyệt hỏi.');
+ try{
+  const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+  if(arcadeCapture!==capture||arcadeSession!==session){releaseStream(stream);return}
+  capture.stream=stream;
+  const recorder=new MediaRecorder(stream);
+  capture.recorder=recorder;
+  recorder.ondataavailable=event=>{if(arcadeCapture===capture&&event.data?.size)capture.chunks.push(event.data)};
+  recorder.onstop=()=>void arcadeTranscribe(session,capture);
+  recorder.onerror=()=>{
+   if(arcadeCapture!==capture)return;
+   arcadeReleaseAudio();arcadeResumeClock(session);arcadeMicLabel('Ghi âm');
+   arcadeAudioStatus('Bản ghi bị gián đoạn. Hãy gõ câu trả lời hoặc thử lại.');
+  };
+  recorder.start();
+  capture.opening=false;
+  arcadeResumeClock(session);
+  arcadeMicLabel('Dừng ghi âm');arcadeAudioStatus('Đang ghi âm trên thiết bị.');
+ }catch(error){
+  if(arcadeCapture!==capture)return;
+  arcadeReleaseAudio();arcadeResumeClock(session);arcadeMicLabel('Ghi âm');
+  arcadeAudioStatus(recordingError(error)+' Bạn vẫn có thể gõ câu trả lời.');
+ }
+}
+function arcadeResumeClock(session){
+ if(session.pausedMs!=null)session.deadline=performance.now()+session.pausedMs;
+ session.pausedMs=null;
+}
+function arcadeStopRecording(){
+ const session=arcadeSession,capture=arcadeCapture;
+ if(!capture?.recorder||capture.stopping)return;
+ capture.stopping=true;
+ session.pausedMs=arcadeMilliseconds(session);
+ arcadeMicLabel('Gõ tay');
+ arcadeAudioStatus('Đang lưu bản ghi trên thiết bị…');
+ capture.stopTimeout=setTimeout(()=>void arcadeTranscribe(session,capture),1800);
+ try{if(capture.recorder.state!=='inactive')capture.recorder.stop()}
+ catch{void arcadeTranscribe(session,capture)}
+}
+async function arcadeTranscribe(session,capture){
+ if(arcadeCapture!==capture||arcadeSession!==session||capture.controller)return;
+ clearTimeout(capture.stopTimeout);
+ const blob=new Blob(capture.chunks,{type:capture.recorder?.mimeType||capture.chunks[0]?.type||''});
+ releaseRecorder(capture,true);capture.stopping=false;
+ const audio=$('#arcade-audio'),answer=$('#arcade-answer');
+ if(blob.size&&audio){
+  capture.url=URL.createObjectURL(blob);
+  audio.src=capture.url;audio.hidden=false;
+ }
+ const original=answer?.value;
+ const controller=new AbortController();
+ capture.controller=controller;
+ capture.transcriptTimeout=setTimeout(()=>controller.abort(),30000);
+ session.pausedMs??=arcadeMilliseconds(session);
+ arcadeMicLabel('Gõ tay');
+ arcadeAudioStatus('Đang chép lời tiếng Anh trên thiết bị…');
+ let transcript='',status='';
+ try{
+  if(blob.size)transcript=arcadeText(await transcribeEnglish(blob,controller.signal,()=>{},true));
+  status=transcript?'Đã chép lời. Bạn có thể kiểm tra và sửa trước khi gửi.':'Chưa nhận ra lời nói. Hãy nghe lại và gõ câu trả lời.';
+ }catch{
+  status=controller.signal.aborted?'Đã dừng chép lời. Bạn có thể nghe lại bản ghi và gõ câu trả lời.':'Chưa chép lời được từ tài nguyên trên thiết bị. Hãy nghe lại và gõ câu trả lời.';
+ }
+ if(arcadeCapture!==capture||arcadeSession!==session)return;
+ clearTimeout(capture.transcriptTimeout);capture.controller=null;
+ if(transcript&&answer&&answer.value===original)answer.value=transcript;
+ else if(transcript)status='Đã giữ phần bạn đang gõ. Bạn có thể nghe lại bản ghi.';
+ // Give the player a short review window when recording stopped at the buzzer.
+ if(capture.expired&&!session.usedReviewTime){session.pausedMs=8000;session.usedReviewTime=true}
+ arcadeResumeClock(session);
+ arcadeMicLabel('Ghi âm lại');arcadeAudioStatus(status);
+}
+document.addEventListener('visibilitychange',()=>{
+ if(document.hidden&&tab==='games'&&arcadeCapture?.recorder?.state==='recording')arcadeStopRecording();
+});
+
 // Chép lời ngoại tuyến bằng Transformers.js và Whisper
 let whisperJob=null;
 
@@ -2213,18 +3088,18 @@ function supportsLocalTranscription(){
     &&typeof DecompressionStream==='function'&&Boolean($('#whisper-worker'));
 }
 
-function whisperAssets(signal,onProgress){
+function whisperAssets(signal,onProgress,localOnly=false){
   const nodes=Array.from(document.querySelectorAll('[data-whisper-asset]'));
   if(!nodes.length)throw Error('assets-missing');
   let loaded=0;
   return Promise.all(nodes.map(async node=>{
-    const data=await embeddedPhoneBlob('#'+node.id,signal);
+    const data=await (localOnly?arcadeLocalAsset('#'+node.id,signal):embeddedPhoneBlob('#'+node.id,signal));
     onProgress?.(++loaded,nodes.length);
     return {name:node.dataset.whisperAsset,length:Number(node.dataset.length),data};
   }));
 }
 
-async function transcribeEnglish(blob,signal,onStage){
+async function transcribeEnglish(blob,signal,onStage,localOnly=false,returnDetails=false){
   if(!supportsLocalTranscription())throw Error('unsupported');
   signal.throwIfAborted();
   const OfflineAudio=window.OfflineAudioContext||window.webkitOfflineAudioContext;
@@ -2246,21 +3121,24 @@ async function transcribeEnglish(blob,signal,onStage){
     if(sum/320>.0015**2)active++;
   }
   if(active<6)return '';
-  const assets=await whisperAssets(signal,(loaded,total)=>onStage?.('assets',loaded,total));
+  const assets=await whisperAssets(signal,(loaded,total)=>onStage?.('assets',loaded,total),localOnly);
   signal.throwIfAborted();
   return new Promise((resolve,reject)=>{
     let worker,url,finished=false;
-    function finish(error,text){
+    function finish(error,text,timestamps=[]){
       if(finished)return;
       finished=true;
       signal.removeEventListener('abort',abort);
       worker?.terminate();
       if(url)URL.revokeObjectURL(url);
-      if(error)reject(error);else resolve(text);
+      if(error)reject(error);else resolve(returnDetails?{text,timestamps:Array.isArray(timestamps)?timestamps:[]}:text);
     }
     function abort(){finish(signal.reason||Error('aborted'))}
     try{
-      url=URL.createObjectURL(new Blob([$('#whisper-worker').textContent],{type:'text/javascript'}));
+      const workerSource=$('#whisper-worker').textContent
+        .replace('chunk_length_s:30,stride_length_s:5,return_timestamps:false',"chunk_length_s:30,stride_length_s:5,return_timestamps:'word'")
+        .replace("self.postMessage({text:typeof result.text==='string'?result.text.trim():''});","self.postMessage({text:typeof result.text==='string'?result.text.trim():'',timestamps:Array.isArray(result.chunks)?result.chunks:[]});");
+      url=URL.createObjectURL(new Blob([workerSource],{type:'text/javascript'}));
       worker=new Worker(url);
       signal.addEventListener('abort',abort,{once:true});
       worker.onerror=event=>finish(Error(event?.message||'worker'));
@@ -2268,7 +3146,7 @@ async function transcribeEnglish(blob,signal,onStage){
       worker.onmessage=({data})=>{
         if(data.stage)onStage(data.stage);
         else if(data.error)finish(Error(data.error));
-        else if(typeof data.text==='string')finish(null,data.text);
+        else if(typeof data.text==='string')finish(null,data.text,data.timestamps);
         else finish(Error('worker'));
       };
       worker.postMessage({assets,audio},[audio.buffer]);
@@ -2319,6 +3197,16 @@ function cancelWhisperByUser(){
   refreshWhisper(entry);
 }
 async function transcribeRecording(){await runBrowserAIWhisper(true)}
+function applyWordTimingToResult(result,chunks,text=result?.text||''){
+ if(!result?.s)return;
+ const timing=summarizeWordTimestamps(chunks,result.duration,text);if(!timing)return;
+ const metrics=result.s.metrics||{};
+ Object.assign(metrics,{timestampWordCount:timing.wordCount,timestampPauseCount:timing.pauseCount,timestampSpanSeconds:timing.spanSeconds,timestampSource:timing.source,selfRepairHints:timing.repairHints,scoringWpm:timing.wpm});
+ metrics.features=metrics.features||{};if(Number.isFinite(timing.wpm))metrics.features.pace=scoreMap(Math.abs(timing.wpm-145),SCORE_MAPS.paceDistance);
+ metrics.pauseCount=Number.isFinite(result.m?.np)?result.m.np:timing.pauseCount;
+ metrics.fluencyBand=scoreFluencyBand(metrics);metrics.fluencyBase=avg([metrics.fluencyBand,metrics.coherenceBand].filter(Number.isFinite));
+ refreshScoreTotals(result.s);applyDictionaryScoreUpdate(result,result.s);
+}
 async function runBrowserAIWhisper(automatic=false,force=false){
   const entry=pronunciationTarget(),blob=lb;
   if(!entry||whisperJob)return;
@@ -2339,20 +3227,22 @@ async function runBrowserAIWhisper(automatic=false,force=false){
   whisperStatus(entry,'Đang chuẩn bị bản ghi cho Whisper…');
   refreshWhisper(entry);
   try{
-     const text=await transcribeEnglish(blob,controller.signal,(stage,loaded,total)=>{
+     const transcription=await transcribeEnglish(blob,controller.signal,(stage,loaded,total)=>{
        if(controller.signal.aborted)return;
        if(stage==='assets'){state.progress=Math.max(state.progress||0,5+Math.round(35*loaded/total));whisperStatus(entry,`Đang chuẩn bị Whisper (${loaded}/${total} tài nguyên)…`)}
        else if(stage==='decode'){state.progress=Math.max(state.progress||0,5);whisperStatus(entry,'Đang đọc bản ghi âm…')}
        else if(stage==='model'){state.progress=Math.max(state.progress||0,55);whisperStatus(entry,'Đang mở Whisper trên thiết bị…')}
        else{state.progress=Math.max(state.progress||0,78);whisperStatus(entry,'Whisper đang chép lời tiếng Anh…')}
-    });
+    },false,true);
     if(controller.signal.aborted)return;
+    const text=transcription.text;state.timestamps=transcription.timestamps;
     state.text=text;state.progress=100;
     if(text){
       if(automatic&&field?.isConnected&&!S.result){
         const spoken=field.value.trim()||text;if(!field.value.trim()){field.value=text;resetPronunciationConfirmation()}
         const draft=S?.pronDraft;if(draft&&draft.blob===blob){draft.text=spoken;const pron=draft.pron??={reference:spoken,checks:{}};pron.mode='self';pron.reference=spoken;pron.note='Đang đối chiếu cách phát âm từ bản ghi…';refreshPronunciation(draft);await measurePronunciation()}
       }
+      if(S?.result?.whisper===state)applyWordTimingToResult(S.result,state.timestamps,text);
       whisperStatus(entry,'Đã chép lời bằng Whisper. Bạn có thể nghe lại và sửa bản chép lời.');
     }else whisperStatus(entry,'Chưa tìm được lời nói rõ trong bản ghi. Bạn có thể ghi lại hoặc nhập câu trả lời.');
   }catch{
@@ -2377,10 +3267,8 @@ async function applyWhisperText(){
   }
   const language=analyzeAnswerLanguage(text);
   if(!language.allowed){whisperStatus(entry,answerLanguageMessage(language));return}
-  const relevance=analyzeAnswerRelevance(text,entry.x.q,entry.x.t);
-  if(!relevance.allowed){whisperStatus(entry,answerScoringMessage(text,entry.x.q,entry.x.t));return}
   whisperStatus(entry,'Đang kiểm tra câu tiếng Anh và từ vựng ngoại tuyến…');
-  let revised;try{revised=await scoreWithDictionary(text,entry.x.p,entry.blob?entry.duration:0,entry.x.q,entry.x.t)}catch{revised=score(text,entry.x.p,entry.blob?entry.duration:0,entry.x.q,entry.x.t);if(revised)revised.metrics.spellingStatus='unavailable'}
+   let revised;try{revised=await scoreWithDictionary(text,entry.x.p,entry.blob?entry.duration:0,entry.x.q,entry.x.t,{onUpdate:updated=>applyDictionaryScoreUpdate(entry,updated)})}catch{revised=score(text,entry.x.p,entry.blob?entry.duration:0,entry.x.q,entry.x.t);if(revised)revised.metrics.spellingStatus='unavailable'}
   if(S?.result!==entry)return;
   if(!revised){
     whisperStatus(entry,answerScoringMessage(text,entry.x.q,entry.x.t));
@@ -2390,7 +3278,7 @@ async function applyWhisperText(){
   Object.assign(entry.s,revised,{p:pronunciation});
   if(pronunciation==null){delete entry.s.pronBasis;delete entry.history.pronBasis;if(entry.pron&&entry.pron.assessment?.reference!==text)entry.pron.assessment=null}
   else{entry.s.pronBasis='acoustic-v1';entry.history.pronBasis='acoustic-v1'}
-  entry.s.o=Math.min(entry.s.metrics?.overallCeiling??Infinity,practiceBand(entry.s));
+   entry.s.o=practiceBand(entry.s);
   Object.assign(entry.history,{f:revised.f,l:revised.l,g:revised.g,p:pronunciation,o:entry.s.o,updated:Date.now()});
   entry.text=text;
   entry.wordIdeasReady=false;entry.wordIdeasError=false;
@@ -3064,6 +3952,9 @@ const activeAnalyses=new Map();
 const COOP_SESSION_KEY='epu-coop-session';
 let coopSession=null,coopSocket=null,coopStatus='',coopReconnectTimer=null,coopReconnects=0,coopPageLeaving=false,coopLastConnectAt=0;
 const COOP_AUDIO_LIMIT=550*1024;
+let coopGameSetup=null,coopGameClock=null,coopGameClockOffset=0,coopGamePending=false,coopGameDraft='',coopGameDraftKey='',coopGameSynchronized=false;
+let coopGameAudio=null;
+const coopMutedGamePlayers=new Set();
 let coopCapture=null,coopRecording=null,coopRecordState='idle',coopRecordStatus='Chưa ghi âm câu trả lời.',coopRecordSeconds=0,coopRecordInterval=null,coopTranscriptionController=null,coopTranscriptProgress=0;
 let coopAnswerDraft='',coopAnswerPending=false,coopChatDraft='',coopChatPinnedToBottom=true;
 const coopAudioByTurn=new Map();
@@ -3074,6 +3965,236 @@ try{
 }catch{}
 
 function coopEndpoint(){return String(st.coop?.endpoint||'').replace(/\/+$/,'')}
+function openArcadeOnline(form){
+ const game=arcadeSelection;
+ if(!game)return;
+ const topic=ARCADE_TOPICS.find(item=>String(item.topic)===form.elements.topic?.value);
+ coopGameSetup={id:game.id,topic:TP[(topic||arcadePick(ARCADE_TOPICS)).topic][0]};
+ go('coop');
+}
+function openSpeakingCoop(){
+ coopGameSetup=null;
+ go('coop');
+}
+function coopGameLanding(config){
+ const game=GAMES.find(item=>item.id===coopGameSetup.id),enabled=Boolean(coopEndpoint());
+ return `${pageIntro('GÓC CHƠI · COOP',game.name,'Tạo phòng cho 2–4 người hoặc nhập mã phòng bạn đã nhận.')}
+ ${config}<div class="coop-grid">
+ <form class="c" data-coop-game="1" onsubmit="event.preventDefault();createCoopRoom(this)"><h2>Tạo phòng trò chơi</h2>
+ <label>Tên hiển thị<input name="name" maxlength="32" value="${esc(st.p.n||'Người chơi')}" required></label>
+ <button type="submit"${enabled?'':' disabled'}>Tạo phòng trò chơi</button></form>
+ <form class="c" onsubmit="event.preventDefault();joinCoopRoom(this)"><h2>Tham gia bằng mã</h2>
+ <label>Tên hiển thị<input name="name" maxlength="32" value="${esc(st.p.n||'Người chơi')}" required></label>
+ <label>Mã phòng<input name="code" maxlength="7" pattern="[A-HJ-NP-Z2-9a-hj-np-z]{7}" autocomplete="off" required></label>
+ <button type="submit"${enabled?'':' disabled'}>Tham gia</button></form></div>
+ <p class="mu" role="status">${esc(coopStatus)}</p><button class="g" type="button" onclick="go('games')">← Về sảnh trò chơi</button>`;
+}
+function coopGameSeconds(game){
+ const now=Date.now()+coopGameClockOffset;
+ return Math.max(0,Math.ceil((game.deadline==null?game.payload.remaining||0:game.deadline-now)/1000));
+}
+function coopGameName(state,id){
+ return state.players.find(player=>player.id===id)?.name||state.game?.payload.names[id]||'Người chơi';
+}
+function coopGameConnected(){return coopSocket?.readyState===1&&navigator.onLine!==false&&coopGameSynchronized}
+function coopGamePrompt(game){
+ const p=game.payload,muted=coopMutedGamePlayers.has(p.author);
+ if(game.id==='letter-link'){
+  const index=TP.findIndex(row=>row[0]===p.topic);
+  return `<p class="eyebrow">${esc(TOPIC_LABELS[index]||p.topic)}</p>
+   <h2>${p.last?'Tìm từ bắt đầu bằng '+esc(p.last.at(-1).toUpperCase()):'Bắt đầu một chuỗi mới'}</h2>
+   <p>${p.last?'Từ trước <b lang="en">'+esc(p.last)+'</b> · ':''}${p.used.length} từ đã dùng.</p>
+   <p class="mu">Máy người gửi kiểm tra từ điển ngoại tuyến và nhóm chủ đề. Máy chủ chỉ kiểm tra luật cơ bản của từ. Thêm một câu dùng lại từ để lấy điểm thưởng. Nếu bí từ, hãy bỏ qua để bắt đầu chuỗi mới.</p>`;
+ }
+ if(game.id==='word-lock'){
+  if(p.stage==='describe')return p.word?`<p class="eyebrow">LƯỢT MÔ TẢ</p><h2 lang="en">${esc(p.word)}</h2>
+   <p>Từ cấm <b lang="en">${p.blocked.map(esc).join(' · ')}</b></p><p>Mô tả bằng tiếng Anh. Mỗi từ cấm làm mất 2 điểm của vòng.</p>`
+   :'<h2>Đang chờ lời mô tả</h2><p>Chỉ người mô tả được thấy từ bí mật.</p>';
+  return `<p class="eyebrow">LƯỢT ĐOÁN</p><h2>Từ tiếng Anh nào đang ẩn?</h2>
+   ${p.description?`<p lang="en">${muted?'[Đã tắt nội dung của người mô tả]':esc(p.description)}</p>`:''}
+   ${p.penalty?`<p class="mu">Trừ ${p.penalty} điểm vì lời mô tả chứa từ cấm.</p>`:''}
+   <ol>${p.clues.map((clue,index)=>`<li><small>${['Định nghĩa','Cụm từ đi kèm','Câu ví dụ'][index]}</small><p lang="en">${esc(clue)}</p></li>`).join('')}</ol>`;
+ }
+ const lines=p.lines.filter(row=>!coopMutedGamePlayers.has(row.playerId));
+ return `<p class="eyebrow">LUẬT CỦA LƯỢT</p><h2>${esc(p.label)}</h2>
+  <p lang="en">${esc(lines.at(-1)?.text||p.opening)}</p><details><summary>Xem cách dùng</summary><p lang="en">${esc(p.example)}</p></details>`;
+}
+function coopGameChat(state){
+ const chat=(state.chat||[]).filter(row=>!coopMutedGamePlayers.has(row.playerId)).slice(-30);
+ return `<section class="c"><h2>Chat trong phòng</h2><div class="arcade-online-chat coop-chat-log" role="log" aria-label="Tin nhắn trong phòng">
+ ${chat.map(row=>`<div class="coop-chat-message"><div>${esc(coopGameName(state,row.playerId))}</div><p>${esc(row.text)}</p></div>`).join('')||'<p class="mu">Chưa có tin nhắn.</p>'}</div>
+ <form class="coop-chat-send" onsubmit="event.preventDefault();sendCoopGameChat(this)">
+ <label>Tin nhắn<input name="gameChat" maxlength="500" autocomplete="off" required></label>
+ <button type="submit"${coopGameConnected()?'':' disabled'}>Gửi</button></form></section>`;
+}
+function coopGamePage(state){
+ const game=state.game,options=state.gameOptions,gameInfo=GAMES.find(item=>item.id===(game?.id||options?.id));
+ const host=state.hostId===coopSession.playerId,connected=coopGameConnected(),online=state.players.filter(player=>player.online).length;
+ const players=state.players.map(player=>`<li class="arcade-chip">${esc(player.name)} · ${player.id===state.hostId?'chủ phòng · ':''}${player.online?'đang kết nối':'mất kết nối'}
+ ${player.id!==coopSession.playerId?`<button class="g" type="button" data-player="${esc(player.id)}" onclick="muteCoopGamePlayer(this.dataset.player)" aria-pressed="${coopMutedGamePlayers.has(player.id)}">${coopMutedGamePlayers.has(player.id)?'Bật lại':'Tắt tiếng'}</button>`:''}</li>`).join('');
+ const header=`<section class="c"><p class="eyebrow">GÓC CHƠI · COOP</p><h1>${esc(gameInfo?.name||'Phòng trò chơi')}</h1>
+ <div class="row"><p>Mã phòng <span class="coop-room-code">${esc(coopSession.roomCode)}</span></p><button class="g" type="button" onclick="copyCoopCode()">Sao chép mã</button></div>
+ <ul class="arcade-online-players">${players}</ul><p class="mu" role="status" id="coop-status">${esc(coopStatus)}</p>
+ <button class="g" type="button" onclick="leaveCoopGameRoom()">Rời phòng</button>
+ <details><summary>Tài nguyên chép lời trên thiết bị</summary><label>Chọn thư mục assets <input type="file" webkitdirectory multiple onchange="arcadeImportAssets(this)"></label><small id="arcade-asset-status" role="status">${arcadeAssetFiles.size?arcadeAssetFiles.size+' tệp sẵn sàng.':'Chọn thư mục đi kèm nếu chưa có mô hình Whisper trên thiết bị.'}</small></details></section>`;
+ if(state.phase==='expired')return header+'<p class="c">Phòng đã hết hạn. Bạn có thể tạo phòng mới.</p>';
+ let panel;
+ if(!game||game.payload.stage==='done'){
+  const scores=game?Object.entries(game.scores).map(([id,score])=>`<li>${esc(coopGameName(state,id))} · ${Number(score)||0} điểm</li>`).join(''):'';
+  const lines=game?.payload.lines?.filter(row=>!coopMutedGamePlayers.has(row.playerId))||[];
+  panel=`<section class="c"><h2>${game?(game.payload.completed?'Kết quả ván chơi':'Ván đã đóng vì thiếu người'):'Chờ bắt đầu ván'}</h2>
+  ${scores?'<ul>'+scores+'</ul>':''}
+  ${game?.payload.opening?`<h3>Câu chuyện</h3><p lang="en">${esc(game.payload.opening)}</p>
+  <ol class="arcade-story">${lines.map(row=>`<li lang="en">${esc(row.text)}</li>`).join('')}</ol>
+  ${lines.length?`<h3>Câu nổi bật</h3><p lang="en">${esc(lines.slice().sort((a,b)=>b.points-a.points)[0].text)}</p>`:''}`:''}
+  <p>${host?(online<2?'Cần ít nhất hai người đang kết nối.':'Bạn có thể mở ván mới.'):'Đợi chủ phòng mở ván.'}</p>
+  ${host?`<button type="button" onclick="sendCoopGame('start')"${online<2||!connected||coopGamePending?' disabled':''}>Bắt đầu ván</button>`:''}</section>`;
+ }else{
+  const p=game.payload,own=game.turn===coopSession.playerId,waiting=p.pausedUntil!=null;
+  const ready=own&&!waiting&&connected&&!coopGamePending;
+  panel=`<section class="c"><div class="arcade-hud">
+  <div class="arcade-clock" aria-hidden="true"><svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="25"/><circle id="coop-game-ring" cx="30" cy="30" r="25" pathLength="100" stroke-dasharray="100" transform="rotate(-90 30 30)"/></svg><span id="coop-game-seconds">${coopGameSeconds(game)}s</span></div>
+  <span class="arcade-chip">Vòng ${game.round}/${p.rounds}</span><span class="arcade-chip" role="status">${own?'Đến lượt bạn':'Đến lượt '+esc(coopGameName(state,game.turn))}</span>
+  <span class="arcade-chip">${Number(game.scores[coopSession.playerId])||0} điểm</span></div>
+  ${waiting?'<p class="mu" role="status">Đồng hồ đang tạm dừng để chờ người chơi kết nối lại.</p>':''}
+  ${p.lastResult&&!coopMutedGamePlayers.has(p.lastResult.playerId)?`<p class="mu">${esc(coopGameName(state,p.lastResult.playerId))} · +${p.lastResult.points} điểm ${esc(p.lastResult.text)}</p>`:''}
+  <div class="arcade-prompt">${coopGamePrompt(game)}</div>
+  ${own?`<form class="arcade-answer" onsubmit="event.preventDefault();void submitCoopGame(this)">
+   <label>Câu trả lời tiếng Anh<textarea name="gameAnswer" lang="en" maxlength="280" rows="3" oninput="coopGameDraft=this.value">${esc(coopGameDraft)}</textarea></label>
+   <div class="row"><button id="coop-game-submit" type="submit"${ready?'':' disabled'}>Gửi câu trả lời</button>
+   <button class="g" type="button" onclick="void toggleCoopGameMic()"${ready?'':' disabled'}>${coopGameAudio?.label||'Ghi âm'}</button>
+   ${game.id==='word-lock'&&p.stage==='guess'&&p.clues.length<3?`<button class="g" type="button" onclick="sendCoopGame('hint')"${ready?'':' disabled'}>Mở thêm manh mối</button>`:''}
+   <button class="g" type="button" onclick="sendCoopGame('skip')"${ready?'':' disabled'}>Bỏ qua lượt</button></div>
+   <small role="status">${esc(coopGameAudio?.status||'Bạn có thể gõ tay. Bản chép lời từ micro chỉ được điền trong thời gian của lượt.')}</small></form>`:''}</section>`;
+ }
+ return header+panel+coopGameChat(state);
+}
+function muteCoopGamePlayer(id){
+ if(coopMutedGamePlayers.has(id))coopMutedGamePlayers.delete(id);else coopMutedGamePlayers.add(id);
+ renderCoopLive();
+}
+function sendCoopGameChat(form){
+ const input=form.elements.gameChat;
+ if(sendCoopMessage({type:'chat',text:input.value.trim()}))input.value='';
+}
+function clearCoopGameAudio(){
+ const capture=coopGameAudio;
+ coopGameAudio=null;
+ if(!capture)return;
+ capture.controller?.abort();
+ clearTimeout(capture.timer);
+ releaseRecorder(capture,true);
+}
+async function toggleCoopGameMic(){
+ const game=coopSession?.state?.game;
+ if(!game||game.turn!==coopSession.playerId||!coopGameConnected()||!game.deadline||!coopGameSeconds(game))return;
+ const existing=coopGameAudio;
+ if(existing?.recorder?.state==='recording'){existing.recorder.stop();return}
+ if(existing?.label==='Gõ tay'){clearCoopGameAudio();renderCoopLive();return}
+ const capture={chunks:[],label:'Gõ tay',status:'Đang mở micro…'};
+ clearCoopGameAudio();coopGameAudio=capture;renderCoopLive();
+ try{
+  if(!navigator.mediaDevices?.getUserMedia||typeof MediaRecorder!=='function')throw new DOMException('Unsupported','NotSupportedError');
+  if(!supportsLocalTranscription())throw new DOMException('Transcription unavailable','NotSupportedError');
+  const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+  if(coopGameAudio!==capture){releaseStream(stream);return}
+  capture.stream=stream;capture.recorder=new MediaRecorder(stream);
+  capture.recorder.ondataavailable=event=>{if(event.data?.size)capture.chunks.push(event.data)};
+  capture.recorder.onerror=()=>{clearCoopGameAudio();renderCoopLive()};
+  capture.recorder.onstop=async()=>{
+   if(coopGameAudio!==capture)return;
+   const blob=new Blob(capture.chunks,{type:capture.recorder.mimeType||capture.chunks[0]?.type||''});
+   releaseRecorder(capture,true);
+   const draft=coopGameDraft,controller=new AbortController();
+   capture.controller=controller;capture.label='Gõ tay';capture.status='Đang chép lời trên thiết bị…';
+   capture.timer=setTimeout(()=>controller.abort(),Math.max(100,game.deadline-Date.now()-coopGameClockOffset));
+   renderCoopLive();
+   try{
+    const text=blob.size?arcadeText(await transcribeEnglish(blob,controller.signal,()=>{},true)):'';
+    if(coopGameAudio!==capture)return;
+    if(text&&coopGameDraft===draft){coopGameDraft=text;capture.status='Đã chép lời. Kiểm tra và sửa trước khi gửi.'}
+    else capture.status=text?'Đã giữ phần bạn đang gõ.':'Không nhận ra lời nói. Hãy gõ câu trả lời.';
+   }catch{capture.status='Chưa chép lời kịp. Bạn có thể gõ tay.'}
+   finally{clearTimeout(capture.timer)}
+   if(coopGameAudio!==capture)return;
+   capture.label='Ghi âm lại';capture.controller=null;renderCoopLive();
+  };
+  capture.recorder.start();capture.label='Dừng ghi âm';capture.status='Đang ghi âm. Đồng hồ của phòng vẫn chạy.';
+  renderCoopLive();
+ }catch(error){
+  if(coopGameAudio!==capture)return;
+  releaseRecorder(capture,true);
+  capture.label='Ghi âm';capture.status=recordingError(error)+' Bạn có thể gõ tay.';
+  renderCoopLive();
+ }
+}
+function sendCoopGame(action,text){
+ const game=coopSession?.state?.game;
+ const payload=action==='start'?{}
+  :{runId:game?.payload.runId,step:game?.payload.step,...(typeof text==='string'?{text}:{})};
+ if(coopGamePending||!coopGameConnected()||!sendCoopMessage({type:'game',action,payload}))return;
+ coopGamePending=true;
+ renderCoopLive();
+}
+async function submitCoopGame(form){
+ const state=coopSession?.state,game=state?.game,text=form.elements.gameAnswer.value.trim();
+ if(!game||!text||game.turn!==coopSession.playerId||coopGamePending||!coopGameConnected())return;
+ if(text.length>280)return;
+ if(game.id==='letter-link'){
+  const word=text.match(/^([a-z]{3,24})(?=$|[\s.!?:,;–—])/i)?.[1].toLowerCase();
+  const topic=ARCADE_TOPICS.find(item=>TP[item.topic][0]===game.payload.topic);
+  if(!word||!topic?.words.includes(word)||!await arcadeLookup(word)){
+   coopStatus='Hãy chọn một từ có trong từ điển ngoại tuyến của chủ đề này.';renderCoopLive();return;
+  }
+  const current=coopSession?.state?.game;
+  if(current?.payload.runId!==game.payload.runId||current?.payload.step!==game.payload.step)return;
+ }
+ sendCoopGame('submit',text);
+}
+function leaveCoopGameRoom(){
+ if(!coopGameConnected()||coopSession?.state?.phase==='expired'){leaveCoop();return}
+ if(coopGamePending)return;
+ coopGamePending='leave';
+ if(!sendCoopMessage({type:'game',action:'leave',payload:{}}))coopGamePending=false;
+}
+function receiveCoopGameState(state){
+ const game=state.game;
+ if(!state.players.some(player=>player.id===coopSession.playerId)){leaveCoop();return}
+ if(Number.isFinite(state.serverNow))coopGameClockOffset=state.serverNow-Date.now();
+ coopGameSynchronized=true;
+ const key=game?game.payload.runId+':'+game.payload.step:'';
+ if(key!==coopGameDraftKey||game?.payload.stage==='done'){
+  coopGameDraftKey=key;coopGameDraft='';clearCoopGameAudio();
+ }
+ if(game?.payload.pausedUntil)clearCoopGameAudio();
+ coopGamePending=false;
+ if(game?.payload.stage==='done'&&game.payload.completed&&Object.hasOwn(game.scores,coopSession.playerId)){
+  const saved=storedEpu(),row={id:game.payload.runId+'_'+coopSession.playerId,game:game.id,mode:'online',at:game.payload.finishedAt,points:Number(game.scores[coopSession.playerId])||0};
+  const history=mergeArcadeHistory(st.games,saved?.games);
+  if(!history.runs.some(run=>run.id===row.id)){
+   st.games=mergeArcadeHistory(history,{runs:[row]});
+   st.game=mergeGame(mergeGame(st.game,saved?.game),{events:[{id:row.id,type:'game',at:row.at,xp:game.payload.earned?ARCADE_XP:0}]});
+   sv(false);
+  }
+ }
+ renderCoopLive();
+}
+function updateCoopGameClock(){
+ clearInterval(coopGameClock);coopGameClock=null;
+ const game=tab==='coop'&&coopSession?.state?.phase==='playing'?coopSession.state.game:null;
+ if(!game)return;
+ const total=game.id==='letter-link'?12:game.id==='word-lock'?30:35;
+ const tick=()=>{
+  const label=$('#coop-game-seconds'),ring=$('#coop-game-ring'),seconds=coopGameSeconds(game);
+  if(label)label.textContent=seconds+'s';
+  if(ring)ring.setAttribute('stroke-dashoffset',String(100*(1-Math.min(1,seconds/total))));
+  if(!seconds){
+   clearCoopGameAudio();
+   const button=$('#coop-game-submit');if(button)button.disabled=true;
+  }
+ };
+ tick();coopGameClock=setInterval(tick,200);
+}
 function coopMessengerPanel(){
  return '<section class="c coop-messenger-panel"><p class="eyebrow">TRAO ĐỔI QUA FACEBOOK</p><h2>Messenger Web</h2><p>Dùng Messenger để nhắn tin hoặc gọi cho bạn học. Sao chép mã phòng ở thẻ phía trên, gửi cho bạn học qua Messenger, rồi quay lại EPU để luyện nói và góp ý theo lượt.</p><a class="coop-messenger-link" href="https://www.facebook.com/messages/t" target="_blank" rel="noopener noreferrer">Mở Messenger trên web ↗</a><p class="mu">Messenger mở ở thẻ mới. Bạn tự chọn người nhận và đăng nhập Facebook nếu được yêu cầu; EPU không đọc hay đồng bộ tin nhắn/cuộc gọi Messenger.</p></section>';
 }
@@ -3085,12 +4206,15 @@ function coopRecordingPanel(maxSeconds){
 }
 function renderCoopLive(){
  if(tab!=='coop')return;
+ const gameState=coopSession?.state?.game;
  const main=$('#m'),fields=Array.from(main.querySelectorAll('input[name],textarea[name],select[name]'));
  const snapshot=fields.map(field=>({name:field.name,tag:field.tagName,type:field.type,value:field.value,checked:field.checked,start:field.selectionStart,end:field.selectionEnd}));
  const focused=fields.includes(document.activeElement)?{name:document.activeElement.name,tag:document.activeElement.tagName}:null;
  render(false);
  const nextFields=Array.from(main.querySelectorAll('input[name],textarea[name],select[name]'));
- for(const saved of snapshot){const field=nextFields.find(item=>item.name===saved.name&&item.tagName===saved.tag);if(!field)continue;if(field.type==='checkbox'||field.type==='radio')field.checked=saved.checked;else field.value=saved.value}
+ for(const saved of snapshot){if(saved.name==='gameAnswer')continue;const field=nextFields.find(item=>item.name===saved.name&&item.tagName===saved.tag);if(!field)continue;if(field.type==='checkbox'||field.type==='radio')field.checked=saved.checked;else field.value=saved.value}
+ const ownTurn=gameState?.turn===coopSession?.playerId;
+ if(focused?.name==='gameAnswer'&&!ownTurn)return;
  if(focused){const field=nextFields.find(item=>item.name===focused.name&&item.tagName===focused.tag);if(field){field.focus({preventScroll:true});const saved=snapshot.find(item=>item.name===focused.name&&item.tag===focused.tag);if(saved&&saved.start!=null&&field.setSelectionRange)try{field.setSelectionRange(saved.start,saved.end)}catch{}}}
 }
 function coopPage(){
@@ -3103,6 +4227,8 @@ function coopPage(){
   <form class="row" onsubmit="event.preventDefault();saveCoopEndpoint(this)"><label class="grow">Địa chỉ Worker<input name="endpoint" type="text" inputmode="url" autocapitalize="none" spellcheck="false" value="${esc(endpoint)}" placeholder="ten-worker.ten-tai-khoan.workers.dev" required></label><button type="submit">Kiểm tra và lưu</button></form>
   <p class="coop-notice mu" id="coop-endpoint-status" role="status" aria-live="polite">${endpoint?'Địa chỉ đã lưu trên thiết bị này. Hãy gửi cùng địa chỉ cho bạn học.':'Chưa kết nối backend coop.'}</p>
   <p class="mu">Có thể dán tên miền Worker hoặc URL đầy đủ; app tự thêm <code>https://</code> nếu thiếu. Chỉ dán địa chỉ gốc, không thêm <code>/health</code>. Địa chỉ được lưu riêng trên thiết bị này. Coop cần mở EPU bằng HTTPS; mở file HTML offline không đồng bộ phòng.</p></section>`;
+ if(!coopSession&&coopGameSetup)return coopGameLanding(config);
+ if(coopSession?.state?.mode==='game')return coopGamePage(coopSession.state);
  if(!coopSession)return `${pageIntro('HỌC CÙNG BẠN','Coop 2 người','Luyện theo cặp: một người trả lời, người kia góp ý theo tiêu chí rõ ràng. Không tự bịa band điểm cho phiên coop.')}${config}
   <div class="coop-grid"><form class="c" onsubmit="event.preventDefault();createCoopRoom(this)"><h2>Tạo phòng mới</h2><label>Tên hiển thị<input name="name" maxlength="32" value="${esc(st.p.n||'Người nói 1')}" required></label>
    <div class="field-grid"><label>Part<select name="part"><option value="1">Part 1 · câu hỏi ngắn</option><option value="2">Part 2 · cue card</option><option value="3">Part 3 · thảo luận</option></select></label><label>Chủ đề<select name="topic">${TP.map((row,index)=>`<option value="${index}">${esc(TOPIC_LABELS[index]||row[0])}</option>`).join('')}</select></label></div>
@@ -3160,6 +4286,8 @@ async function coopGetIceServers(){
  return fallback;
 }
 function coopSaveSession(data,endpoint,name){
+ coopGameSynchronized=false;coopGamePending=false;coopGameDraft='';coopGameDraftKey='';coopLastConnectAt=0;
+ coopMutedGamePlayers.clear();
  coopSession={endpoint,roomCode:data.roomCode,playerId:data.playerId,playerToken:data.playerToken,displayName:name,state:data.state||null};
  try{sessionStorage.setItem(COOP_SESSION_KEY,JSON.stringify(coopSession))}catch{}
  coopStatus='Đã vào phòng. Đang đồng bộ với bạn học…';coopReconnects=0;
@@ -3167,6 +4295,18 @@ function coopSaveSession(data,endpoint,name){
 }
 async function createCoopRoom(form){
  const button=form.querySelector('[type="submit"]');if(button)button.disabled=true;
+ if(form.dataset.coopGame==='1'){
+  try{
+   const name=form.elements.name.value.trim(),setup=coopGameSetup;
+   const response=await fetch(coopEndpoint()+'/health',{cache:'no-store',signal:AbortSignal.timeout(8000)});
+   const health=await response.json();
+   if(!response.ok||!Array.isArray(health.games)||!health.games.includes(setup.id))throw Error('Worker chưa hỗ trợ trò này. Hãy triển khai bản Worker mới.');
+   const data=await coopPost('/api/rooms',{displayName:name,mode:'game',gameId:setup.id,gameTopic:setup.topic});
+   if(data.state?.mode!=='game')throw Error('Worker chưa tạo được phòng trò chơi.');
+   coopSaveSession(data,coopEndpoint(),name);
+  }catch(error){coopStatus=error.message||'Không tạo được phòng trò chơi.';if(button)button.disabled=false;renderCoopLive()}
+  return;
+ }
  try{const name=form.elements.name.value.trim(),part=Number(form.elements.part.value),topicIndex=Number(form.elements.topic.value),row=TP[topicIndex];if(!row)throw new Error('Chủ đề không hợp lệ.');
   const prompts=part===1?row[1].slice(0,4):part===2?[row[2],row[2]]:row[3].slice(0,4);if(prompts.length<2)throw new Error('Chủ đề này chưa có đủ câu hỏi để đổi lượt.');
   const data=await coopPost('/api/rooms',{displayName:name,part,topic:TOPIC_LABELS[topicIndex]||row[0],prompts});coopSaveSession(data,coopEndpoint(),name)
@@ -3174,29 +4314,59 @@ async function createCoopRoom(form){
 }
 async function joinCoopRoom(form){
  const button=form.querySelector('[type="submit"]');if(button)button.disabled=true;
- try{const name=form.elements.name.value.trim(),code=form.elements.code.value.trim().toUpperCase();const data=await coopPost(`/api/rooms/${encodeURIComponent(code)}/join`,{displayName:name});coopSaveSession(data,coopEndpoint(),name)}
+ try{const name=form.elements.name.value.trim(),code=form.elements.code.value.trim().toUpperCase();const data=await coopPost(`/api/rooms/${encodeURIComponent(code)}/join`,{displayName:name,...(coopGameSetup?{mode:'game'}:{})});coopSaveSession(data,coopEndpoint(),name)}
  catch(error){coopStatus=error.message||'Không tham gia được phòng.';if(button)button.disabled=false;render(false)}
 }
 function connectCoopSocket(){
  if(!coopSession||coopPageLeaving||coopSocket&&coopSocket.readyState<2)return;
  if(Date.now()-coopLastConnectAt<900)return;
  if(!('WebSocket'in window)){coopStatus='Trình duyệt này chưa hỗ trợ kết nối coop realtime.';return}
- let socketUrl;try{socketUrl=new URL(`/api/rooms/${encodeURIComponent(coopSession.roomCode)}/socket`,coopSession.endpoint);socketUrl.protocol='wss:';socketUrl.searchParams.set('playerId',coopSession.playerId);socketUrl.searchParams.set('token',coopSession.playerToken)}catch{coopStatus='Địa chỉ phòng không hợp lệ.';return}
+ let socketUrl;try{
+  socketUrl=new URL(`/api/rooms/${encodeURIComponent(coopSession.roomCode)}/socket`,coopSession.endpoint);
+  socketUrl.protocol=socketUrl.protocol==='http:'&&['127.0.0.1','localhost','[::1]'].includes(socketUrl.hostname)?'ws:':'wss:';
+  socketUrl.searchParams.set('playerId',coopSession.playerId);socketUrl.searchParams.set('token',coopSession.playerToken);
+ }catch{coopStatus='Địa chỉ phòng không hợp lệ.';return}
  try{
   coopLastConnectAt=Date.now();
-  coopSocket=new WebSocket(socketUrl.href);
-  coopSocket.addEventListener('open',()=>{coopReconnects=0;coopStatus='Đã kết nối trực tiếp với phòng.';flushCoopSignals();if(coopIceRestartPending)scheduleCoopIceRestart('Mạng đã kết nối lại',250);renderCoopLive()});
-  coopSocket.addEventListener('message',event=>{let message;try{message=JSON.parse(event.data)}catch{return}
+  const socket=new WebSocket(socketUrl.href);coopSocket=socket;
+  socket.addEventListener('open',()=>{if(coopSocket!==socket)return;coopReconnects=0;coopStatus='Đã kết nối trực tiếp với phòng.';flushCoopSignals();if(coopIceRestartPending)scheduleCoopIceRestart('Mạng đã kết nối lại',250);renderCoopLive()});
+  socket.addEventListener('message',event=>{if(coopSocket!==socket||!coopSession)return;let message;try{message=JSON.parse(event.data)}catch{return}
+   if(message.type==='state'&&message.state?.mode==='game'){
+    coopSession.state=message.state;coopStatus='Đang đồng bộ trực tiếp.';
+    try{sessionStorage.setItem(COOP_SESSION_KEY,JSON.stringify(coopSession))}catch{}
+    receiveCoopGameState(message.state);return;
+   }
+   if(coopSession.state?.mode==='game'&&['error','expired'].includes(message.type)){
+    coopGamePending=false;coopStatus=message.error||message.message||'Phòng đã kết thúc.';
+    if(message.type==='expired'){coopSession.state.phase='expired';coopGameSynchronized=false;try{sessionStorage.setItem(COOP_SESSION_KEY,JSON.stringify(coopSession))}catch{}}
+    renderCoopLive();return;
+   }
    if(message.type==='state'&&message.state){coopSession.state=message.state;try{sessionStorage.setItem(COOP_SESSION_KEY,JSON.stringify(coopSession))}catch{};const turnSpeaker=message.state.players?.[message.state.turn%2],ownAnswer=message.state.phase==='review'&&message.state.currentAnswer?.playerId===coopSession.playerId;if(message.state.phase!=='answer'||turnSpeaker?.id!==coopSession.playerId)coopAnswerPending=false;if(ownAnswer){coopAnswerDraft='';if(coopRecording){coopStoreAudio(message.state.turn,coopRecording.url);coopRecording=null;coopRecordState='idle';coopRecordStatus='Bản ghi đã gửi cho bạn học.'}}else if(turnSpeaker?.id!==coopSession.playerId)coopAnswerDraft='';coopStatus=message.state.phase==='waiting'?'Đang chờ bạn học tham gia…':'Đang đồng bộ trực tiếp.';renderCoopLive()}
    else if(message.type==='audio'&&Number.isInteger(message.turn)&&typeof message.audio==='string'&&message.audio.startsWith('data:audio/')){try{coopStoreAudio(message.turn,message.audio);renderCoopLive()}catch{coopStatus='Đã nhận bản ghi nhưng không giải mã được. Nhờ bạn học ghi và gửi lại.';renderCoopLive()}}
    else if(message.type==='signal'){void handleCoopSignal(message)}
     else if(message.type==='error'||message.type==='expired'){coopStatus=message.error||message.message||'Phòng đã kết thúc.';coopAnswerPending=false;if(message.type==='expired'){coopSession.state={...coopSession.state,phase:'expired'};endCoopCall(false,'Phòng đã hết hạn.')}else if(coopCallState!=='idle'&&/Tín hiệu cuộc gọi|Bạn học chưa kết nối/.test(coopStatus)){if(coopIceRestartPending||coopIceRestartAttempts>0){coopVoiceStatus='Đang chờ bạn học kết nối lại để tiếp tục cuộc gọi…';renderCoopLive()}else endCoopCall(false,coopStatus)}else renderCoopLive()}
   });
-   coopSocket.addEventListener('close',()=>{coopSocket=null;if(coopPageLeaving||!coopSession||coopSession.state?.phase==='expired')return;coopStatus='Mất kết nối. Đang tự kết nối lại…';renderCoopLive();const delay=Math.min(30000,1000*2**Math.min(coopReconnects++,5));clearTimeout(coopReconnectTimer);coopReconnectTimer=setTimeout(connectCoopSocket,delay)});
-  coopSocket.addEventListener('error',()=>{coopStatus='Không kết nối được Worker. Kiểm tra địa chỉ hoặc thử tải lại.';renderCoopLive()});
+  socket.addEventListener('close',event=>{
+   if(coopSocket!==socket)return;
+   coopSocket=null;coopGamePending=false;coopGameSynchronized=false;clearCoopGameAudio();
+   if(coopPageLeaving||!coopSession||coopSession.state?.phase==='expired')return;
+   if(event.code===4001){coopStatus='Phòng đang mở ở thẻ khác. Mở lại trang nếu muốn tiếp tục tại đây.';renderCoopLive();return}
+   coopStatus='Mất kết nối. Đang tự kết nối lại…';renderCoopLive();
+   const delay=Math.min(30000,1000*2**Math.min(coopReconnects++,5));
+   clearTimeout(coopReconnectTimer);coopReconnectTimer=setTimeout(connectCoopSocket,delay);
+  });
+  socket.addEventListener('error',()=>{if(coopSocket!==socket)return;coopStatus='Không kết nối được Worker. Kiểm tra địa chỉ hoặc thử tải lại.';renderCoopLive()});
  }catch{coopStatus='Không tạo được kết nối WebSocket.'}
 }
-function sendCoopMessage(message){if(!coopSocket||coopSocket.readyState!==WebSocket.OPEN){coopStatus='Chưa kết nối. Chờ kết nối lại rồi thử gửi.';renderCoopLive();return false}coopSocket.send(JSON.stringify(message));coopStatus='Đã gửi. Đang chờ đồng bộ…';return true}
+function sendCoopMessage(message){
+ try{
+  if(!coopSocket||coopSocket.readyState!==WebSocket.OPEN)throw Error('disconnected');
+  coopSocket.send(JSON.stringify(message));
+  coopStatus='Đã gửi. Đang chờ đồng bộ…';return true;
+ }catch{
+  coopStatus='Chưa kết nối. Chờ kết nối lại rồi thử gửi.';renderCoopLive();return false;
+ }
+}
 function stopCoopRecording(discard=false){
  const capture=coopCapture;if(!capture)return;
  capture.discard=discard;clearInterval(coopRecordInterval);coopRecordInterval=null;
@@ -3387,6 +4557,17 @@ function flushCoopSignals(){
  }
 }
 function handleCoopNetworkChange(online=true){
+ if(coopSession?.state?.mode==='game'){
+  if(!online){
+   coopGamePending=false;coopGameSynchronized=false;coopStatus='Đã mất mạng. Đang chờ kết nối lại…';
+   clearCoopGameAudio();
+   coopSocket?.close(1000,'Network unavailable');
+   renderCoopLive();
+  }else if(!coopSocket||coopSocket.readyState>=2){
+   coopReconnects=0;clearTimeout(coopReconnectTimer);coopLastConnectAt=0;connectCoopSocket();
+  }
+  return;
+ }
  if(coopCallState==='idle'||!coopPeer)return;
  if(!online){coopVoiceStatus='Mạng tạm ngắt. Cuộc gọi sẽ thử nối lại khi có mạng.';renderCoopLive();return}
  coopVoiceStatus='Đã có mạng trở lại. Đang thử làm mới cuộc gọi…';renderCoopLive();
@@ -3427,7 +4608,20 @@ function endCoopCall(notifyPeer=true,status='Cuộc gọi đã kết thúc.'){
 }
 function sendCoopReview(form){sendCoopMessage({type:'review',checks:{onTopic:form.elements.onTopic.checked,reasonExample:form.elements.reasonExample.checked,clear:form.elements.clear.checked},note:form.elements.note.value.trim()})}
 async function copyCoopCode(){try{await navigator.clipboard.writeText(coopSession?.roomCode||'');coopStatus='Đã sao chép mã phòng.'}catch{coopStatus='Không sao chép tự động được; bạn có thể ghi lại mã đang hiển thị.'}renderCoopLive()}
-function leaveCoop(){cancelCoopTranscription(false);coopPageLeaving=true;clearTimeout(coopReconnectTimer);endCoopCall(true,'Phiên coop đã kết thúc.');stopCoopRecording(true);if(coopRecording?.url?.startsWith('blob:'))URL.revokeObjectURL(coopRecording.url);coopRecording=null;coopRecordState='idle';coopRecordStatus='Chưa ghi âm câu trả lời.';coopTranscriptProgress=0;for(const src of coopAudioByTurn.values())if(src.startsWith('blob:'))URL.revokeObjectURL(src);coopAudioByTurn.clear();coopChatDraft='';coopAnswerDraft='';coopAnswerPending=false;coopSocket?.close(1000,'Participant left');coopSocket=null;coopPageLeaving=false;coopSession=null;coopStatus='Phiên đã đóng trên thiết bị này. Phòng sẽ tự hết hạn sau tối đa 2 giờ.';try{sessionStorage.removeItem(COOP_SESSION_KEY)}catch{}render(false)}
+function leaveCoop(){
+ cancelCoopTranscription(false);coopPageLeaving=true;clearTimeout(coopReconnectTimer);
+ endCoopCall(true,'Phiên coop đã kết thúc.');stopCoopRecording(true);
+ if(coopRecording?.url?.startsWith('blob:'))URL.revokeObjectURL(coopRecording.url);
+ coopRecording=null;coopRecordState='idle';coopRecordStatus='Chưa ghi âm câu trả lời.';coopTranscriptProgress=0;
+ for(const src of coopAudioByTurn.values())if(src.startsWith('blob:'))URL.revokeObjectURL(src);
+ coopAudioByTurn.clear();coopChatDraft='';coopAnswerDraft='';coopAnswerPending=false;
+ coopGamePending=false;coopGameSynchronized=false;coopGameDraft='';coopGameDraftKey='';coopMutedGamePlayers.clear();
+ clearCoopGameAudio();
+ coopSocket?.close(1000,'Participant left');coopSocket=null;coopPageLeaving=false;coopSession=null;
+ coopStatus='Phiên đã đóng trên thiết bị này. Phòng sẽ tự hết hạn sau tối đa 2 giờ.';
+ try{sessionStorage.removeItem(COOP_SESSION_KEY)}catch{}
+ render(false);
+}
 
 function start(parts,topic){
  stopQuickClock();stopPracticeMedia();
@@ -3479,6 +4673,14 @@ function retryCurrentAnswer(){
  S.retake=previous;S.retakeAudio=previousAudio;S.result=null;S.pronDraft=null;
  openView();
 }
+function rescoreIgnoringRelevance(){
+ if(!S?.result||S.mode==='exam')return;
+ const previous=S.result,audio={blob:previous.blob||null,duration:previous.duration||0};
+ stopCelebration();cancel();
+ S.retake=previous;S.retakeAudio=audio;S.result=null;S.pronDraft=null;S.ignoreRelevanceOnce=true;
+ lb=audio.blob;dur=audio.duration;openView();
+ showAfter(audio.blob,previous.text,'Đã bỏ qua kiểm tra chủ đề cho lượt chấm tiếp theo. Bạn vẫn có thể sửa transcript trước khi chấm.');
+}
 function restorePreviousAnswer(){
  if(!S?.retake)return;
  const previousAudio=S.retakeAudio;
@@ -3495,15 +4697,16 @@ async function ev(){
   if(S.mode==='baseline'&&(!lb||dur<30)){
    out.innerHTML='<p role="alert">Hãy ghi âm ít nhất 30 giây trước khi chấm mức xuất phát.</p>';return;
  }
- const session=S,text=input.value.trim(),language=analyzeAnswerLanguage(text);
+ const session=S,text=input.value.trim(),language=analyzeAnswerLanguage(text),ignoreRelevance=S.ignoreRelevanceOnce===true;
  if(!language.allowed){out.innerHTML='<p class="mu" role="alert">'+esc(answerLanguageMessage(language))+'</p>';input.focus();return}
- const relevance=analyzeAnswerRelevance(text,x.q,x.t);
- if(!relevance.allowed){out.innerHTML='<p class="mu" role="alert">'+esc(answerScoringMessage(text,x.q,x.t))+'</p>';input.focus();return}
+ const relevance=analyzeAnswerRelevance(text,x.q,x.t,{ignoreRelevance});
  if(text.length>3600){out.innerHTML='<p class="mu" role="alert">Câu trả lời tối đa 3.600 ký tự.</p>';input.focus();return}
+ S.ignoreRelevanceOnce=false;const previous=S.retake;let result=null;
  S.scoring=true;input.readOnly=true;const submit=$('#evaluate-answer');if(submit)submit.disabled=true;
- out.innerHTML='<p class="mu" role="status">Đang chấm ba tiêu chí và đối chiếu từ điển ngoại tuyến…</p>';
+ out.innerHTML='<p class="mu" role="status">Đang tính điểm cục bộ…</p>';
  let s;
- try{s=await scoreWithDictionary(text,x.p,lb?dur:0,x.q,x.t)}catch{s=score(text,x.p,lb?dur:0,x.q,x.t);if(s){s.metrics.spellingStatus='unavailable';s.metrics.spellingChecked=0}}
+ const wordTimings=S.pronDraft?.whisper?.timestamps||S.pronDraft?.timestamps||[];
+ try{s=await scoreWithDictionary(text,x.p,lb?dur:0,x.q,x.t,{ignoreRelevance,wordTimings,onUpdate:updated=>{if(result)applyDictionaryScoreUpdate(result,updated,previous)}})}catch{s=score(text,x.p,lb?dur:0,x.q,x.t,{ignoreRelevance,wordTimings});if(s){s.metrics.spellingStatus='unavailable';s.metrics.spellingChecked=0}}
  if(S!==session)return;
  S.scoring=false;input.readOnly=false;if(submit)submit.disabled=false;
  if(!s){
@@ -3512,8 +4715,7 @@ async function ev(){
   return;
  }
  const confirmed=$('#pron-confirm')?.checked;
- const previous=S.retake;
- const blob=lb,result={x,s,blob,text:input.value.trim(),m:null,state:blob?'pending':'no-recording',pron:S.pronDraft?.pron,whisper:S.pronDraft?.whisper,duration:dur,
+ const blob=lb;result={x,s,blob,text:input.value.trim(),m:null,state:blob?'pending':'no-recording',pron:S.pronDraft?.pron,whisper:S.pronDraft?.whisper,duration:dur,
    pathMode:S.mode==='baseline'?'baseline':null,quickMode:S.mode==='quick',pairPractice:x.pairPractice===true};
  if(activePronunciation&&activePronunciation.result===S.pronDraft)activePronunciation.result=result;
  cancelTranscription();S.pronDraft=null;$('#free-pron')?.remove();$('#ai-whisper-container')?.remove();
@@ -3587,6 +4789,7 @@ async function diagnose(result,blob,previous){
    activeAnalyses.delete(controller);
   }
   if(controller.signal.aborted)return;
+  if(result.m)applyPronunciationBand(result);
   recordPracticeLearning(result,previous,submittedAt);
   gameAudio(result,previous,submittedAt);
   if(result.quickMode){
@@ -3611,11 +4814,11 @@ async function diagnose(result,blob,previous){
 }
 
 async function offerAI(result){
- if(cloudHosted||typeof window.claude?.use!=='function')return;
+  if(typeof window.claude?.use!=='function')return;
  try{
   const target=$('#ai');
   if(tab==='prac'&&S?.result===result&&target&&await window.claude.use('sample')&&target.isConnected){
-   target.innerHTML='<button class="g w" onclick="ai()">Chẩn đoán chi tiết bằng AI</button>';
+    target.innerHTML='<p class="mu"><small>Nếu chọn chấm sâu, transcript và câu hỏi sẽ được gửi tới dịch vụ AI đang kết nối. Điểm cục bộ không bị thay đổi.</small></p><button class="g w" onclick="ai()">Chấm sâu bằng AI</button>';
   }
  }catch{}
 }
@@ -3623,26 +4826,42 @@ async function offerAI(result){
 async function ai(){
  const result=S?.result,target=$('#ai');
  if(!result||!target||typeof window.claude?.use!=='function')return;
- const {x,s,m,text}=result;
- const measure=m?`Âm vực ${m.f0?Math.round(m.f0)+' Hz':'chưa đo được'}, biên độ ngữ điệu ${m.st==null?'chưa đo được':m.st.toFixed(1)+' bán cung'}, âm lượng ${m.db.toFixed(0)} dBFS (độ lệch ${m.sd.toFixed(1)} dB), tỷ lệ nói ${Math.round(m.vr*100)}%, ${m.np} lần ngắt hơn 0,5 giây, SNR ${m.snr==null?'chưa đo được':m.snr.toFixed(0)+' dB'}`:'Chưa có số đo âm thanh';
- const prompt=`Hãy phản hồi bài luyện IELTS Speaking dưới đây bằng tiếng Việt, cụ thể và dễ áp dụng.
-Câu hỏi Part ${x.p}, chủ đề ${x.t}: ${x.q}
-Câu trả lời (có thể có lỗi nhận dạng): ${text}
-Điểm ước tính: Fluency ${s.f}, Lexical ${s.l}, Grammar ${s.g}, Pronunciation ${s.p??'chưa đo'}, tổng ${s.o}. ${s.n} từ${s.r?', '+s.r+' từ/phút':''}.
-Số đo âm thanh: ${measure}.
-Tóm tắt bài nói, nhận xét theo từng tiêu chí, chỉ ra những lỗi thực sự xuất hiện kèm câu sửa và gợi ý cách luyện. Cho một câu trả lời mẫu bằng tiếng Anh. Chỉ nhận xét chất giọng dựa trên số đo được cung cấp và nói rõ khi thiếu dữ liệu. Trình bày dạng văn bản thuần.`;
- target.innerHTML='<h3>Chẩn đoán bằng AI</h3><p id="aix" role="status" style="white-space:pre-wrap">Đang phân tích…</p>';
+ const {x,s,m,text}=result,hasAudio=Number.isFinite(audioBand(s));
+ const anchors=`Neo rubric (chỉ để thống nhất cách chấm, không sao chép câu trả lời):
+Band 4: “I like my town. It is nice. There are many things.” — ý đơn giản, lặp, phát triển hạn chế.
+Band 6: “I enjoy living there because the parks are close to my home. For example, I walk there after class, although it can be crowded.” — trả lời rõ, có giải thích/ví dụ, một số cấu trúc và lỗi nhỏ.
+Band 8: “What makes the area special is its balance of convenience and green space. Although traffic has increased, residents still have easy access to parks, which makes daily life more pleasant.” — phát triển ý mạch lạc, từ vựng linh hoạt/chính xác, cấu trúc đa dạng và phần lớn đúng.`;
+ const schema={f:'number 0..9',l:'number 0..9',g:'number 0..9',p:hasAudio?'number 0..9':'null',why:{f:'string',l:'string',g:'string',p:'string'}};
+ const prompt=`Chấm sâu câu trả lời IELTS Speaking bằng rubric bốn tiêu chí công khai (Fluency & Coherence, Lexical Resource, Grammatical Range & Accuracy, Pronunciation). Chỉ dùng bằng chứng trong transcript và số đo cung cấp; không suy đoán pronunciation nếu thiếu audio. Chọn điểm 0..9, có thể nửa band. Độ liên quan, nội dung trả lời và độ dài phải được xem xét. Chỉ trả một JSON object hợp lệ theo schema: ${JSON.stringify(schema)}. Mỗi why tối đa 180 ký tự, tiếng Việt.
+${anchors}
+Part ${x.p}, chủ đề ${x.t}, câu hỏi: ${x.q}
+Transcript: ${String(text||'').slice(0,3600)}
+Điểm cục bộ: f=${s.f}, l=${s.l}, g=${s.g}, p=${s.p??'null'}, tổng=${s.o}; số từ=${s.n}, WPM=${s.r??'chưa đo'}; độ liên quan=${m?.relevance?.status||'chưa kiểm tra'}, độ phủ=${m?.relevance?.coverage??'chưa đo'}; lỗi dò ngữ pháp=${m?.grammarFindings?.length??0}; số đo âm thanh=${m?JSON.stringify({pauses:m.np,voicedSeconds:m.voicedSeconds,snr:m.snr}):'không có'}.`;
+ target.innerHTML='<section class="c ai-score-card"><h3>Chấm sâu bằng AI</h3><p id="aix" role="status" aria-live="polite">Đang phân tích…</p></section>';
  const output=$('#aix');
  try{
   const sample=await window.claude.use('sample');
   if(!target.isConnected)return;
   if(!sample){output.textContent='Tính năng AI hiện không khả dụng.';return}
-  const response=await sample(prompt,{modelTier:'default',cache:false,onText:t=>{if(output.isConnected)output.textContent=t.text}});
-  if(output.isConnected)output.textContent=response.text;
+  const response=await Promise.race([sample(prompt,{modelTier:'default',cache:false}),new Promise((_,reject)=>setTimeout(()=>reject(Object.assign(Error('timeout'),{code:'timeout'})),30000))]);
+  if(!output.isConnected)return;
+  const source=String(response?.text||'').trim(),json=source.match(/\{[\s\S]*\}/)?.[0];
+  if(!json)throw Error('invalid_json');
+  const parsed=JSON.parse(json),keys=['f','l','g','p'],local={f:s.f,l:s.l,g:s.g,p:audioBand(s)},ai={};
+  for(const key of keys){
+   if(key==='p'&&local.p==null){ai.p=null;continue}
+   const value=Number(parsed[key]);if(!Number.isFinite(value)||value<0||value>9)throw Error('invalid_score');
+   ai[key]=Math.max(3.5,Math.min(9,Math.round(Math.max(local[key]-1,Math.min(local[key]+1,value))*2)/2));
+  }
+  ai.o=half(avg([ai.f,ai.l,ai.g,ai.p].filter(Number.isFinite)));ai.why={};
+  for(const key of keys)ai.why[key]=String(parsed.why?.[key]||'Chưa có nhận xét cụ thể.').slice(0,180);
+  result.aiScore=ai;
+  const labels={f:'Fluency & Coherence',l:'Lexical Resource',g:'Grammar',p:'Pronunciation'},rows=keys.filter(key=>Number.isFinite(ai[key])).map(key=>`<li><strong>${labels[key]}:</strong> Điểm AI ${ai[key].toFixed(1)} · điểm cục bộ ${local[key].toFixed(1)}<br>${esc(ai.why[key])}</li>`).join('');
+  output.innerHTML=`<strong>Điểm AI (đã giới hạn ±1,0 band mỗi tiêu chí): ${ai.o.toFixed(1)}</strong><p>Điểm cục bộ: ${s.o.toFixed(1)} · Điểm AI: ${ai.o.toFixed(1)}</p><ul>${rows}</ul><small>AI chỉ là ý kiến bổ sung; điểm cục bộ không đổi. Không phải kết quả IELTS chính thức.</small>`;
  }catch(error){
   if(!output.isConnected)return;
-  output.textContent=error?.code==='not_granted'?'Bạn có thể cho phép khi mở lại phần chẩn đoán.':error?.code==='rate_limited'?'Dịch vụ AI đang bận. Hãy thử lại sau ít phút.':'Chưa thể hoàn tất chẩn đoán bằng AI.';
-  target.insertAdjacentHTML('beforeend','<button class="g" onclick="ai()">Thử lại</button>');
+  output.textContent=error?.code==='not_granted'?'Bạn có thể cho phép khi mở lại phần chấm sâu.':error?.code==='rate_limited'?'Dịch vụ AI đang bận. Hãy thử lại sau ít phút.':error?.code==='timeout'?'AI phản hồi quá lâu. Điểm cục bộ vẫn dùng được; bạn có thể thử lại.':'Chưa nhận được JSON điểm hợp lệ. Điểm cục bộ vẫn dùng được.';
+  target.insertAdjacentHTML('beforeend','<button type="button" class="g" onclick="ai()">Thử lại</button>');
  }
 }
 
@@ -3967,6 +5186,8 @@ function animateBands(root){
 }
 function go(t,lesson){
  if(!Object.hasOwn(V,t)||(t===tab&&!lesson))return;
+ if(tab==='games')leaveArcade();
+ if(tab==='coop'&&t!=='coop')clearCoopGameAudio();
  if(tab==='coop'&&t!=='coop'){if(coopCallState!=='idle')endCoopCall(true,'Cuộc gọi đã kết thúc khi bạn rời phòng coop.');if(coopRecordState==='recording')stopCoopRecording();else if(coopRecordState==='opening')stopCoopRecording(true)}
  stopQuickClock();stopCelebration();
  if(tab==='library')libraryLeave();
@@ -3990,6 +5211,7 @@ function render(enter=false){
  if(tab==='library')void libraryRefresh();
   if(tab==='review')mountReviewPage();
   if(tab==='coop')connectCoopSocket();
+ updateCoopGameClock();
  document.querySelectorAll('[data-head-route]').forEach(button=>{
   if(button.dataset.headRoute===tab)button.setAttribute('aria-current','page');
   else button.removeAttribute('aria-current');
@@ -4004,7 +5226,8 @@ function render(enter=false){
   });
   animateBands(main);
  }
- $('#n').innerHTML=TABS.map(([id,label])=>`<button class="${id===tab?'on':''}"${id===tab?' aria-current="page"':''} onclick="go('${id}')">${icon(id,'nav-icon')}<span class="nav-label">${label}</span></button>`).join('');
+ const activeTab=tab==='games'?arcadeOrigin:tab;
+ $('#n').innerHTML=TABS.map(([id,label])=>`<button class="${id===activeTab?'on':''}"${id===activeTab?' aria-current="page"':''} onclick="go('${id}')">${icon(id,'nav-icon')}<span class="nav-label">${label}</span></button>`).join('');
  if(tab==='prac'&&S?.result){
   void loadWordSuggestions(S.result);
   if(S.result.state!=='pending')void offerAI(S.result);
@@ -4013,12 +5236,16 @@ function render(enter=false){
 themeMedia.addEventListener?.('change',updateTheme);
 window.addEventListener('pagehide',()=>{
  stopQuickClock();libraryLeave();
+ if(tab==='games')leaveArcade();
+ clearCoopGameAudio();clearInterval(coopGameClock);coopGameClock=null;
  abortExam();
  stopPronunciation();
  for(const [controller,result] of activeAnalyses){result.state='interrupted';controller.abort()}
  window.speechSynthesis?.cancel();
 });
 window.addEventListener('pageshow',event=>{
+ if(event.persisted&&tab==='games')render();
+ if(event.persisted&&tab==='coop'&&coopSession?.state?.mode==='game')renderCoopLive();
  if(event.persisted&&pronunciationTarget()?.pron)refreshPronunciation(pronunciationTarget());
  if(event.persisted&&S?.result?.state==='interrupted'&&$('#vx'))$('#vx').innerHTML=voiceResult(S.result);
 });
@@ -4478,21 +5705,24 @@ function applyPronunciationBand(result) {
   if(!result.s)return;
   const assessment=result.pron?.assessment;
   const band=result.blob&&result.duration>3&&assessment?.reference===result.text&&Number.isFinite(assessment.band)?assessment.band:null;
-  if(band===audioBand(result.s))return;
+  const metrics=result.s.metrics||{},previousF=result.s.f,previousBand=audioBand(result.s),previousPauseCount=metrics.pauseCount;
   result.s.p=band;
-  result.history.p=band;
+  if(result.history)result.history.p=band;
   if(band==null){
     delete result.s.pronBasis;
-    delete result.history.pronBasis;
+    if(result.history)delete result.history.pronBasis;
   }else{
     result.s.pronBasis='acoustic-v1';
-    result.history.pronBasis='acoustic-v1';
+    if(result.history)result.history.pronBasis='acoustic-v1';
   }
-  result.s.o=Math.min(result.s.metrics?.overallCeiling??Infinity,practiceBand(result.s));
-  Object.assign(result.history,{o:result.s.o,updated:Date.now()});
+  metrics.pauseCount=Number.isFinite(result.m?.np)?result.m.np:(Number.isFinite(metrics.timestampPauseCount)?metrics.timestampPauseCount:null);
+  metrics.audioPausePenalty=metrics.pauseCount==null?0:Math.min(.9,Math.max(0,metrics.pauseCount-1)*.12);
+  if(Number.isFinite(metrics.fluencyBase))refreshScoreTotals(result.s);
+  result.s.o=half(avg([result.s.f,result.s.l,result.s.g,audioBand(result.s)].filter(Number.isFinite)));
+  if(result.history)Object.assign(result.history,{f:result.s.f,p:band,o:result.s.o,updated:Date.now()});
   sv();
   const target=$('#result-scores');
-  if(target&&S?.result===result){
+  if(target&&S?.result===result&&(previousBand!==band||previousF!==result.s.f||previousPauseCount!==metrics.pauseCount)){
     target.innerHTML=scoreOverview(result);
     animateBands(target);
   }
@@ -4628,39 +5858,74 @@ function celebrateResult(){
  if(vibrate){try{navigator.vibrate?.(30)}catch{}}
 }
 
-function scoreExplanation(s){
+function scoreConfidence(result){
+ const s=result.s,p=audioBand(s),hasVoice=Boolean(result.m&&Number.isFinite(result.m.np));
+ return p!=null&&hasVoice?{label:'Cao',margin:.25}:s.metrics?.duration!=null?{label:'Vừa',margin:.4}:{label:'Thấp',margin:.5};
+}
+function scoreRange(result){const {margin}=scoreConfidence(result),value=result.s.o;return `${Math.max(0,value-margin).toFixed(1)}–${Math.min(9,value+margin).toFixed(1)}`}
+function scoreEvidenceMarkup(result){
+ const text=String(result.text||'').slice(0,3600),m=result.s.metrics||{},ranges=[];
+ const addOccurrences=(needle,kind,priority=2)=>{if(!needle)return;let from=0;while(from<text.length){const index=text.toLowerCase().indexOf(String(needle).toLowerCase(),from);if(index<0)break;ranges.push({start:index,end:index+String(needle).length,kind,priority});from=index+Math.max(1,String(needle).length)}};
+ for(const item of m.grammarFindings||[])addOccurrences(item.example,'grammar',0);
+ for(const item of m.spellingFindings||[])addOccurrences(item.word,'spelling',0);
+  const matchedIds=new Set(m.relevance?.matchedIds||[]),answerWords=text.match(/[A-Za-z]+(?:['’][A-Za-z]+)*/g)||[],environmentContext=(m.relevance?.anchors||[]).some(label=>/môi trường|khí hậu|ô nhiễm|tự nhiên/i.test(label));
+  for(const word of answerWords){const stem=relevanceStem(word),ids=RELEVANCE_LEMMA.get(stem);if(ids&&[...ids].some(id=>matchedIds.has(id))||environmentContext&&(matchedIds.has('environment')&&ENVIRONMENTAL_SIGNAL_WORDS.has(stem)||[...matchedIds].some(id=>id==='help'||id==='protect')&&ENVIRONMENT_ACTION_WORDS.has(stem)))addOccurrences(word,'topic',1)}
+ SCORE_CONNECTORS.lastIndex=0;for(const match of text.matchAll(SCORE_CONNECTORS))ranges.push({start:match.index,end:match.index+match[0].length,kind:'connector',priority:2});SCORE_CONNECTORS.lastIndex=0;
+ ranges.sort((a,b)=>a.priority-b.priority||a.start-b.start||b.end-a.end);
+  const accepted=[];for(const range of ranges){if(range.end<=range.start||accepted.some(item=>item.start<range.end&&range.start<item.end))continue;accepted.push(range)}
+ accepted.sort((a,b)=>a.start-b.start);let cursor=0,html='';
+ for(const range of accepted){html+=esc(text.slice(cursor,range.start))+`<mark class="score-evidence--${range.kind}">${esc(text.slice(range.start,range.end))}</mark>`;cursor=range.end}
+ html+=esc(text.slice(cursor));return html||esc(text);
+}
+function scoreTips(s){
+ const tips=[],relevance=s.metrics?.relevance;
+ if(relevance?.checked&&relevance.status!=='relevant')tips.push('Trả lời thẳng ý hỏi, rồi nêu một hành động cụ thể và kết quả của hành động đó.');
+ const keys=[['f','Fluency & Coherence'],['l','Lexical Resource'],['g','Grammatical Range & Accuracy'],['p','Pronunciation']].filter(([key])=>Number.isFinite(s[key])).sort((a,b)=>s[a[0]]-s[b[0]]);
+ for(const [key,label] of keys){if(tips.length>=2)break;const text=TIP[key];if(text)tips.push(`${label}: ${text}`)}
+ return tips.slice(0,2);
+}
+function scoreCriterionCaps(metrics){
+  const defaults={f:8,l:8.5,g:8.5},names={f:'Fluency & Coherence',l:'Lexical Resource',g:'Grammar'};
+ return Object.entries(defaults).filter(([key,value])=>Number.isFinite(metrics.ceilings?.[key])&&metrics.ceilings[key]<value).map(([key])=>`${names[key]} tối đa ${metrics.ceilings[key]}`).join(', ');
+}
+function scoreExplanation(s,result=null){
  const m=s.metrics;if(!m)return '';
- const duration=m.duration==null?'Không có bản ghi nên chưa đo WPM.':`${s.r} từ/phút · bản ghi ${Math.round(m.duration)} giây${s.r!==m.scoringWpm?' · '+m.scoringWpm+' từ/phút sau khi hạn chế từ lặp':''}`;
- const grammarNotes=(m.grammarFindings||[]).slice(0,5).map(item=>`${esc(item.label)} (“${esc(item.example)}”)`).join('; ');
+ const duration=m.duration==null?'Không có thời lượng bản ghi nên chưa đo WPM.':`${s.r} từ/phút theo bản ghi ${Math.round(m.duration)} giây${s.r!==m.scoringWpm?' · khoảng '+m.scoringWpm+' từ/phút sau khi giảm ảnh hưởng từ lặp':''}`;
+ const pauses=m.pauseCount==null?'chưa đo số lần ngắt âm thanh >0,5 giây':`${m.pauseCount} lần ngắt dài hơn 0,5 giây`;
+ const connectors=(m.connectors||[]).slice(0,5).map(esc).join(', ')||'chưa có cụm nối hợp lệ';
+ const grammarNotes=(m.grammarFindings||[]).slice(0,6).map(item=>`${esc(item.label)}: “${esc(item.example)}” → gợi ý “${esc(item.suggestion||'Kiểm tra lại cấu trúc câu.')}”`).join('; ');
  const spellingNotes=(m.spellingFindings||[]).slice(0,5).map(item=>`${esc(item.word)}${item.count>1?' ×'+item.count:''} → ${item.suggestions.map(esc).join(' / ')}`).join('; ');
- const spellingStatus=m.spellingStatus==='checked'?`Đã đối chiếu ngoại tuyến ${m.spellingChecked} từ.`:m.spellingStatus==='partial'?`Đã đối chiếu ${m.spellingChecked} từ; một số nhóm từ điển chưa tải được.`:m.spellingStatus==='unavailable'?'Chưa tải được từ điển ngoại tuyến; lượt này không bị trừ điểm chính tả.':'Không có từ đủ dài để kiểm tra chính tả.';
- const relevance=m.relevance?.checked?`Độ bám đề ${Math.round(m.relevance.coverage*100)}% (${m.relevance.matched.length}/${m.relevance.anchors.length} từ khóa câu hỏi/chủ đề khớp): ${m.relevance.status==='relevant'?'có bằng chứng phù hợp':m.relevance.status==='partial'?'mới khớp một phần': 'ít ý khớp'} · từ khóa khớp: ${(m.relevance.matched||[]).slice(0,6).map(esc).join(', ')||'chưa có'}${m.relevance.missing?.length?' · còn thiếu: '+m.relevance.missing.slice(0,4).map(esc).join(', '):''}${Number.isFinite(m.relevance.ceiling)?` · trần tổng theo độ bám đề ${m.relevance.ceiling}`:''}.`:'';
- const part2Limit=m.part===2&&(m.shortPart2Length||m.shortPart2Duration)?`Part 2: ${s.n} từ thực tế, khoảng ${m.effectiveWords} từ sau khi hạn chế lặp${m.duration==null?' · chưa có bản ghi để đo thời lượng':` · bản ghi ${Math.round(m.duration)} giây`}; trần Fluency ${m.ceilings.f}, Lexical ${m.ceilings.l}, Grammar ${m.ceilings.g}, điểm tổng ${Number.isFinite(m.overallCeiling)?m.overallCeiling:'không áp trần do độ dài'}.`:'Part 2 cần khoảng 150–250 từ trong 1–2 phút; câu ngắn hoặc bản ghi dưới 60 giây bị giới hạn riêng từng tiêu chí.';
- return `<details class="result-feedback"><summary>Vì sao được điểm này?</summary><ul>
-  <li>${s.n} từ tiếng Anh${m.vietnameseWords?` · đã bỏ ${m.vietnameseWords} từ không phải tiếng Anh khỏi số đo`:''} · nhận diện ${m.englishRatio}% từ tiếng Anh · mốc độ dài tham khảo ${m.target} từ.</li>
-  ${relevance?`<li>${relevance}</li>`:''}
-  ${m.part===2?`<li>${part2Limit}</li>`:''}
-  <li>${duration}.</li>
-  <li>${m.connectorCount} cụm nối khác nhau trong câu có nội dung · ${Math.round(m.longRatio*100)}% từ dài trên 6 chữ cái (chỉ hiển thị, không tự cộng điểm vì từ dài).</li>
-  <li>Ngữ pháp: ${m.errors} mẫu lỗi nghi vấn, trừ tối đa ${m.grammarPenalty.toFixed(1)} điểm ước tính.${grammarNotes?' '+grammarNotes:''}</li>
-  <li>Chính tả: ${spellingStatus}${m.lexicalPenalty?` Trừ ${m.lexicalPenalty.toFixed(1)} điểm từ vựng ước tính.`:''}${spellingNotes?' '+spellingNotes:''}</li></ul>
-  <small>Đây là ước tính luyện tập từ bản chép lời, không phải điểm IELTS chính thức. Bộ dò ngữ pháp chỉ nhận diện một số mẫu. Từ điển ngoại tuyến chỉ nêu từ nghi vấn gần cách viết; tên riêng, thuật ngữ và biến thể có thể bị bỏ sót hoặc đánh dấu nhầm.</small></details>`;
+ const spellingStatus=m.spellingStatus==='checked'?`Đã đối chiếu ngoại tuyến ${m.spellingChecked} từ nội dung khác nhau.`:m.spellingStatus==='partial'?`Đã đối chiếu ${m.spellingChecked} từ; một số nhóm từ điển chưa tải được.`:m.spellingStatus==='unavailable'?'Từ điển ngoại tuyến chưa sẵn sàng; không áp dụng trừ điểm chính tả.':m.spellingStatus==='pending'?'Đang kiểm tra chính tả ngoại tuyến; kết quả sẽ tự cập nhật.':'Không có từ nội dung đủ dài để kiểm tra.';
+ const relevance=m.relevance?.checked?`Khớp ${m.relevance.matched.length}/${m.relevance.anchors.length} ý chính (${Math.round(m.relevance.coverage*100)}%): ${m.relevance.matched.map(esc).join(', ')||'chưa khớp ý nào'}${m.relevance.missing?.length?' · chưa thấy: '+m.relevance.missing.slice(0,4).map(esc).join(', '):''}.`:'Đã bỏ qua bước kiểm tra chủ đề theo lựa chọn của bạn.';
+  const part2Limit=m.part===2?`Part 2 thường cần khoảng 150–250 từ trong 1–2 phút. Bản này có ${s.n} từ transcript, khoảng ${m.effectiveWords} từ sau khi giảm lặp${m.duration==null?' · chưa có thời lượng bản ghi':` · bản ghi ${Math.round(m.duration)} giây`}.`:'';
+  const criterionCaps=scoreCriterionCaps(m),limitNote=criterionCaps?`Giới hạn riêng do câu trả lời ngắn: ${criterionCaps}. Không có trần ẩn lên điểm tổng.`:'Không áp dụng trần tổng; điểm tổng là trung bình các tiêu chí có dữ liệu.';
+  const tips=scoreTips(s),styleNotes=(m.styleWarnings||[]).map(esc),evidence=result?`<p class="score-evidence-text" lang="en">${scoreEvidenceMarkup(result)}</p><div class="score-evidence-legend" aria-label="Chú giải bằng chứng"><span class="topic"><i></i>Ý đúng chủ đề</span><span><i></i>Từ nối</span><span class="error"><i></i>Lỗi nghi vấn</span></div>`:'';
+ return `<details class="result-feedback"><summary>Vì sao được điểm này?</summary>${evidence}<ul>
+   <li><strong>Fluency & Coherence:</strong> ${m.connectorCount} cụm nối khác nhau trong câu có nội dung${m.connectorCount?` (${connectors})`:''}; ${duration}; ${pauses}; ${m.fillers} filler trong transcript (${(m.fillerRatio*100).toFixed(1)}%); lặp từ ${Math.round((m.repetitionRatio||0)*100)}%; ${m.runOnSentences||0} câu nối dài.${m.relevancePenalty?` Trừ ${m.relevancePenalty.toFixed(1)} band tối đa vì độ bám đề.`:''}</li>
+   <li><strong>Lexical Resource:</strong> ${Math.round(m.longRatio*100)}% từ dài (chỉ là số đo, không tự cộng điểm); từ/cụm theo chủ đề: ${(m.topicHits||[]).slice(0,5).map(esc).join(', ')||'chưa có từ trúng danh sách chủ đề'}; cụm ít phổ biến có trong dữ liệu chủ đề: ${(m.advancedVocabHits||[]).slice(0,4).map(esc).join(', ')||'chưa nhận diện được'}; collocation: ${(m.collocationHits||[]).slice(0,3).map(esc).join(', ')||'chưa tìm thấy'}; ${spellingStatus}${m.lexicalPenalty?` Trừ ${m.lexicalPenalty.toFixed(1)} band từ vựng.`:''}${spellingNotes?' '+spellingNotes:''}</li>
+   <li><strong>Grammar:</strong> ${m.errors} lỗi nghi vấn; khoảng ${Math.round(m.sentenceAccuracy*100)}% câu không bị bộ dò gắn cờ; ${m.complexityRate.toFixed(2)} dấu hiệu cấu trúc phức/câu; ${m.errorRate.toFixed(2)} trọng số lỗi/câu. Đây là phép dò quy tắc, không phải phân tích ngữ pháp đầy đủ.${grammarNotes?' '+grammarNotes:''}</li>
+   <li><strong>Độ phong phú từ:</strong> đa dạng từ nội dung ${Math.round(m.typeToken*100)}%; ${m.curatedWords} từ thuộc danh sách chủ đề; ${m.collocationHits.length} collocation nhận diện được; không cộng chỉ vì từ dài.</li>
+  <li><strong>Độ liên quan:</strong> ${relevance}</li>
+   ${part2Limit?`<li>${part2Limit}</li>`:''}<li>${limitNote}</li>
+   </ul>${styleNotes.length?`<p class="score-warning"><strong>Cảnh báo văn bản:</strong> ${styleNotes.join('; ')}. Cảnh báo này không làm tăng hoặc giảm điểm trực tiếp.</p>`:''}${tips.length?`<p><strong>Cách tăng 0,5 band</strong></p><ul class="score-tips">${tips.map(item=>`<li>${esc(item)}</li>`).join('')}</ul>`:''}
+   <small>Đây là điểm ước tính để luyện tập, không phải điểm IELTS chính thức. Bộ dò ngữ pháp chỉ nhận diện một số lỗi; từ điển ngoại tuyến có thể bỏ sót tên riêng, thuật ngữ và biến thể. Độ giống văn viết chỉ là cảnh báo.</small></details>`;
 }
 
 function scoreOverview(result) {
-  const {s}=result;
-  const p = audioBand(s);
-  const relevanceMeter=s.metrics?.relevance?.checked
-   ?`<p class="mu" role="status"><strong>Độ phù hợp nội dung với câu hỏi: ${Math.round(s.metrics.relevance.coverage*100)}%</strong> · khớp ${s.metrics.relevance.matched.length}/${s.metrics.relevance.anchors.length} từ khóa/ý chính. Đây là chỉ số bám đề để luyện tập, không phải band IELTS độc lập.</p>`:'';
-  const relevanceNotice=s.metrics?.relevance?.status==='partial'||s.metrics?.relevance?.status==='weak'
-   ?`<p class="mu" role="status">Câu trả lời mới bám đề một phần; điểm tổng được giới hạn ở ${Math.min(s.metrics.relevance.ceiling??Infinity,s.metrics.overallCeiling??Infinity)} cho đến khi có thêm nội dung trực tiếp liên quan.</p>`:'';
-  const part2Limit=s.metrics?.part===2&&(s.metrics.shortPart2Length||s.metrics.shortPart2Duration)
-   ?`<p class="mu" role="status">Part 2 còn ngắn${s.metrics.shortPart2Length?` (${s.n} từ thực tế, khoảng ${s.metrics.effectiveWords} từ sau khi hạn chế lặp; nên hướng tới ít nhất 150 từ)`:''}${s.metrics.shortPart2Duration?` · bản ghi ${Math.round(s.metrics.duration)} giây, dưới 1 phút`:''}. Trần riêng Fluency ${s.metrics.ceilings.f}, Lexical ${s.metrics.ceilings.l}, Grammar ${s.metrics.ceilings.g}; điểm tổng tối đa ${Number.isFinite(s.metrics.overallCeiling)?s.metrics.overallCeiling:'theo tiêu chí'}.</p>`:'';
-  return `<div class="result-header"><div><p class="eyebrow">PHẢN HỒI BÀI NÓI</p><h2 id="result-title" tabindex="-1">Điểm luyện tập ước tính</h2></div><div class="big">${bandNumber(s.o)}</div></div>
-  ${bars(s)}${relevanceMeter}${relevanceNotice}${part2Limit}<p><small>${s.n} từ${s.r?' · '+s.r+' từ/phút':''} · ${p==null?(result.blob?'Chưa có đủ dữ liệu âm thanh phù hợp để ước tính Pronunciation':'Pronunciation chưa chấm vì không có dữ liệu âm thanh'):'Điểm tổng hợp từ 4 tiêu chí'}</small></p>
-  ${scoreExplanation(s)}
+ const {s}=result,p=audioBand(s),m=s.metrics||{},relevance=m.relevance;
+ const criteria=[s.f,s.l,s.g,p].filter(Number.isFinite).length,confidence=scoreConfidence(result);
+ const relevanceWarning=relevance?.checked&&relevance.status!=='relevant'
+  ?`<div class="score-warning" role="status"><strong>Bài chưa bám sát câu hỏi: khớp ${relevance.matched.length}/${relevance.anchors.length} ý chính.</strong> Trừ ${m.relevancePenalty.toFixed(1)} band tối đa 1,0 ở Fluency & Coherence, không cắt điểm tổng.<br><button type="button" class="g" onclick="rescoreIgnoringRelevance()">Tôi đang trả lời câu khác</button><small>Nút này chấm lại câu hiện tại và bỏ qua kiểm tra chủ đề một lần.</small></div>`:'';
+  const criterionCaps=scoreCriterionCaps(m),part2Limit=m.part===2&&(m.shortPart2Length||m.shortPart2Duration)
+   ?`<p class="mu" role="status">Part 2 còn ngắn${m.shortPart2Length?` (${s.n} từ, khoảng ${m.effectiveWords} từ sau khi giảm lặp; nên hướng tới ít nhất 150 từ)`:''}${m.shortPart2Duration?` · bản ghi ${Math.round(m.duration)} giây, dưới 1 phút`:''}. ${criterionCaps?`Giới hạn riêng: ${criterionCaps}.`:''} Tổng vẫn là trung bình các tiêu chí, không có trần ẩn.</p>`:'';
+  const shortAnswerCap=m.part!==2&&criterionCaps?`<p class="mu" role="status">Câu trả lời còn ngắn; giới hạn riêng: ${criterionCaps}. Tổng vẫn là trung bình các tiêu chí, không có trần ẩn.</p>`:'';
+ const criteriaLabel=criteria===3&&!Number.isFinite(p)?`Tính từ 3/4 tiêu chí (${result.blob?'chưa có Pronunciation đủ dữ liệu':'chưa có bản ghi để chấm Pronunciation'})`:`Tính từ ${criteria}/4 tiêu chí${criteria<4?' · Pronunciation chỉ chấm khi có dữ liệu âm thanh phù hợp':''}`;
+ const sourceLabel=result.blob?'Ước tính từ transcript và thời lượng bản ghi':'Ước tính từ văn bản';
+  return `<div class="result-header"><div><p class="eyebrow">PHẢN HỒI BÀI NÓI</p><h2 id="result-title" tabindex="-1">Điểm luyện tập ước tính</h2></div><div class="big">${scoreRange(result)}</div></div>
+    ${bars(s)}${relevanceWarning}${part2Limit}${shortAnswerCap}<p><small>${s.n} từ${s.r?' · '+s.r+' từ/phút':''} · ${criteriaLabel} · ${sourceLabel} · Độ tin cậy: ${confidence.label.toLowerCase()} (khoảng ±${confidence.margin.toFixed(2)} band)${m.pauseCount!=null?` · ${m.pauseCount} lần ngắt >0,5 giây`:''}${m.timestampSource?` · ${m.timestampSource}${m.selfRepairHints?` · ${m.selfRepairHints} dấu hiệu tự sửa trong transcript`:''}`:''} · filler ${Math.round((m.fillerRatio||0)*100)}%</small></p>
+  ${scoreExplanation(s,result)}
   <div class="result-feedback">${resultComparison(result)}</div>
-  <p class="mu"><small>${p==null?'Xác nhận câu bạn định nói trong phần Phát âm để nhận điểm từ bản ghi.':'Pronunciation dựa trên độ khớp âm vị và âm cuối với câu đã xác nhận. Đây là thang phản hồi luyện tập.'}</small></p>`;
+  <p class="mu"><small>${p==null?'Pronunciation chưa được chấm vì chưa có dữ liệu âm thanh phù hợp đã đối chiếu.':'Pronunciation được ước tính từ độ khớp âm vị và âm cuối trong bản ghi.'} Tất cả điểm trên màn hình là phản hồi luyện tập.</small></p>`;
 }
 
 function pronunciationAdvice(report) {
@@ -4700,27 +5965,28 @@ function dictionaryPage() {
   <section id="curated-vocabulary" aria-labelledby="curated-title"><div class="section-head"><div><p class="eyebrow">IELTS SPEAKING</p><h2 id="curated-title">Từ vựng chọn lọc</h2></div></div><div id="vr" class="vocab-grid"></div></section>`;
 }
 
-async function dictionaryShard(key) {
+async function dictionaryShard(key,localOnly=false) {
   const bucket = /^[a-z]/.test(key) ? key[0] : '_';
-  const cached = dictionaryCache.get(bucket);
+  const cache=localOnly?arcadeDictionaryCache:dictionaryCache;
+  const cached = cache.get(bucket);
   if (cached) {
-    dictionaryCache.delete(bucket);
-    dictionaryCache.set(bucket, cached);
+    cache.delete(bucket);
+    cache.set(bucket, cached);
     return cached;
   }
   const id = '#offline-dictionary-' + bucket;
   if (!$(id)) return [{}, {}, []];
   const pending = (async () => {
-    const blob=await embeddedPhoneBlob(id);
+    const blob=await (localOnly?arcadeLocalAsset(id):embeddedPhoneBlob(id));
     const stream=blob.stream().pipeThrough(new DecompressionStream('gzip'));
     const [entries, aliases] = await new Response(stream).json();
     return [entries, aliases, Object.keys(entries).sort()];
   })().catch(error => {
-    if (dictionaryCache.get(bucket) === pending) dictionaryCache.delete(bucket);
+    if (cache.get(bucket) === pending) cache.delete(bucket);
     throw error;
   });
-  dictionaryCache.set(bucket, pending);
-  if (dictionaryCache.size > 4) dictionaryCache.delete(dictionaryCache.keys().next().value);
+  cache.set(bucket, pending);
+  if (cache.size > 4) cache.delete(cache.keys().next().value);
   return pending;
 }
 
@@ -4773,16 +6039,44 @@ async function offlineSpellingAssessment(text){
  const status=failed?(checked?'partial':'unavailable'):'checked';
  return {status,checked,findings};
 }
-async function scoreWithDictionary(text,part,duration,question='',topic=''){
- const result=score(text,part,duration,question,topic);if(!result)return null;
- const spelling=await offlineSpellingAssessment(text);
- const penalty=Math.min(2.5,spelling.findings.reduce((sum,item)=>sum+(item.distance===1?.4:.7)*Math.min(item.count,2),0));
- result.metrics.spellingStatus=spelling.status;
- result.metrics.spellingChecked=spelling.checked;
- result.metrics.spellingFindings=spelling.findings;
- result.metrics.lexicalPenalty=penalty;
- result.l=Math.min(result.metrics.lexicalCeiling,Math.max(3.5,half(result.metrics.lexicalBase-penalty)));
- result.o=Math.min(result.metrics.overallCeiling??Infinity,half(avg([result.f,result.l,result.g])));
+const SCORE_SPELLING_CACHE=new Map();
+const cloneSpelling=value=>JSON.parse(JSON.stringify(value));
+function applySpellingToScore(result,spelling){
+ const metrics=result.metrics,penalty=Math.min(1.8,spelling.findings.reduce((sum,item)=>sum+(item.distance===1?.4:.7)*Math.min(item.count,2),0));
+ metrics.spellingStatus=spelling.status;metrics.spellingChecked=spelling.checked;metrics.spellingFindings=spelling.findings;metrics.lexicalPenalty=penalty;
+ result.l=Math.min(metrics.lexicalCeiling,Math.max(3.5,half(metrics.lexicalBase-penalty)));
+ result.o=half(avg([result.f,result.l,result.g,audioBand(result)].filter(Number.isFinite)));
+ return result;
+}
+function applyDictionaryScoreUpdate(result,updated,previous=null){
+ if(!result?.s||!updated)return;
+ const current=result.s,pronunciation=audioBand(current);
+ if(current!==updated)Object.assign(current,updated,{p:pronunciation});
+ if(pronunciation!=null)current.pronBasis='acoustic-v1';
+  const metrics=current.metrics||{};
+  if(result.m){metrics.pauseCount=Number.isFinite(result.m.np)?result.m.np:null;metrics.audioPausePenalty=0;if(Number.isFinite(metrics.fluencyBase))refreshScoreTotals(current)}
+ current.o=half(avg([current.f,current.l,current.g,audioBand(current)].filter(Number.isFinite)));
+ if(result.history)Object.assign(result.history,{f:current.f,l:current.l,g:current.g,p:audioBand(current),o:current.o,scoreVersion:SCORE_VERSION,updated:Date.now()});
+ if(result.comparison){refreshResultComparison(result);result.comparison.current=comparableBand(current);result.comparison.delta=result.comparison.prior?half(result.comparison.current-comparableBand(result.comparison.prior)):null;result.comparison.isRecord=result.comparison.best!=null&&result.comparison.current>result.comparison.best}
+ if(result.history){const index=st.h.findIndex(row=>row.id===result.history.id);if(index>=0)st.h[index]=result.history}
+ sv();
+ if(S?.result===result){const target=$('#result-scores');if(target){target.innerHTML=scoreOverview(result);animateBands(target)}}
+ else if(pathTryReview?.score===current){pathTryReview.score=current;pathTryReview.scorePassed=Boolean(current.o>=4.5);pathTryReview.passed=pathTryReview.evidence.passed&&pathTryReview.scorePassed;openView()}
+ else if(S?.mode==='exam'&&S.pending?.estimate===current){openView()}
+}
+function scheduleScoreIdle(task){if(typeof requestIdleCallback==='function')requestIdleCallback(()=>void task(),{timeout:350});else setTimeout(()=>void task(),0)}
+function scoreWithDictionary(text,part,duration,question='',topic='',options={}){
+ const result=score(text,part,duration,question,topic,options);if(!result)return null;
+ const key=scoreHash(String(text||'').toLowerCase().replace(/\s+/g,' ').trim()),cached=SCORE_SPELLING_CACHE.get(key);
+ if(cached){SCORE_SPELLING_CACHE.delete(key);SCORE_SPELLING_CACHE.set(key,cached);applySpellingToScore(result,cloneSpelling(cached));return result}
+ result.metrics.spellingStatus='pending';
+ scheduleScoreIdle(async()=>{
+  let spelling;
+  try{spelling=await offlineSpellingAssessment(text)}catch{spelling={status:'unavailable',checked:0,findings:[]}}
+  SCORE_SPELLING_CACHE.set(key,cloneSpelling(spelling));if(SCORE_SPELLING_CACHE.size>80)SCORE_SPELLING_CACHE.delete(SCORE_SPELLING_CACHE.keys().next().value);
+  applySpellingToScore(result,spelling);
+  try{options.onUpdate?.(result)}catch{}
+ });
  return result;
 }
 
@@ -4845,7 +6139,8 @@ async function searchDictionary(submitted = false) {
   }
 }
 
-function dictionaryEntry(key, [word, ipa, vi, en]) {
+function dictionaryEntry(key, [word, ipa, vi, en], compact=false) {
+  if(compact)return `<span lang="en"><strong>${esc(word)}</strong>${ipa[0]?' /'+esc(ipa[0])+'/':''}</span>${vi[0]?.[1]||en[0]?.[1]?' · '+esc(vi[0]?.[1]||en[0][1]):''}`;
   const title = `<h3 lang="en">${esc(word)}</h3>`;
   const saved = st.c.some(item => dictionaryKey(item.w) === key);
   dictionaryPositions.set(key, {word, vi, en});
@@ -5001,7 +6296,7 @@ function cleanGame(input){
  const entries=Array.isArray(input?.events)?input.events:[];
  const map=new Map(),future=Date.now()+DAY;
  for(const event of entries){
-  if(!validKey(event?.id)||!['practice','audio','shadow','review','remember','win','focus','lesson','speed'].includes(event.type)||
+  if(!validKey(event?.id)||!['practice','audio','shadow','review','remember','win','focus','lesson','speed','game'].includes(event.type)||
      !Number.isFinite(event.at)||event.at<0||event.at>future)continue;
   const row={id:event.id,type:event.type,at:event.at};
   if(event.type==='practice'){
@@ -5024,6 +6319,7 @@ function cleanGame(input){
   if(event.type==='win')row.progress=event.progress===true;
   if(event.type==='focus')row.seconds=Math.max(0,Math.min(86400,Number(event.seconds)||0));
   if(event.type==='speed')row.seconds=Math.max(0,Math.min(60,Number(event.seconds)||0));
+  if(event.type==='game')row.xp=event.xp===ARCADE_XP?ARCADE_XP:0;
   const old=map.get(row.id);
   if(!old||JSON.stringify(row)<JSON.stringify(old))map.set(row.id,row);
  }
@@ -5082,14 +6378,16 @@ function gameDaily(game=st.game,day=dayNumber(Date.now())){
  ];
  const base=events.reduce((sum,event)=>sum+gameXp(event),0),rate=game.rates[day]??10;
  const bonus=done.every(Boolean)?Math.round(base*rate/100):0;
- return {events,topic,done,base,rate,bonus};
+ const arcade=events.reduce((xp,event)=>xp+(event.type==='game'?event.xp:0),0);
+ return {events,topic,done,base:base+Math.min(ARCADE_DAILY_CAP,arcade),rate,bonus};
 }
 
 function gameTotal(game=st.game){
  const days=new Map();
  for(const event of game.events){
-  const day=dayNumber(event.at),row=days.get(day)||{base:0,part:false,review:false,shadow:false};
+  const day=dayNumber(event.at),row=days.get(day)||{base:0,arcade:0,part:false,review:false,shadow:false};
   row.base+=gameXp(event);
+  if(event.type==='game')row.arcade+=event.xp;
   if(event.type==='practice'&&event.part===1&&event.topic===TP[gameTopic(day)][0])row.part=true;
   if(event.type==='review')row.review=true;
   if(event.type==='shadow')row.shadow=true;
@@ -5098,7 +6396,7 @@ function gameTotal(game=st.game){
  let total=0;
  for(const [day,row] of days){
   const rate=game.rates[day]??10;
-  total+=row.base+(row.part&&row.review&&row.shadow?Math.round(row.base*rate/100):0);
+  total+=row.base+Math.min(ARCADE_DAILY_CAP,row.arcade)+(row.part&&row.review&&row.shadow?Math.round(row.base*rate/100):0);
  }
  return total;
 }
@@ -5191,7 +6489,7 @@ function gameHome(){
   <p><strong>${xp} XP · ${level.name}</strong> ${next?'· '+(next.xp-xp)+' XP tới '+next.name:'· Đã đạt cấp cao nhất'}</p></div>
   <progress max="${range}" value="${progress}" aria-label="XP tới cấp tiếp theo"></progress>
   <small>Hãy ghi nghĩa nhớ được trước khi lật thẻ. Nếu chưa có thẻ, bạn có thể thêm từ trong Bộ sưu tập.
-  Tên cấp là mốc động lực. Nói lại cần bản ghi có giọng nói được phát hiện. XP thưởng áp dụng cho XP của ngày hoàn thành nhiệm vụ.</small></section>${gameWeekly()}`;
+  Tên cấp là mốc động lực. Nói lại cần bản ghi có giọng nói được phát hiện. XP từ sảnh trò chơi tối đa 30 mỗi ngày và được tính riêng với phần thưởng nhiệm vụ.</small></section>${gameWeekly()}`;
 }
 
 function gameProfile(){
@@ -5583,11 +6881,10 @@ async function submitPathTry(event){
  const item=PATH_LESSONS.find(entry=>entry.id===pathView);
  if(!item||st.learningPath.active?.id!==item.id||st.learningPath.active.step!==1)return;
  const form=event.currentTarget;if(form.dataset.scoring==='true')return;
- const value=form.elements.answer.value.trim(),rule=pathRule(item),evidence=pathEvidence(item.id,value,'try'),language=analyzeAnswerLanguage(value),prompt=rule.challenge||item.question,topic=LS[item.id][1];
- const relevance=analyzeAnswerRelevance(value,prompt,topic);
- if(!language.allowed||!relevance.allowed){pathTryReview={id:item.id,answer:value,evidence,score:null,scorePassed:false,passed:false,scoreMessage:answerScoringMessage(value,prompt,topic)};openView();return}
+  const value=form.elements.answer.value.trim(),rule=pathRule(item),evidence=pathEvidence(item.id,value,'try'),language=analyzeAnswerLanguage(value),prompt=rule.challenge||item.question,topic=LS[item.id][1];
+  if(!language.allowed){pathTryReview={id:item.id,answer:value,evidence,score:null,scorePassed:false,passed:false,scoreMessage:answerScoringMessage(value,prompt,topic)};openView();return}
  form.dataset.scoring='true';const button=form.querySelector('button[type="submit"]');if(button){button.disabled=true;button.textContent='Đang chấm…'}
- let scored;try{scored=await scoreWithDictionary(value,rule.part,0,prompt,topic)}catch{scored=score(value,rule.part,0,prompt,topic)}
+  let scored;try{scored=await scoreWithDictionary(value,rule.part,0,prompt,topic,{onUpdate:updated=>applyDictionaryScoreUpdate({s:scored,history:null},updated)})}catch{scored=score(value,rule.part,0,prompt,topic)}
  if(pathView!==item.id)return;
  form.dataset.scoring='false';if(button){button.disabled=false;button.textContent='Chấm câu trả lời'}
  const scorePassed=Boolean(scored&&scored.o>=4.5),passed=evidence.passed&&scorePassed;
@@ -5779,9 +7076,11 @@ function mountLearning(){
  document.body.append(notice);
  window.addEventListener('storage',event=>{
   if(event.key!=='epu')return;
-  st.learningV1=mergeLearning(st.learningV1,storedEpu()?.learningV1);
-  st.game=mergeGame(st.game,storedEpu()?.game);
-  st.learningPath=mergeLearningPath(st.learningPath,storedEpu()?.learningPath);
+  const saved=storedEpu();
+  st.learningV1=mergeLearning(st.learningV1,saved?.learningV1);
+  st.game=mergeGame(st.game,saved?.game);
+  st.games=mergeArcadeHistory(st.games,saved?.games);
+  st.learningPath=mergeLearningPath(st.learningPath,saved?.learningPath);
   refreshLearningViews();
   if(tab==='home'&&!$('#m').contains(document.activeElement))render();
  });
@@ -6061,7 +7360,7 @@ const legacyId=(value,index)=>{
 };
 function mergeThemeState(local,remote){if(!remote)return normalizeThemeState(local);const a=normalizeThemeState(local),b=normalizeThemeState(remote),map=new Map(a.customThemes.map(item=>[item.id,item]));b.customThemes.forEach(item=>{const old=map.get(item.id);if(!old||item.updated>=old.updated)map.set(item.id,item)});const source=(b.updated||0)>=(a.updated||0)?b:a;return normalizeThemeState({...source,customThemes:[...map.values()].sort((x,y)=>y.updated-x.updated).slice(0,12)},[],source.skin)}
 function progressSnapshot(){
- return cleanProgress({h:st.h,c:st.c,goal:st.goal,goalUpdated:st.goalUpdated,gone:st.gone,game:st.game,learningPath:st.learningPath,theme:st.theme});
+ return cleanProgress({h:st.h,c:st.c,goal:st.goal,goalUpdated:st.goalUpdated,gone:st.gone,game:st.game,games:st.games,learningPath:st.learningPath,theme:st.theme});
 }
 function cleanProgress(data){
  const src=data&&typeof data==='object'?data:{}, now=Date.now()+DAY;
@@ -6089,7 +7388,7 @@ function cleanProgress(data){
   return row;
  });
  const gone=Object.fromEntries(Object.entries(src.gone||{}).filter(([id,t])=>validKey(id)&&validTime(t)));
- return {h:history,c:cards,gone,goal:scoreValue(src.goal)&&src.goal>=1?src.goal:null,goalUpdated:validTime(src.goalUpdated)?src.goalUpdated:0,game:cleanGame(src.game),learningPath:cleanLearningPath(src.learningPath),theme:src.theme?normalizeThemeState(src.theme):null};
+ return {h:history,c:cards,gone,goal:scoreValue(src.goal)&&src.goal>=1?src.goal:null,goalUpdated:validTime(src.goalUpdated)?src.goalUpdated:0,game:cleanGame(src.game),games:cleanArcadeHistory(src.games),learningPath:cleanLearningPath(src.learningPath),theme:src.theme?normalizeThemeState(src.theme):null};
 }
 function mergeProgress(a,b){
  const history=new Map();
@@ -6106,7 +7405,7 @@ function mergeProgress(a,b){
   if(!cards.has(card.id)||cards.get(card.id).updated<=card.updated)cards.set(card.id,card);
  }
  const goal=b.goalUpdated>a.goalUpdated||(a.goal==null&&b.goal!=null)?b:a;
- return {h,c:[...cards.values()],gone,goal:goal.goal,goalUpdated:goal.goalUpdated,game:mergeGame(a.game,b.game),learningPath:mergeLearningPath(a.learningPath,b.learningPath),theme:mergeThemeState(a.theme,b.theme)};
+ return {h,c:[...cards.values()],gone,goal:goal.goal,goalUpdated:goal.goalUpdated,game:mergeGame(a.game,b.game),games:mergeArcadeHistory(a.games,b.games),learningPath:mergeLearningPath(a.learningPath,b.learningPath),theme:mergeThemeState(a.theme,b.theme)};
 }
 function applyProgress(data){
  // Preserve active review cards and the history row an open result can update.
@@ -6115,6 +7414,7 @@ function applyProgress(data){
  const history=new Map(st.h.filter(row=>row?.id).map(row=>[row.id,row]));
  st.h=data.h.map(row=>history.has(row.id)?Object.assign(history.get(row.id),row):row);
  st.gone=data.gone;st.goal=data.goal;st.goalUpdated=data.goalUpdated;st.game=mergeGame(st.game,data.game);st.learningPath=mergeLearningPath(st.learningPath,data.learningPath);st.theme=mergeThemeState(st.theme,data.theme);
+ st.games=mergeArcadeHistory(st.games,data.games);
  if(review&&!review.finished){const count=review.queue.length;review.queue=review.queue.filter(card=>st.c.includes(card));review.skipped+=count-review.queue.length}
  sv(false);
 }
@@ -6265,14 +7565,14 @@ async function submitExam(){
  if(exam?.mode!=='exam'||exam.pending||exam.scoring||!input||!x)return;
  if(exam.full&&!lb){$('#evaluation').innerHTML='<p role="alert">Thi thử đầy đủ yêu cầu ghi âm câu này. Hãy ghi âm trước khi nộp.</p>';return}
  if(exam.full&&x.p===2&&dur<60){$('#evaluation').innerHTML='<p role="alert">Part 2 cần bản ghi ít nhất một phút.</p>';return}
- const answer=input.value.trim(),language=analyzeAnswerLanguage(answer),relevance=analyzeAnswerRelevance(answer,x.q,x.t);
- if(!language.allowed||!relevance.allowed||answer.length>3600){
+  const answer=input.value.trim(),language=analyzeAnswerLanguage(answer);
+  if(!language.allowed||answer.length>3600){
   $('#evaluation').innerHTML='<p class="mu" role="alert">'+esc(answer.length>3600?'Câu trả lời tối đa 3.600 ký tự.':answerScoringMessage(answer,x.q,x.t))+'</p>';
   input.focus();return;
  }
  exam.scoring=true;input.readOnly=true;const submit=$('#evaluate-answer');if(submit)submit.disabled=true;
  $('#evaluation').innerHTML='<p class="mu" role="status">Đang chấm câu trả lời và kiểm tra từ vựng ngoại tuyến…</p>';
- let estimate;try{estimate=await scoreWithDictionary(answer,x.p,lb?dur:0,x.q,x.t)}catch{estimate=score(answer,x.p,lb?dur:0,x.q,x.t);if(estimate)estimate.metrics.spellingStatus='unavailable'}
+  let estimate;try{estimate=await scoreWithDictionary(answer,x.p,lb?dur:0,x.q,x.t,{onUpdate:()=>{if(S===exam&&exam.pending?.estimate===estimate)openView()}})}catch{estimate=score(answer,x.p,lb?dur:0,x.q,x.t);if(estimate)estimate.metrics.spellingStatus='unavailable'}
  if(S!==exam)return;
  exam.scoring=false;input.readOnly=false;if(submit)submit.disabled=false;
  if(!estimate){$('#evaluation').innerHTML='<p class="mu" role="alert">'+esc(answerScoringMessage(answer,x.q,x.t))+'</p>';return}
@@ -6395,8 +7695,7 @@ async function advanceExam(exam,blob,confirmed,heard){
    const pronunciation=avg(answers.map(item=>item.p));
    const scores={f:localScores.f,l:localScores.l,g:localScores.g,p:pronunciation==null?null:half(pronunciation)};
    if(scores.p!=null)scores.pronBasis='acoustic-v1';
-   const examAnswerCeiling=Math.min(...answers.map(answer=>answer.estimate.metrics?.overallCeiling??Infinity));
-   scores.o=Math.min(examAnswerCeiling,practiceBand(scores));
+    scores.o=practiceBand(scores);
    exam.final={result,scores,local:!feedback};
    const now=Date.now();
    const gameBefore=gameBadgeStatus();
@@ -6927,6 +8226,7 @@ function mountReviewPage(){
 
 function historyCount(){return st.h.length+' lượt chấm đã lưu.'}
 st.game=cleanGame(st.game);
+st.games=cleanArcadeHistory(st.games);
 st.learningPath=cleanLearningPath(st.learningPath);
 if(!st.learningPath.setup.done&&!st.learningPath.setup.deferred)tab='onboarding';
 ensureProgressIds(true);
