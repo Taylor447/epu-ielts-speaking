@@ -1,4 +1,4 @@
-const VERSION='epu-pwa-v2';
+const VERSION='epu-pwa-v3';
 const SHELL_CACHE='epu-shell-'+VERSION;
 const ASSET_CACHE='epu-pwa-assets-'+VERSION;
 const SCOPE=self.registration.scope;
@@ -26,7 +26,7 @@ self.addEventListener('fetch',event=>{
  if(request.mode==='navigate'){
   event.respondWith((async()=>{
    try{
-    const response=await fetch(request);
+    const response=await fetch(new Request(request,{cache:'no-store'}));
     if(response.ok&&(url.pathname===APP_PATH||url.pathname===CAMPUS_PATH)){
       const cache=await caches.open(SHELL_CACHE);
       event.waitUntil(cache.put(url.pathname===CAMPUS_PATH?CAMPUS_URL:APP_URL,response.clone()).catch(()=>{}));

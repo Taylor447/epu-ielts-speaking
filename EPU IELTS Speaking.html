@@ -4994,15 +4994,27 @@ const IDEA_EXPRESSION_MAP=[
  [['de hieu'],'easy to understand','Dễ hiểu'],
  [['kho hieu'],'difficult to understand','Khó hiểu'],
  [['than thien voi moi truong'],'eco-friendly','Thân thiện với môi trường'],
- [['rat my mieu','my mieu','cau chu my mieu','loi le my mieu'],'very flowery','Dùng cho lời nói hoặc câu chữ nhiều mỹ từ; đôi khi mang sắc thái hơi cầu kỳ'],
- [['rat my mieu','my mieu','cau chu my mieu','loi le my mieu'],'beautifully worded','Dùng để khen cách diễn đạt được trau chuốt, tự nhiên'],
- [['rat my mieu','my mieu','cau chu my mieu','loi le my mieu'],'quite eloquent','Dùng khi mô tả người nói hoặc bài nói diễn đạt thuyết phục']
+ [['rat my mieu','rat mi mieu','my mieu','mi mieu','cau chu my mieu','cau chu mi mieu','loi le my mieu','loi le mi mieu','van hoa','hoa my','loi van hoa my','dien dat chau chuot','tu ngu bong bay'],'very flowery','Dùng khi lời nói hoặc câu chữ có nhiều mỹ từ, đôi khi hơi cầu kỳ'],
+ [['rat my mieu','rat mi mieu','my mieu','mi mieu','cau chu my mieu','cau chu mi mieu','loi le my mieu','loi le mi mieu','van hoa','hoa my','loi van hoa my','dien dat chau chuot','tu ngu bong bay'],'beautifully worded','Dùng để khen một câu hoặc cách diễn đạt được trau chuốt'],
+ [['rat my mieu','rat mi mieu','my mieu','mi mieu','cau chu my mieu','cau chu mi mieu','loi le my mieu','loi le mi mieu','van hoa','hoa my','loi van hoa my','dien dat chau chuot','tu ngu bong bay'],'elegantly phrased','Một cách nói tự nhiên khi muốn diễn tả câu chữ được chọn lọc, tinh tế']
 ];
 function ideaNormalizeVi(value){return String(value??'').toLocaleLowerCase('vi').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim()}
+const IDEA_SOFT_WORDS=new Set(['rat','cuc','ky','kha','hoi','that','vo','cung','lam','qua','minh','toi','em','ban','thay','nghi','rang','la','thi','mot','cau','chu','loi','le','tu','ngu','noi','dien','dat']);
+function ideaHasPhrase(normalized,variant){
+ const key=ideaNormalizeVi(variant);if(!key)return false;
+ const padded=` ${normalized} `;if(padded.includes(` ${key} `))return true;
+ const phrase=key.split(' ').filter(word=>word&&!IDEA_SOFT_WORDS.has(word));
+ if(phrase.length<2||phrase.join('').length<6)return false;
+ const words=normalized.split(' ').filter(word=>word&&!IDEA_SOFT_WORDS.has(word));
+ outer:for(let start=0;start<=words.length-phrase.length;start++){
+  for(let offset=0;offset<phrase.length;offset++)if(words[start+offset]!==phrase[offset])continue outer;
+  return true;
+ }
+ return false;
+}
 function offlineIdeaSuggestions(input,topic){
  const normalized=ideaNormalizeVi(input),found=[];
- const padded=' '+normalized+' ';
- const add=(variants,english,note)=>{for(const variant of variants){const key=ideaNormalizeVi(variant);if(key.length>=4&&padded.includes(' '+key+' ')){found.push({english,note,matchLength:key.length});break}}};
+ const add=(variants,english,note)=>{for(const variant of variants){const key=ideaNormalizeVi(variant);if(key.length>=4&&ideaHasPhrase(normalized,key)){found.push({english,note,matchLength:key.length});break}}};
  IDEA_EXPRESSION_MAP.forEach(([variants,english,note])=>add(variants,english,note));
  (VT?.[topic]||[]).forEach(entry=>{const [english,vietnamese]=String(entry).split('|');if(english&&vietnamese)add([vietnamese],english,`Từ vựng chủ đề ${topic}`)});
  (D||[]).forEach(row=>{const [english,,vietnamese]=row;if(!english||!vietnamese)return;add(String(vietnamese).split(/[;,]/).map(part=>part.trim()),english,'Từ trong từ điển ngoại tuyến')});
@@ -5410,7 +5422,7 @@ async function addToHomeScreen(){
 async function registerPwa(){
  if(location.protocol==='file:'||globalThis.isSecureContext!==true){syncPwaUI();return}
  if(!('serviceWorker' in navigator)){pwaOfflineError='Trình duyệt này không hỗ trợ lưu ngoại tuyến.';syncPwaUI();return}
- try{const workerUrl=new URL('./service-worker.js',location.href);workerUrl.searchParams.set('v','2');await navigator.serviceWorker.register(workerUrl,{scope:new URL('./',location.href).pathname,updateViaCache:'none'});pwaOfflineReady=true}
+ try{const workerUrl=new URL('./service-worker.js',location.href);workerUrl.searchParams.set('v','3');await navigator.serviceWorker.register(workerUrl,{scope:new URL('./',location.href).pathname,updateViaCache:'none'});pwaOfflineReady=true}
  catch{pwaOfflineError='Chưa bật được lưu ngoại tuyến. Hãy tải lại trang HTTPS.'}
  syncPwaUI();
 }
