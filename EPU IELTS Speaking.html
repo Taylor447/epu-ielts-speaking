@@ -2568,8 +2568,6 @@ const V={
  },
  prac:()=>S?(S.mode==='exam'?examView():sess()):`${pageIntro('LUYỆN TẬP','Luyện nói theo chủ đề','Chọn một phần và chủ đề, hoặc luyện cả ba phần theo thứ tự.')}
  ${examEntry()}
-  ${arcadeEntry('prac')}
-  ${campus3dEntry('prac')}
   <button class="g w quick-entry" type="button" onclick="startQuick()">Nói nhanh 60 giây · một câu ngẫu nhiên</button>
   <button class="g w quick-entry" type="button" onclick="openSpeakingCoop()">Học coop 2 người · Luyện cùng bạn</button>
  <button class="w" onclick="startExam(123)">${icon('prac')} Thi thử IELTS Speaking · Part 1–2–3</button>`+
@@ -4995,21 +4993,21 @@ const IDEA_EXPRESSION_MAP=[
  [['hoc tu vung'],'learn vocabulary','Học từ vựng'],
  [['de hieu'],'easy to understand','Dễ hiểu'],
  [['kho hieu'],'difficult to understand','Khó hiểu'],
- [['than thien voi moi truong'],'eco-friendly','Thân thiện với môi trường']
+ [['than thien voi moi truong'],'eco-friendly','Thân thiện với môi trường'],
+ [['rat my mieu','my mieu','cau chu my mieu','loi le my mieu'],'very flowery','Dùng cho lời nói hoặc câu chữ nhiều mỹ từ; đôi khi mang sắc thái hơi cầu kỳ'],
+ [['rat my mieu','my mieu','cau chu my mieu','loi le my mieu'],'beautifully worded','Dùng để khen cách diễn đạt được trau chuốt, tự nhiên'],
+ [['rat my mieu','my mieu','cau chu my mieu','loi le my mieu'],'quite eloquent','Dùng khi mô tả người nói hoặc bài nói diễn đạt thuyết phục']
 ];
 function ideaNormalizeVi(value){return String(value??'').toLocaleLowerCase('vi').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim()}
 function offlineIdeaSuggestions(input,topic){
  const normalized=ideaNormalizeVi(input),found=[];
- const add=(variants,english,note)=>{for(const variant of variants){const key=ideaNormalizeVi(variant);if(key.length>=4&&normalized.includes(key)){found.push({english,note,matchLength:key.length});break}}};
+ const padded=' '+normalized+' ';
+ const add=(variants,english,note)=>{for(const variant of variants){const key=ideaNormalizeVi(variant);if(key.length>=4&&padded.includes(' '+key+' ')){found.push({english,note,matchLength:key.length});break}}};
  IDEA_EXPRESSION_MAP.forEach(([variants,english,note])=>add(variants,english,note));
  (VT?.[topic]||[]).forEach(entry=>{const [english,vietnamese]=String(entry).split('|');if(english&&vietnamese)add([vietnamese],english,`Từ vựng chủ đề ${topic}`)});
  (D||[]).forEach(row=>{const [english,,vietnamese]=row;if(!english||!vietnamese)return;add(String(vietnamese).split(/[;,]/).map(part=>part.trim()),english,'Từ trong từ điển ngoại tuyến')});
  const unique=[...new Map(found.sort((a,b)=>b.matchLength-a.matchLength).map(item=>[item.english.toLocaleLowerCase(),item])).values()].slice(0,3);
  const sentence=offlineIdeaSentence(normalized,topic);if(sentence)unique.unshift(sentence);
- if(unique.length<3){
-  const frames=[['One reason is that …','Nêu một lý do cụ thể'],['For example, …','Thêm một ví dụ ngắn'],['This is useful because …','Giải thích vì sao điều đó hữu ích']];
-  for(const [english,note] of frames){if(unique.length>=3)break;if(!unique.some(item=>item.english===english))unique.push({english,note,matchLength:0})}
- }
  return unique.slice(0,3);
 }
 function ideaExactPhrase(value,topic){
@@ -5064,10 +5062,11 @@ async function expressIdea(){
  const text=input.value.trim().slice(0,500);if(!text){renderIdeaSuggestions(target,[], 'Hãy nhập một ý ngắn bằng tiếng Việt trước.');return}
  const request=++ideaRequestId,owner=S,suggestions=offlineIdeaSuggestions(text,S?.it?.[S.i]?.t||'');
  if(owner)owner.ideaOptions=suggestions;
- renderIdeaSuggestions(target,suggestions,'Đang có gợi ý ngoại tuyến. Nếu AI khả dụng, app sẽ bổ sung cách diễn đạt tự nhiên hơn.');
+ const noMatch='Chưa tìm được cụm ngoại tuyến phù hợp. Hãy thử nhập một ý ngắn hơn hoặc diễn đạt bằng từ khác; app sẽ không đưa câu khung chung thay cho bản dịch.';
+ renderIdeaSuggestions(target,suggestions,suggestions.length?'Gợi ý ngoại tuyến dựa trên cụm từ đã nhận ra. Nếu AI khả dụng, app có thể bổ sung cách diễn đạt tự nhiên hơn.':noMatch);
  if(useStatus)useStatus.textContent='';
  if(typeof window.claude?.use!=='function'){
-  renderIdeaSuggestions(target,suggestions,'Dịch vụ AI chưa khả dụng; đây là cụm từ khớp trong kho ngoại tuyến và câu khung. Hãy hoàn thiện chúng theo đúng ý mình.');return;
+  renderIdeaSuggestions(target,suggestions,suggestions.length?'Dịch vụ AI chưa khả dụng; bên dưới là các cụm khớp trong kho ngoại tuyến.':noMatch);return;
  }
  try{
   const sample=await window.claude.use('sample');if(!sample||request!==ideaRequestId||owner!==S||!target.isConnected)return;
@@ -5077,7 +5076,7 @@ async function expressIdea(){
   const improved=parseIdeaAiSuggestions(response?.text);owner.ideaOptions=improved;
   renderIdeaSuggestions(target,improved,'Gợi ý AI là bản nháp để tham khảo. Kiểm tra lại để câu tiếng Anh giữ đúng ý của bạn.');
  }catch{
-  if(request===ideaRequestId&&owner===S&&target.isConnected)renderIdeaSuggestions(target,suggestions,'Chưa lấy được gợi ý AI. Bạn vẫn có thể dùng các cụm ngoại tuyến bên dưới và tự hoàn thiện câu.');
+  if(request===ideaRequestId&&owner===S&&target.isConnected)renderIdeaSuggestions(target,suggestions,suggestions.length?'Chưa lấy được gợi ý AI. Bạn vẫn có thể dùng các cụm ngoại tuyến bên dưới.':noMatch);
  }
 }
 function useIdeaSuggestion(index){
