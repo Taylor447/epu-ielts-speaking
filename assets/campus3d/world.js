@@ -104,6 +104,8 @@ window.createEPUWorld = function (host, buildings, callbacks) {
   function facade(b) {
     const {id,x,z,w,d,floors,kind} = b, h = height(b), face = z+d/2;
     if (kind==='yard') {sign('SÂN TRƯỜNG',x,2.25,z-7,8,1.05,0,'#486343'); hit(x,.25,z,w,.5,d,{id});return;}
+    // The entrance already has a freestanding gate; keep its location selectable without a blocking booth/building.
+    if (id==='gate') {hit(-9,.45,62,8,.9,1.4,{id});return;}
     const skin = palette[kind];
     if (kind==='hall') piece(x,h/2,z,w,h,d,skin,Math.PI/8,'octagon');
     else piece(x,h/2,z,w,h,d,skin);
