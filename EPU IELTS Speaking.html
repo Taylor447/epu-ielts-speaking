@@ -540,10 +540,25 @@ nav svg { width: 18px; height: 18px; }
 .whisper-transcript { padding: 9px 11px; margin-top: 9px; border: 1px solid var(--bd); border-radius: 10px; background: var(--cd); overflow-wrap: anywhere; }
 .whisper-transcript p { margin-top: 0; white-space: pre-wrap; }
 
+.dictionary-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; }
+.dictionary-form input { margin: 0; }
+.dictionary-entry { margin: 14px 0; padding: clamp(12px, 2vw, 19px); border: 1px solid var(--bd); border-radius: 14px; background: var(--cd); overflow-wrap: anywhere; }
+.dictionary-entry h3 { margin: 0; font-size: clamp(1.32rem, 4vw, 1.8rem); }
+.dictionary-entry .row { flex-wrap: wrap; }
+.dictionary-ipa { margin: 4px 0 0; color: var(--pr); }
+.dictionary-senses { padding-inline-start: 22px; }
+.dictionary-senses li { margin-block: 9px; }
+.dictionary-senses li > small { color: var(--pr); font-weight: 650; }
+.dictionary-senses p { margin-block: 4px; }
+.dictionary-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-block: 5px; }
+.dictionary-chip { font-size: .88rem; min-height: 36px; padding: 5px 9px; }
+.dictionary-sources { margin-top: 10px; }
+#dictionary-status:empty { display: none; }
 .pron-confirm { display: flex; gap: 9px; align-items: center; margin-block: 8px 12px; cursor: pointer; }
 .pron-confirm input { width: auto; margin: 0; accent-color: var(--pr); }
 .pron-advice { padding: 9px 12px; border: 1px solid var(--bd); border-radius: 12px; }
 .pron-metrics { grid-template-columns: repeat(auto-fit, minmax(min(100%, 110px), 1fr)); }
+@media (max-width: 380px) { .dictionary-entry > .section-head { display: grid; gap: 8px; } }
 
 .progress-home { margin-top: 28px; }
 .progress-stats { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
@@ -609,7 +624,7 @@ body > header #theme { background: var(--tool-bg); }
 :root { --tool-bg: rgba(247,251,255,.68); --tool-edge: rgba(69,116,182,.24); --tool-shadow: 0 14px 38px rgba(38,77,134,.12); --surface-glass: rgba(250,252,255,.72); }
 :root[data-theme="dark"] { --tool-bg: rgba(12,23,42,.68); --tool-edge: rgba(151,182,239,.25); --tool-shadow: 0 14px 38px rgba(0,0,0,.28); --surface-glass: rgba(18,31,54,.76); }
 body > header, body > nav, .recording-panel, .exam-controls { background: var(--tool-bg); border-color: var(--tool-edge); backdrop-filter: blur(20px) saturate(150%); -webkit-backdrop-filter: blur(20px) saturate(150%); box-shadow: var(--tool-shadow); }
-.c, .voice-report, .pron-panel, .recording-playback, .recording-result, .linking-example, .pron-metrics > div, .whisper-transcript, .exam-pending, .flash-face, .retake-note { background: var(--surface-glass); border-color: var(--tool-edge); backdrop-filter: blur(16px) saturate(145%); -webkit-backdrop-filter: blur(16px) saturate(145%); }
+.c, .voice-report, .pron-panel, .dictionary-entry, .recording-playback, .recording-result, .linking-example, .pron-metrics > div, .whisper-transcript, .exam-pending, .flash-face, .retake-note { background: var(--surface-glass); border-color: var(--tool-edge); backdrop-filter: blur(16px) saturate(145%); -webkit-backdrop-filter: blur(16px) saturate(145%); }
 input, textarea, select, .goal-form input { background: var(--surface-glass); border-color: var(--tool-edge); }
 button.g { background: color-mix(in srgb, var(--surface-glass) 88%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
 body > nav button.on { background: color-mix(in srgb,var(--pr) 17%,transparent); }
@@ -793,44 +808,6 @@ body > nav button.on { background: color-mix(in srgb,var(--pr) 17%,transparent);
 .path-study-examples [lang="en"] { font-weight: 650; }
 .path-lesson-model { margin: 14px 0; }
 .path-lesson-model blockquote { line-height: 1.7; }
-.grammar-library { margin-top: 20px; }
-.grammar-library-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 10px 18px; }
-.grammar-library-head h2 { margin: 0; }
-.grammar-library-head p { margin: 5px 0 0; }
-.grammar-filter { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
-.grammar-filter button[aria-pressed="true"] { border-color: var(--action); background: var(--action); color: var(--on,#fff); }
-.grammar-search { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
-.grammar-search input { flex: 1 1 240px; min-width: 0; }
-.grammar-search .sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-.grammar-groups { display: grid; gap: 18px; margin-top: 18px; }
-.grammar-group { scroll-margin-top: 90px; }
-.grammar-group-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 12px; padding-bottom: 8px; margin-bottom: 10px; border-bottom: 1px solid var(--bd); }
-.grammar-group-head h3 { margin: 0; }
-.grammar-group-head span,.grammar-count { color: var(--mu); }
-.grammar-cards { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,330px),1fr)); gap: 10px; }
-.grammar-card { min-width: 0; border: 1px solid var(--bd); border-radius: 16px; padding: 13px 15px; background: var(--sf); }
-.grammar-card[open] { border-color: color-mix(in srgb,var(--pr) 55%,var(--bd)); }
-.grammar-card summary { cursor: pointer; list-style: none; }
-.grammar-card summary::-webkit-details-marker { display: none; }
-.grammar-card-title { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 9px; }
-.grammar-card-title strong { flex: 1 1 220px; }
-.grammar-code { color: var(--pr); font: 650 .82em ui-monospace,monospace; }
-.grammar-level { border: 1px solid var(--bd); border-radius: 7px; padding: 2px 7px; font-size: .82em; font-weight: 700; }
-.grammar-card-summary { margin: 7px 0 0; color: var(--mu); }
-.grammar-detail { display: grid; gap: 10px; margin-top: 13px; padding-top: 12px; border-top: 1px solid var(--bd); }
-.grammar-detail h4 { margin: 0 0 4px; }
-.grammar-detail p { margin: 3px 0; }
-.grammar-formula { padding: 9px 11px; border-radius: 10px; background: var(--cd); font-weight: 650; overflow-wrap: anywhere; }
-.grammar-warning { color: var(--mu); }
-.grammar-examples { display: grid; gap: 7px; }
-.grammar-example { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 9px 10px; border: 1px solid var(--bd); border-radius: 10px; }
-.grammar-example p { margin: 2px 0; }
-.grammar-example [lang="en"] { font-weight: 650; }
-.grammar-empty { padding: 16px; border: 1px dashed var(--bd); border-radius: 12px; color: var(--mu); }
-@media (max-width: 560px) {
- .grammar-card { padding: 11px; }
- .grammar-example { align-items: flex-start; }
-}
 @media (max-width: 700px) {
  .review-switch { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 8px; }
  .review-switch button { padding-inline: 5px; font-size: clamp(11px, 3.55vw, 14px); }
@@ -2411,7 +2388,6 @@ const ICONS={
  career:'<path d="M3 20h18M5 16l5-5 3 3 6-8"/><path d="M15 6h4v4"/>',
  bus:'<path d="M5 18V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v13M4 18h16M7 7h10v6H7z"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/><path d="M7 15h.01M17 15h.01"/>',
  spark:'<path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3ZM19 16l1 2.5 2.5 1-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1 1-2.5Z"/>',
- palette:'<path d="M12 3a9 9 0 1 0 0 18h1.3a2.2 2.2 0 0 0 1.8-3.5 1.3 1.3 0 0 1 1.1-2h.8A4 4 0 0 0 21 11.5C21 6.8 16.97 3 12 3Z"/><circle cx="7.5" cy="10" r=".7"/><circle cx="10.5" cy="6.5" r=".7"/><circle cx="15" cy="7" r=".7"/><circle cx="17.5" cy="10.5" r=".7"/>',
  sport:'<path d="M6 4v6m-3-6v4a3 3 0 0 0 6 0V4m-3 6v10m12-16v6m-3-6v4a3 3 0 0 0 6 0V4m-3 6v10"/>',
  music:'<path d="M9 18V5l12-2v13M9 8l12-2"/><ellipse cx="6" cy="18" rx="3" ry="2"/><ellipse cx="18" cy="16" rx="3" ry="2"/>',
  book:'<path d="M4 4h12a4 4 0 0 1 4 4v12H8a4 4 0 0 1-4-4V4Z"/><path d="M4 16a4 4 0 0 1 4-4h12M8 4v8"/>',
@@ -4960,7 +4936,6 @@ function start(parts,topic){
 }
 
 let ideaRequestId=0;
-let offlineIdeaDictionaryRowsCache=null;
 const IDEA_EXPRESSION_MAP=[
  [['theo toi','theo y kien cua toi','toi nghi rang'],'In my opinion','Mở đầu để nêu quan điểm'],
  [['toi nghi','minh nghi','toi cho rang'],'I think','Nêu suy nghĩ'],
@@ -5016,19 +4991,6 @@ const IDEA_EXPRESSION_MAP=[
  [['giup toi'],'helps me','Giúp tôi'],
  [['hoc tieng anh'],'study English','Học tiếng Anh'],
  [['hoc tu vung'],'learn vocabulary','Học từ vựng'],
- [['buon non','rat buon non','cam thay buon non','muon non'],'feel nauseous','Cách nói rõ nghĩa, trung tính: cảm thấy buồn nôn'],
- [['buon non','rat buon non','cam thay buon non','muon non'],'feel sick','Cách nói thông dụng, thân mật hơn: thấy buồn nôn'],
- [['buon non','rat buon non','cam thay buon non','muon non'],'feel like throwing up','Cách nói mạnh hơn: cảm giác sắp nôn'],
- [['met moi','rat met moi','kiem suc'],'feel exhausted','Cách nói tự nhiên khi rất mệt'],
- [['lo lang','rat lo lang','bat an'],'feel anxious','Diễn tả cảm giác lo lắng'],
- [['cang thang','rat cang thang','ap luc'],'feel stressed','Diễn tả căng thẳng do áp lực'],
- [['that vong','rat that vong'],'feel disappointed','Diễn tả cảm giác thất vọng'],
- [['tu hao','rat tu hao'],'feel proud','Diễn tả cảm giác tự hào'],
- [['vui mung','rat vui mung','phan khoi'],'feel delighted','Cách nói mạnh hơn “feel happy”'],
- [['buon','rat buon'],'feel sad','Diễn tả cảm giác buồn'],
- [['my mieu','rat my mieu','cau chu my mieu','loi van my mieu','dien dat my mieu'],'flowery','Dùng cho lời nói hoặc văn phong nhiều mỹ từ; sắc thái có thể hơi cầu kỳ'],
- [['hoa my','loi van hoa my','cau chu hoa my'],'ornate','Diễn tả cách viết/trang trí cầu kỳ, nhiều chi tiết'],
- [['dien dat chau chuot','loi van chau chuot'],'eloquent','Diễn tả lời nói trôi chảy, diễn đạt khéo'],
  [['de hieu'],'easy to understand','Dễ hiểu'],
  [['kho hieu'],'difficult to understand','Khó hiểu'],
  [['than thien voi moi truong'],'eco-friendly','Thân thiện với môi trường'],
@@ -5038,12 +5000,6 @@ const IDEA_EXPRESSION_MAP=[
 ];
 function ideaNormalizeVi(value){return String(value??'').toLocaleLowerCase('vi').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim()}
 const IDEA_SOFT_WORDS=new Set(['rat','cuc','ky','kha','hoi','that','vo','cung','lam','qua','minh','toi','em','ban','thay','nghi','rang','la','thi','mot','cau','chu','loi','le','tu','ngu','noi','dien','dat']);
-function offlineIdeaDictionaryRows(){
- if(offlineIdeaDictionaryRowsCache)return offlineIdeaDictionaryRowsCache;
- const source=typeof D==='string'?D:'';
- offlineIdeaDictionaryRowsCache=source.split(/\r?\n/).map(line=>line.split('|').map(value=>value.trim())).filter(row=>row.length>=3&&row[0]&&row[2]);
- return offlineIdeaDictionaryRowsCache;
-}
 function ideaHasPhrase(normalized,variant){
  const key=ideaNormalizeVi(variant);if(!key)return false;
  const padded=` ${normalized} `;if(padded.includes(` ${key} `))return true;
@@ -5058,23 +5014,12 @@ function ideaHasPhrase(normalized,variant){
 }
 function offlineIdeaSuggestions(input,topic){
  const normalized=ideaNormalizeVi(input),found=[];
- const add=(variants,english,note)=>{for(const variant of variants){const key=ideaNormalizeVi(variant);if(key.length>=4&&ideaHasPhrase(normalized,key)){found.push({kind:'term',english,note,matchLength:key.length});break}}};
+ const add=(variants,english,note)=>{for(const variant of variants){const key=ideaNormalizeVi(variant);if(key.length>=4&&ideaHasPhrase(normalized,key)){found.push({english,note,matchLength:key.length});break}}};
  IDEA_EXPRESSION_MAP.forEach(([variants,english,note])=>add(variants,english,note));
  (VT?.[topic]||[]).forEach(entry=>{const [english,vietnamese]=String(entry).split('|');if(english&&vietnamese)add([vietnamese],english,`Từ vựng chủ đề ${topic}`)});
-  offlineIdeaDictionaryRows().forEach(row=>{const [english,,vietnamese]=row;if(!english||!vietnamese)return;add(String(vietnamese).split(/[;,]/).map(part=>part.trim()),english,'Từ trong từ điển ngoại tuyến')});
-  const words=normalized.split(' '),known=[];
-  for(let size=Math.min(5,words.length);size>=1;size--){
-   for(let start=0;start+size<=words.length;start++){
-    const phrase=words.slice(start,start+size).join(' '),english=ideaExactPhrase(phrase,topic);
-    if(english&&phrase.length>=4&&!known.some(item=>item.english.toLocaleLowerCase()===english.toLocaleLowerCase()))known.push({kind:'term',english,note:`Cụm “${phrase}” trong từ điển ngoại tuyến`,matchLength:phrase.length});
-   }
-  }
-  const unique=[...new Map([...known,...found].sort((a,b)=>b.matchLength-a.matchLength).map(item=>[item.english.toLocaleLowerCase(),item])).values()];
-  const sentence=offlineIdeaSentence(normalized,topic);
-  if(sentence){
-   const covered=new Set(sentence.english.toLocaleLowerCase().match(/[a-z]+/g)||[]);
-   return [sentence,...unique.filter(item=>!(item.english.toLocaleLowerCase().match(/[a-z]+/g)||[]).filter(word=>!IDEA_SOFT_WORDS.has(word)).every(word=>covered.has(word)))].slice(0,3);
-  }
+ (D||[]).forEach(row=>{const [english,,vietnamese]=row;if(!english||!vietnamese)return;add(String(vietnamese).split(/[;,]/).map(part=>part.trim()),english,'Từ trong từ điển ngoại tuyến')});
+ const unique=[...new Map(found.sort((a,b)=>b.matchLength-a.matchLength).map(item=>[item.english.toLocaleLowerCase(),item])).values()].slice(0,3);
+ const sentence=offlineIdeaSentence(normalized,topic);if(sentence)unique.unshift(sentence);
  return unique.slice(0,3);
 }
 function ideaExactPhrase(value,topic){
@@ -5088,60 +5033,24 @@ function ideaExactPhrase(value,topic){
  for(const [variants,english] of slots)if(variants.some(variant=>ideaNormalizeVi(variant)===key))return english;
  for(const [variants,english] of IDEA_EXPRESSION_MAP)if(variants.some(variant=>ideaNormalizeVi(variant)===key))return english;
  for(const entry of VT?.[topic]||[]){const [english,vietnamese]=String(entry).split('|');if(vietnamese&&ideaNormalizeVi(vietnamese)===key)return english}
-  for(const row of offlineIdeaDictionaryRows()){const [english,,vietnamese]=row;if(String(vietnamese||'').split(/[;,]/).some(part=>ideaNormalizeVi(part)===key))return english}
  return '';
 }
-function ideaResolvePhrase(value,topic){
- const normalized=ideaNormalizeVi(value),direct=ideaExactPhrase(normalized,topic);if(direct)return direct;
- if(!normalized)return '';
- let best=null;
- const consider=(variants,english)=>{if(!english)return;for(const variant of variants){const key=ideaNormalizeVi(variant);if(key.length<4||!ideaHasPhrase(normalized,key))continue;const useful=key.split(' ').filter(word=>word&&!IDEA_SOFT_WORDS.has(word)).length,score=key.length+useful*3;if(!best||score>best.score)best={english,score}}};
- IDEA_EXPRESSION_MAP.forEach(([variants,english])=>consider(variants,english));
- (VT?.[topic]||[]).forEach(entry=>{const [english,vietnamese]=String(entry).split('|');if(english&&vietnamese)consider([vietnamese],english)});
- offlineIdeaDictionaryRows().forEach(row=>{const [english,,vietnamese]=row;if(english&&vietnamese)consider(String(vietnamese).split(/[;,]/).map(part=>part.trim()),english)});
- return best?.english||'';
-}
-function ideaBaseVerb(value){return String(value||'').trim().replace(/^learning\b/i,'learn').replace(/^studying\b/i,'study').replace(/^using\b/i,'use').replace(/^taking\b/i,'take').replace(/^doing\b/i,'do')}
 function offlineIdeaSentence(normalized,topic){
  let match=normalized.match(/^(?:toi|minh|em) (thuong )?(?:dung|su dung) (.+?) de (.+?)(?: khi (.+))?$/);
  if(match){
-  const object=ideaResolvePhrase(match[2],topic),purpose=ideaBaseVerb(ideaResolvePhrase(match[3],topic)),when=match[4]?ideaResolvePhrase(match[4],topic):'';
-  const context=when==='take the bus'?"while I'm on the bus":when?`when I ${when}`:'';
-  if(object&&purpose&&(!match[4]||when))return {kind:'sentence',english:`I ${match[1]?'usually ':''}use ${object} to ${purpose}${context?' '+context:''}.`,note:'Ghép từ các cụm đã tra trong từ điển ngoại tuyến; hãy kiểm tra lại sắc thái.',matchLength:normalized.length};
- }
- match=normalized.match(/^(.+?) giup (?:toi|minh|em) (.+?)(?: khi (.+))?$/);
- if(match){
-  let subject=ideaResolvePhrase(match[1],topic),action=ideaBaseVerb(ideaResolvePhrase(match[2],topic)),when=match[3]?ideaResolvePhrase(match[3],topic):'';
-  if(subject==='smartphone')subject='my phone';if(subject==='laptop')subject='my laptop';
-  const context=when==='take the bus'?"while I'm on the bus":when?`when I ${when}`:'';
-  if(subject&&action&&(!match[3]||when))return {kind:'sentence',english:`${subject.charAt(0).toUpperCase()+subject.slice(1)} helps me ${action}${context?' '+context:''}.`,note:'Ghép từ các cụm đã tra trong từ điển ngoại tuyến; hãy kiểm tra lại sắc thái.',matchLength:normalized.length};
+  const object=ideaExactPhrase(match[2],topic),purpose=ideaExactPhrase(match[3],topic),when=match[4]?ideaExactPhrase(match[4],topic):'';
+  if(object&&purpose&&(!match[4]||when))return {english:`I ${match[1]?'usually ':''}use ${object} to ${purpose}${when?` when I ${when}`:''}.`,note:'Câu ghép từ các cụm ngoại tuyến đã nhận ra.',matchLength:normalized.length};
  }
  match=normalized.match(/^(?:toi|minh|em) (?:rat )?(?:thich|yeu thich) (.+?) vi (.+)$/);
  if(match){
-  let subject=ideaResolvePhrase(match[1],topic),reason=ideaResolvePhrase(match[2],topic);
+  let subject=ideaExactPhrase(match[1],topic),reason=ideaExactPhrase(match[2],topic);
   if(subject==='hometown')subject='my hometown';if(subject==='study English')subject='learning English';if(subject==='dish')subject='local food';
   if(reason&&!/^(?:it is|the food is|many )/.test(reason))reason=`it is ${reason}`;
-  if(subject&&reason)return {kind:'sentence',english:`I really enjoy ${subject} because ${reason}.`,note:'Ghép từ các cụm đã tra trong từ điển ngoại tuyến; hãy kiểm tra lại sắc thái.',matchLength:normalized.length};
- }
- match=normalized.match(/^(?:toi|minh|em) (muon|can|co the|thuong) (.+)$/);
- if(match){
-  const activity=ideaBaseVerb(ideaResolvePhrase(match[2],topic)),leads={muon:'want to',can:'need to','co the':'can',thuong:'usually'};
-  if(activity)return {kind:'sentence',english:`I ${leads[match[1]]} ${activity}.`,note:'Câu mẫu theo cấu trúc đơn giản và cụm trong từ điển ngoại tuyến; hãy kiểm tra sắc thái.',matchLength:normalized.length};
- }
- match=normalized.match(/^(?:toi|minh|em) (?:cam thay|thay) (.+?)(?: khi (.+))?$/);
- if(match){
-  const feeling=ideaResolvePhrase(match[1],topic).replace(/^feel\s+/i,''),when=match[2]?ideaResolvePhrase(match[2],topic):'',intensifier=/\brat\b/.test(match[1]);
-  const context=when==='take the bus'?"while I'm on the bus":when?`when I ${when}`:'';
-  if(feeling&&(!match[2]||when))return {kind:'sentence',english:`I feel ${intensifier?'really ':''}${feeling}${context?' '+context:''}.`,note:'Câu mẫu “I feel…” ghép từ từ điển ngoại tuyến; “really” giữ sắc thái “rất”. Hãy kiểm tra xem đúng ý bạn không.',matchLength:normalized.length};
- }
- const standalone=ideaResolvePhrase(normalized,topic);
- if(/^feel\s+\S+/i.test(standalone)){
-  const feeling=standalone.replace(/^feel\s+/i,'');
-  return {kind:'sentence',english:`I feel ${/^rat\s/.test(normalized)?'really ':''}${feeling}.`,note:'Câu được ghép từ cụm cảm giác đã tra; “really” giữ sắc thái “rất”. Hãy kiểm tra xem đúng ý bạn không.',matchLength:normalized.length};
+  if(subject&&reason)return {english:`I really enjoy ${subject} because ${reason}.`,note:'Câu ghép từ các cụm ngoại tuyến đã nhận ra.',matchLength:normalized.length};
  }
  return null;
 }
-function ideaCoachMarkup(){return `<details class="idea-coach"><summary>💡 Bí ý? Nhập bằng tiếng Việt để tìm cách nói tiếng Anh</summary><div class="idea-coach-body"><p>Nhập ý bằng tiếng Việt. App sẽ ghép câu mẫu ngoại tuyến khi nhận ra cấu trúc, rồi tra các từ/cụm gần nghĩa trong từ điển để bạn chọn và lưu ôn tập.</p><label for="idea-vi">Ý của bạn bằng tiếng Việt</label><textarea id="idea-vi" rows="3" maxlength="500" placeholder="Ví dụ: điện thoại giúp em học từ vựng khi đi xe buýt"></textarea><div class="row"><button type="button" onclick="expressIdea()">Gợi ý cách nói</button></div><p class="idea-coach-note">Tính năng dùng từ điển và mẫu câu có sẵn trên máy, không gửi nội dung đi đâu. File chưa có mô hình AI tạo câu chạy ngoại tuyến; câu ghép chỉ là gợi ý, hãy kiểm tra sắc thái. Để nhớ lâu: nghe mẫu, tự nói lại không nhìn rồi lưu từ/cụm để ôn.</p><div id="idea-output" class="idea-coach-results" role="status" aria-live="polite"></div><div id="idea-dictionary-results" class="idea-dictionary-terms" aria-live="polite"></div><p id="idea-use-status" class="idea-coach-note" aria-live="polite"></p></div></details>`}
+function ideaCoachMarkup(){return `<details class="idea-coach"><summary>💡 Bí ý? Nhập bằng tiếng Việt để tìm cách nói tiếng Anh</summary><div class="idea-coach-body"><p>Gõ ý ngắn của bạn. App sẽ đưa tối đa 3 cách diễn đạt; hãy chọn câu đúng với điều bạn muốn nói.</p><label for="idea-vi">Ý của bạn bằng tiếng Việt</label><textarea id="idea-vi" rows="3" maxlength="500" placeholder="Ví dụ: điện thoại giúp em học từ vựng khi đi xe buýt"></textarea><div class="row"><button type="button" onclick="expressIdea()">Gợi ý cách nói</button></div><p class="idea-coach-note">Khi dịch vụ AI đang kết nối, app chỉ gửi ý này và câu hỏi hiện tại sau khi bạn bấm nút. Nếu không có dịch vụ hoặc mất mạng, app dùng cụm từ ngoại tuyến.</p><div id="idea-output" class="idea-coach-results" role="status" aria-live="polite"></div><p id="idea-use-status" class="idea-coach-note" aria-live="polite"></p></div></details>`}
 function renderIdeaSuggestions(target,suggestions,note){
  if(!target?.isConnected)return;
  target.replaceChildren();
@@ -5150,59 +5059,37 @@ function renderIdeaSuggestions(target,suggestions,note){
   const card=document.createElement('article');card.className='idea-suggestion';
   const copy=document.createElement('div'),english=document.createElement('p');english.lang='en';english.textContent=item.english;copy.appendChild(english);
   if(item.note){const hint=document.createElement('small');hint.textContent=item.note;copy.appendChild(hint)}
-  const actions=document.createElement('div');actions.className='row';
-  const button=document.createElement('button');button.type='button';button.className='g';button.textContent=item.kind==='sentence'?'Chèn câu này':'Chèn cụm từ';button.addEventListener('click',()=>useIdeaSuggestion(index));actions.appendChild(button);
-  if(item.kind==='sentence'||item.kind==='term'){
-   const listen=document.createElement('button');listen.type='button';listen.className='g';listen.textContent='Nghe mẫu';listen.addEventListener('click',()=>say(item.english,.9));actions.appendChild(listen);
-  }
-  card.append(copy,actions);target.appendChild(card);
+  const button=document.createElement('button');button.type='button';button.className='g';button.textContent='Dùng câu này';button.addEventListener('click',()=>useIdeaSuggestion(index));
+  card.append(copy,button);target.appendChild(card);
  });
 }
-function renderIdeaDictionaryResults(target,items,note,owner,request){
- if(!target?.isConnected||request!==ideaRequestId||owner!==S)return;
- target.replaceChildren();
- const message=document.createElement('p');message.className='idea-coach-note';message.textContent=note;target.appendChild(message);
- if(!items.length)return;
- owner.ideaDictionaryOptions=items;
- const list=document.createElement('div');list.className='idea-dictionary-terms';
- items.forEach(item=>{
-  const [word,ipa,vi,en]=item.entry||[];if(!word)return;
-  dictionaryPositions.set(item.key,{word,vi:vi||[],en:en||[]});
-  const card=document.createElement('article');card.className='idea-dictionary-term';
-  const info=document.createElement('div'),title=document.createElement('strong'),meaning=document.createElement('p');title.lang='en';title.textContent=word;
-  const pron=Array.isArray(ipa)&&ipa[0]?' /'+ipa[0]+'/':'';title.textContent+=pron;
-  meaning.textContent=(vi?.[0]?.[1]||en?.[0]?.[1]||'Chưa có nghĩa tiếng Việt trong mục này.')+(en?.find(row=>row?.[2])?.[2]?' · Ví dụ: '+en.find(row=>row?.[2])[2]:'');
-  info.append(title,meaning);
-  const actions=document.createElement('div');actions.className='row';
-  const insert=document.createElement('button');insert.type='button';insert.className='g';insert.textContent='Chèn cụm từ';insert.addEventListener('click',()=>useIdeaDictionaryTerm(item.key));
-  const listen=document.createElement('button');listen.type='button';listen.className='g';listen.textContent='Nghe';listen.addEventListener('click',()=>say(word,.9));
-  const save=document.createElement('button');save.type='button';save.className='g';save.dataset.word=item.key;const alreadySaved=st.c.some(saved=>dictionaryKey(saved.w)===item.key);save.textContent=alreadySaved?'✓ Đã lưu':'Lưu để ôn';save.disabled=alreadySaved;save.addEventListener('click',()=>saveDictionaryWord(save));
-  actions.append(insert,listen,save);card.append(info,actions);list.appendChild(card);
- });
- target.appendChild(list);
-}
-function useIdeaDictionaryTerm(key){
- const item=S?.ideaDictionaryOptions?.find(entry=>entry.key===key);if(!item)return;
- S.ideaOptions=[...(S.ideaOptions||[]),{kind:'term',english:item.key,note:item.entry?.[2]?.[0]?.[1]||'Cụm từ tra từ điển ngoại tuyến'}];
- useIdeaSuggestion(S.ideaOptions.length-1);
+function parseIdeaAiSuggestions(response){
+ const source=String(response??'').trim(),match=source.match(/\{[\s\S]*\}/);if(!match)throw Error('idea_json');
+ const data=JSON.parse(match[0]),list=Array.isArray(data.suggestions)?data.suggestions:[];
+ const suggestions=list.slice(0,3).map(item=>({english:String(item?.english??'').trim().slice(0,220),note:String(item?.note??'').trim().slice(0,120)})).filter(item=>/[a-z]/i.test(item.english)&&!/[ăâđêôơưĂÂĐÊÔƠƯ]/.test(item.english));
+ if(!suggestions.length)throw Error('idea_empty');return suggestions;
 }
 async function expressIdea(){
-  const input=$('#idea-vi'),target=$('#idea-output'),dictionaryTarget=$('#idea-dictionary-results'),useStatus=$('#idea-use-status');if(!input||!target)return;
+ const input=$('#idea-vi'),target=$('#idea-output'),useStatus=$('#idea-use-status');if(!input||!target)return;
  const text=input.value.trim().slice(0,500);if(!text){renderIdeaSuggestions(target,[], 'Hãy nhập một ý ngắn bằng tiếng Việt trước.');return}
- const request=++ideaRequestId,owner=S;let suggestions=[],localWarning='';
- try{suggestions=offlineIdeaSuggestions(text,S?.it?.[S.i]?.t||'')}catch(error){localWarning='Một phần dữ liệu gợi ý chưa đọc được; app vẫn sẽ thử tra từ điển ngoại tuyến.'}
+ const request=++ideaRequestId,owner=S,suggestions=offlineIdeaSuggestions(text,S?.it?.[S.i]?.t||'');
  if(owner)owner.ideaOptions=suggestions;
-  const hasSentence=suggestions.some(item=>item.kind==='sentence');
-  const noMatch=localWarning||(hasSentence?'Đã ghép câu mẫu từ các cụm trong từ điển ngoại tuyến. Hãy nghe, nói lại không nhìn rồi sửa cho đúng ý.':suggestions.length?'Đã tìm thấy cụm từ trong kho ngoại tuyến; đây chưa phải câu hoàn chỉnh. Từ điển đang tìm thêm cách diễn đạt gần nghĩa.':'Chưa có mẫu câu khớp ngay. App đang tra từ điển ngoại tuyến để tìm từ/cụm gần nghĩa; kết quả có thể là gợi ý từ vựng, không phải bản dịch nguyên câu.');
-  const dictionaryMessage='Đang tìm cách nói gần nghĩa trong từ điển ngoại tuyến…';
-  renderIdeaSuggestions(target,suggestions,suggestions.length?'Các câu mẫu được ghép từ cụm đã nhận ra. Hãy chọn câu giữ đúng ý bạn.':noMatch);
-  if(dictionaryTarget)renderIdeaDictionaryResults(dictionaryTarget,[],dictionaryMessage,owner,request);
+ const noMatch='Chưa tìm được cụm ngoại tuyến phù hợp. Hãy thử nhập một ý ngắn hơn hoặc diễn đạt bằng từ khác; app sẽ không đưa câu khung chung thay cho bản dịch.';
+ renderIdeaSuggestions(target,suggestions,suggestions.length?'Gợi ý ngoại tuyến dựa trên cụm từ đã nhận ra. Nếu AI khả dụng, app có thể bổ sung cách diễn đạt tự nhiên hơn.':noMatch);
  if(useStatus)useStatus.textContent='';
+ if(typeof window.claude?.use!=='function'){
+  renderIdeaSuggestions(target,suggestions,suggestions.length?'Dịch vụ AI chưa khả dụng; bên dưới là các cụm khớp trong kho ngoại tuyến.':noMatch);return;
+ }
  try{
-   const found=await reverseDictionarySearch(text,6,message=>{if(request===ideaRequestId&&owner===S&&dictionaryTarget?.isConnected){const p=document.createElement('p');p.className='idea-coach-note';p.textContent=message;dictionaryTarget.replaceChildren(p)}});
-   if(request!==ideaRequestId||owner!==S||!target.isConnected)return;
-   renderIdeaDictionaryResults(dictionaryTarget,found,found.length?'Các từ/cụm dưới đây có nghĩa tiếng Việt gần với ý bạn trong từ điển tích hợp. Hãy chọn đúng sắc thái rồi lưu để ôn lại.':'Không tìm thấy mục đủ gần trong từ điển tích hợp. Thử rút gọn ý hoặc nhập một cụm tiếng Việt cụ thể hơn.',owner,request);
-  }catch(error){if(request===ideaRequestId&&owner===S&&target.isConnected)renderIdeaDictionaryResults(dictionaryTarget,[],error?.message==='reverse_dictionary_unsupported'?'Trình duyệt này chưa hỗ trợ mở bộ từ điển ngoại tuyến. Bạn vẫn có thể dùng câu mẫu đã nhận ra.':'Chưa mở được chỉ mục nghĩa Việt → Anh. Hãy thử lại; câu mẫu nhận ra vẫn dùng được.',owner,request)}
+  const sample=await window.claude.use('sample');if(!sample||request!==ideaRequestId||owner!==S||!target.isConnected)return;
+  const current=owner?.it?.[owner.i],prompt=`Bạn là trợ lý diễn đạt ý IELTS Speaking. Hãy chuyển đúng ý tiếng Việt thành 3 cách nói tiếng Anh tự nhiên, phù hợp trình độ người học; không thêm dữ kiện cá nhân, không chấm band. Có thể dùng một câu ngắn, một câu tự nhiên hơn và một mẫu có thể mở rộng. Giải thích ngắn bằng tiếng Việt. Chỉ trả JSON hợp lệ dạng {"suggestions":[{"english":"...","note":"..."}]}, tối đa 3 mục.\nChủ đề: ${String(current?.t||'IELTS Speaking').slice(0,100)}\nCâu hỏi: ${String(current?.q||'').slice(0,240)}\nÝ người học: ${text}`;
+  const response=await Promise.race([sample(prompt,{modelTier:'default',cache:false}),new Promise((_,reject)=>setTimeout(()=>reject(Error('timeout')),18000))]);
+  if(request!==ideaRequestId||owner!==S||!target.isConnected)return;
+  const improved=parseIdeaAiSuggestions(response?.text);owner.ideaOptions=improved;
+  renderIdeaSuggestions(target,improved,'Gợi ý AI là bản nháp để tham khảo. Kiểm tra lại để câu tiếng Anh giữ đúng ý của bạn.');
+ }catch{
+  if(request===ideaRequestId&&owner===S&&target.isConnected)renderIdeaSuggestions(target,suggestions,suggestions.length?'Chưa lấy được gợi ý AI. Bạn vẫn có thể dùng các cụm ngoại tuyến bên dưới.':noMatch);
+ }
 }
 function useIdeaSuggestion(index){
  const text=String(S?.ideaOptions?.[index]?.english||'').trim(),status=$('#idea-use-status');if(!text||!S)return;
@@ -5718,7 +5605,7 @@ function updateTheme(forcedSkin){
 }
 function ensureThemeUi(){
  const header=document.querySelector('body > header .head-actions');
- if(header&&!$('#themes')){const button=themeNode('button','theme-toggle');button.id='themes';button.type='button';button.setAttribute('aria-label','Chủ đề giao diện');button.setAttribute('aria-haspopup','dialog');button.setAttribute('aria-controls','theme-picker');button.title='Chọn chủ đề giao diện';button.append(icon('palette'),themeNode('span','','Themes'));button.addEventListener('click',openThemePicker);header.insertBefore(button,$('#theme'))}
+ if(header&&!$('#themes')){const button=themeNode('button','theme-toggle');button.id='themes';button.type='button';button.setAttribute('aria-label','Chủ đề giao diện');button.setAttribute('aria-haspopup','dialog');button.setAttribute('aria-controls','theme-picker');button.title='Chọn chủ đề giao diện';button.append(document.createTextNode('🎨 '),themeNode('span','','Themes'));button.addEventListener('click',openThemePicker);header.insertBefore(button,$('#theme'))}
  let dialog=$('#theme-picker');if(!dialog){dialog=document.createElement('dialog');dialog.id='theme-picker';document.body.append(dialog)}if(dialog.dataset.themeUiReady==='true')return dialog;
  dialog.setAttribute('aria-labelledby','theme-picker-title');
  const shell=themeNode('div','theme-picker-shell'),heading=themeNode('div','theme-picker-heading'),titleWrap=themeNode('div'),kicker=themeNode('span','theme-picker-kicker','EPU IELTS SPEAKING'),title=themeNode('h2','','Chủ đề giao diện'),close=themeButton('×',closeThemePicker,'g theme-picker-close');
@@ -6530,14 +6417,230 @@ function pronunciationAdvice(report) {
   return `${finals.length?'Luyện âm cuối':'Luyện âm'} /${ipa}/ trong ${examples.join(', ')}. ${drill}`;
 }
 
+const dictionaryCache = new Map();
+const dictionaryPositions = new Map();
+let dictionarySearchTimer;
+const dictionaryKey = word => word.toLowerCase().normalize('NFKC').replace(/[’‘]/g, "'").replace(/[_\s]+/g, ' ').trim();
+
 function dictionaryPage() {
-  return `${pageIntro('TỪ VỰNG', 'Từ vựng theo chủ đề', 'Tra cứu và ôn lại các từ, cụm từ chọn lọc cho IELTS Speaking.')}
-  <section class="c" aria-labelledby="curated-title">
-    <div class="section-head"><div><p class="eyebrow">IELTS SPEAKING</p><h2 id="curated-title">Kho từ vựng IELTS</h2><p class="mu">Các từ đã biên soạn theo chủ đề, có nghĩa, ví dụ và chức năng nghe/lưu.</p></div></div>
-    <label for="q">Tìm trong kho từ vựng IELTS</label>
-    <input id="q" type="search" maxlength="80" autocomplete="off" placeholder="Ví dụ: energy, study, environment" oninput="vl()">
-    <div id="curated-vocabulary" aria-live="polite"><div id="vr" class="vocab-grid"></div><p id="vocab-empty" class="mu" hidden>Chưa tìm thấy từ phù hợp. Thử từ khóa khác nhé.</p></div>
-  </section>`;
+  const {count, bilingual} = JSON.parse($('#offline-dictionary-meta').textContent);
+  return `${pageIntro('TỪ VỰNG', 'Từ điển tiếng Anh', 'Tra từ và cụm từ ngay trên thiết bị.')}
+  <section class="c dictionary-lookup" aria-labelledby="dictionary-title">
+    <div class="section-head"><div><h2 id="dictionary-title">Tra từ điển</h2><p class="mu">${count.toLocaleString('vi-VN')} mục từ · ${bilingual.toLocaleString('vi-VN')} mục có nghĩa tiếng Việt</p></div><span class="part-index">NGOẠI TUYẾN</span></div>
+    <form onsubmit="event.preventDefault(); searchDictionary(true)">
+      <label for="q">Từ hoặc cụm từ tiếng Anh</label>
+      <div class="dictionary-form"><input id="q" type="search" maxlength="100" autocomplete="off" spellcheck="false" aria-controls="dictionary-results" placeholder="Ví dụ: resilience, geese, carbon footprint" oninput="if(!event.isComposing) queueDictionarySearch()" oncompositionend="queueDictionarySearch()"><button type="submit">Tra từ</button></div>
+    </form>
+    <div id="dictionary-results"><p class="mu">Thử một từ, cụm từ hoặc dạng biến đổi như <button class="g dictionary-chip" data-word="ran" onclick="chooseDictionaryWord(this)">ran</button>.</p></div>
+    <p class="mu" id="dictionary-status" role="status"></p>
+    <details class="dictionary-sources"><summary>Nguồn dữ liệu và giấy phép</summary>
+      <p><small>Nghĩa tiếng Anh và từ đồng nghĩa được trích lọc từ <a href="https://en-word.net/downloads" target="_blank" rel="noopener">Open English WordNet 2025</a> của cộng đồng Open English WordNet, phát triển từ Princeton WordNet, theo <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>.</small></p>
+      <p><small>Nghĩa tiếng Việt và một phần phiên âm được trích lọc từ <a href="https://vi.wiktionary.org/" target="_blank" rel="noopener">Wiktionary tiếng Việt</a> qua <a href="https://kaikki.org/viwiktionary/Ti%E1%BA%BFng%20Anh/" target="_blank" rel="noopener">Kaikki và Wiktextract</a>, theo <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>. Các mục có đường dẫn đến trang gốc và lịch sử đóng góp.</small></p>
+    </details>
+  </section>
+  <section id="curated-vocabulary" aria-labelledby="curated-title"><div class="section-head"><div><p class="eyebrow">IELTS SPEAKING</p><h2 id="curated-title">Từ vựng chọn lọc</h2></div></div><div id="vr" class="vocab-grid"></div></section>`;
+}
+
+async function dictionaryShard(key,localOnly=false) {
+  const bucket = /^[a-z]/.test(key) ? key[0] : '_';
+  const cache=localOnly?arcadeDictionaryCache:dictionaryCache;
+  const cached = cache.get(bucket);
+  if (cached) {
+    cache.delete(bucket);
+    cache.set(bucket, cached);
+    return cached;
+  }
+  const id = '#offline-dictionary-' + bucket;
+  if (!$(id)) return [{}, {}, []];
+  const pending = (async () => {
+    const blob=await (localOnly?arcadeLocalAsset(id):embeddedPhoneBlob(id));
+    const stream=blob.stream().pipeThrough(new DecompressionStream('gzip'));
+    const [entries, aliases] = await new Response(stream).json();
+    return [entries, aliases, Object.keys(entries).sort()];
+  })().catch(error => {
+    if (cache.get(bucket) === pending) cache.delete(bucket);
+    throw error;
+  });
+  cache.set(bucket, pending);
+  if (cache.size > 4) cache.delete(cache.keys().next().value);
+  return pending;
+}
+
+function editDistanceWithin(left,right,limit){
+ if(Math.abs(left.length-right.length)>limit)return limit+1;
+ let previous=Array.from({length:right.length+1},(_,index)=>index);
+ for(let i=1;i<=left.length;i++){
+  const current=Array(right.length+1).fill(limit+1);current[0]=i;let rowMin=current[0];
+  const start=Math.max(1,i-limit),end=Math.min(right.length,i+limit);
+  for(let j=start;j<=end;j++){
+   current[j]=Math.min(previous[j]+1,current[j-1]+1,previous[j-1]+(left[i-1]===right[j-1]?0:1));
+   rowMin=Math.min(rowMin,current[j]);
+  }
+  if(rowMin>limit)return limit+1;
+  previous=current;
+ }
+ return previous[right.length];
+}
+function spellingSuggestionsFor(word,keys){
+ const limit=word.length>=7?2:1,candidates=[];
+ for(const candidate of keys){
+  if(candidate===word||candidate[0]!==word[0]||candidate.length<4||Math.abs(candidate.length-word.length)>limit||! /^[a-z]+$/.test(candidate))continue;
+  const distance=editDistanceWithin(word,candidate,limit);
+  if(distance<=limit)candidates.push({word:candidate,distance});
+ }
+ return candidates.sort((a,b)=>a.distance-b.distance||Math.abs(a.word.length-word.length)-Math.abs(b.word.length-word.length)||a.word.localeCompare(b.word)).slice(0,3);
+}
+async function offlineSpellingAssessment(text){
+ const counts=new Map();
+ for(const word of String(text??'').toLowerCase().match(/[a-z]+(?:'[a-z]+)*/g)||[]){
+  if(word.length<4||word.includes("'")||SCORE_STOP.has(word))continue;
+  counts.set(word,(counts.get(word)||0)+1);
+ }
+ const groups=new Map();
+ for(const word of counts.keys()){const bucket=word[0];if(!groups.has(bucket))groups.set(bucket,[]);groups.get(bucket).push(word)}
+ if(!groups.size)return {status:'skipped',checked:0,findings:[]};
+ let failed=false,checked=0;const findings=[];
+ for(const [bucket,words] of groups){
+  let dictionary;
+  try{dictionary=await dictionaryShard(bucket)}catch{failed=true;continue}
+  const [entries,aliases,keys]=dictionary;
+  if(!keys.length){failed=true;continue}
+  checked+=words.length;
+  for(const word of words){
+   if(Object.hasOwn(entries,word)||Object.hasOwn(aliases,word))continue;
+   const suggestions=spellingSuggestionsFor(word,keys);
+   if(suggestions.length)findings.push({word,count:counts.get(word)||1,suggestions:suggestions.map(item=>item.word),distance:suggestions[0].distance});
+  }
+ }
+ const status=failed?(checked?'partial':'unavailable'):'checked';
+ return {status,checked,findings};
+}
+const SCORE_SPELLING_CACHE=new Map();
+const cloneSpelling=value=>JSON.parse(JSON.stringify(value));
+function applySpellingToScore(result,spelling){
+ const metrics=result.metrics,penalty=Math.min(1.8,spelling.findings.reduce((sum,item)=>sum+(item.distance===1?.4:.7)*Math.min(item.count,2),0));
+ metrics.spellingStatus=spelling.status;metrics.spellingChecked=spelling.checked;metrics.spellingFindings=spelling.findings;metrics.lexicalPenalty=penalty;
+ result.l=Math.min(metrics.lexicalCeiling,Math.max(3.5,half(metrics.lexicalBase-penalty)));
+ result.o=half(avg([result.f,result.l,result.g,audioBand(result)].filter(Number.isFinite)));
+ return result;
+}
+function applyDictionaryScoreUpdate(result,updated,previous=null){
+ if(!result?.s||!updated)return;
+ const current=result.s,pronunciation=audioBand(current);
+ if(current!==updated)Object.assign(current,updated,{p:pronunciation});
+ if(pronunciation!=null)current.pronBasis='acoustic-v1';
+  const metrics=current.metrics||{};
+  if(result.m){metrics.pauseCount=Number.isFinite(result.m.np)?result.m.np:null;metrics.audioPausePenalty=0;if(Number.isFinite(metrics.fluencyBase))refreshScoreTotals(current)}
+ current.o=half(avg([current.f,current.l,current.g,audioBand(current)].filter(Number.isFinite)));
+ if(result.history)Object.assign(result.history,{f:current.f,l:current.l,g:current.g,p:audioBand(current),o:current.o,scoreVersion:SCORE_VERSION,updated:Date.now()});
+ if(result.comparison){refreshResultComparison(result);result.comparison.current=comparableBand(current);result.comparison.delta=result.comparison.prior?half(result.comparison.current-comparableBand(result.comparison.prior)):null;result.comparison.isRecord=result.comparison.best!=null&&result.comparison.current>result.comparison.best}
+ if(result.history){const index=st.h.findIndex(row=>row.id===result.history.id);if(index>=0)st.h[index]=result.history}
+ sv();
+ if(S?.result===result){const target=$('#result-scores');if(target){target.innerHTML=scoreOverview(result);animateBands(target)}}
+ else if(pathTryReview?.score===current){pathTryReview.score=current;pathTryReview.scorePassed=Boolean(current.o>=4.5);pathTryReview.passed=pathTryReview.evidence.passed&&pathTryReview.scorePassed;openView()}
+ else if(S?.mode==='exam'&&S.pending?.estimate===current){openView()}
+}
+function scheduleScoreIdle(task){if(typeof requestIdleCallback==='function')requestIdleCallback(()=>void task(),{timeout:350});else setTimeout(()=>void task(),0)}
+function scoreWithDictionary(text,part,duration,question='',topic='',options={}){
+ const result=score(text,part,duration,question,topic,options);if(!result)return null;
+ const key=scoreHash(String(text||'').toLowerCase().replace(/\s+/g,' ').trim()),cached=SCORE_SPELLING_CACHE.get(key);
+ if(cached){SCORE_SPELLING_CACHE.delete(key);SCORE_SPELLING_CACHE.set(key,cached);applySpellingToScore(result,cloneSpelling(cached));return result}
+ result.metrics.spellingStatus='pending';
+ scheduleScoreIdle(async()=>{
+  let spelling;
+  try{spelling=await offlineSpellingAssessment(text)}catch{spelling={status:'unavailable',checked:0,findings:[]}}
+  SCORE_SPELLING_CACHE.set(key,cloneSpelling(spelling));if(SCORE_SPELLING_CACHE.size>80)SCORE_SPELLING_CACHE.delete(SCORE_SPELLING_CACHE.keys().next().value);
+  applySpellingToScore(result,spelling);
+  try{options.onUpdate?.(result)}catch{}
+ });
+ return result;
+}
+
+function dictionarySuggestions(keys, query) {
+  let low = 0, high = keys.length;
+  while (low < high) {
+    const middle = Math.floor((low + high) / 2);
+    if (keys[middle] < query) low = middle + 1;
+    else high = middle;
+  }
+  const matches = [];
+  for (let i = low; i < keys.length && matches.length < 12 && keys[i].startsWith(query); i++) {
+    if (keys[i] !== query) matches.push(keys[i]);
+  }
+  return matches;
+}
+
+function queueDictionarySearch() {
+  clearTimeout(dictionarySearchTimer);
+  dictionarySearchTimer = setTimeout(searchDictionary, 180);
+}
+
+function chooseDictionaryWord(button) {
+  const field = $('#q');
+  field.value = button.dataset.word;
+  field.focus({preventScroll:true});
+  void searchDictionary(true);
+}
+
+const dictionaryChip = word => `<button class="g dictionary-chip" lang="en" type="button" data-word="${esc(word)}" onclick="chooseDictionaryWord(this)">${esc(word)}</button>`;
+
+async function searchDictionary(submitted = false) {
+  clearTimeout(dictionarySearchTimer);
+  const field = $('#q'), output = $('#dictionary-results'), status = $('#dictionary-status');
+  if (!field || !output || !status) return;
+  const raw = field.value, query = dictionaryKey(raw);
+  vl();
+  dictionaryPositions.clear();
+  output.replaceChildren();
+  status.textContent = '';
+  if (!query || query.length < 2 && !submitted) {
+    status.textContent = query ? 'Nhấn Tra từ để tìm mục từ một ký tự.' : 'Nhập từ tiếng Anh để xem nghĩa, phiên âm và ví dụ khi có.';
+    return;
+  }
+  try {
+    status.textContent = 'Đang tra dữ liệu trên thiết bị…';
+    const [entries, aliases, keys] = await dictionaryShard(query);
+    if (!field.isConnected || field.value !== raw) return;
+    const exact = Object.hasOwn(entries, query) ? entries[query] : null;
+    const forms = Object.hasOwn(aliases, query) ? aliases[query] : [];
+    const suggestions = dictionarySuggestions(keys, query).filter(key => !forms.includes(key));
+    const html = [exact ? dictionaryEntry(query, exact) : ''];
+    if (forms.length) html.push(`<p class="mu">Dạng gốc hoặc cách viết liên quan</p><div class="dictionary-chips">${forms.map(dictionaryChip).join('')}</div>`);
+    if (suggestions.length) html.push(`<p class="mu">Từ và cụm từ bắt đầu bằng “${esc(query)}”</p><div class="dictionary-chips">${suggestions.map(dictionaryChip).join('')}</div>`);
+    output.innerHTML = html.join('');
+    status.textContent = exact ? '' : forms.length || suggestions.length ? 'Chọn một mục bên trên để xem nghĩa.' :
+      $('#curated-vocabulary').hidden ? 'Chưa tìm thấy mục từ này. Hãy kiểm tra chính tả hoặc thử dạng gốc.' : 'Có kết quả trong nhóm từ vựng chọn lọc bên dưới.';
+  } catch {
+    if (field.isConnected && field.value === raw) status.textContent = 'Chưa mở được bộ từ điển trên trình duyệt này. Bạn vẫn có thể tìm trong nhóm từ vựng chọn lọc.';
+  }
+}
+
+function dictionaryEntry(key, [word, ipa, vi, en], compact=false) {
+  if(compact)return `<span lang="en"><strong>${esc(word)}</strong>${ipa[0]?' /'+esc(ipa[0])+'/':''}</span>${vi[0]?.[1]||en[0]?.[1]?' · '+esc(vi[0]?.[1]||en[0][1]):''}`;
+  const title = `<h3 lang="en">${esc(word)}</h3>`;
+  const saved = st.c.some(item => dictionaryKey(item.w) === key);
+  dictionaryPositions.set(key, {word, vi, en});
+  const groups = [];
+  if (vi.length) {
+    const sources = [...new Set(vi.map(row => row[2]))];
+    groups.push(`<h4>Nghĩa tiếng Việt</h4><ol class="dictionary-senses">${vi.map(([pos, meaning]) => `<li><small>${esc(pos)}</small> ${esc(meaning)}</li>`).join('')}</ol>
+      <p class="mu"><small>Nguồn ${sources.map(source => `<a href="https://vi.wiktionary.org/wiki/${esc(encodeURIComponent(source))}#Tiếng_Anh" target="_blank" rel="noopener">Wiktionary (${esc(source)})</a>`).join(', ')}</small></p>`);
+  }
+  if (en.length) groups.push(`<details${vi.length ? '' : ' open'}><summary>Nghĩa tiếng Anh · ${en.length}</summary><ol class="dictionary-senses">${en.map(([pos, meaning, example, synonyms]) =>
+    `<li><small>${esc(pos)}</small> <span lang="en">${esc(meaning)}</span>${example ? `<p lang="en"><i>${esc(example)}</i></p>` : ''}${synonyms.length ? `<div class="dictionary-chips"><small>Đồng nghĩa</small>${synonyms.map(dictionaryChip).join('')}</div>` : ''}</li>`).join('')}</ol><p class="mu"><small>Nguồn Open English WordNet 2025</small></p></details>`);
+  return `<article class="dictionary-entry"><div class="section-head"><div>${title}${ipa.length ? `<p class="dictionary-ipa">${ipa.map(value => esc('/' + value + '/')).join(' · ')}</p>` : ''}</div><div class="row"><button class="g" data-word="${esc(word)}" onclick="say(this.dataset.word,.9)">Nghe</button><button class="g" data-word="${esc(key)}" onclick="saveDictionaryWord(this)"${saved ? ' disabled' : ''}>${saved ? '✓ Đã lưu' : 'Lưu từ'}</button></div></div>${groups.join('')}</article>`;
+}
+
+function saveDictionaryWord(button) {
+  const key = button.dataset.word, entry = dictionaryPositions.get(key);
+  if (!entry) return;
+  if (!st.c.some(item => dictionaryKey(item.w) === key)) {
+    st.c.unshift({w:entry.word, m:(entry.vi[0]?.[1] || entry.en[0]?.[1] || '').slice(0, 600), e:entry.en.find(row => row[2])?.[2] || '', k:0});
+    sv();
+    vl();
+  }
+  button.textContent = '✓ Đã lưu';
+  button.disabled = true;
 }
 
 // Gợi ý theo từ lặp trong bản chép lời; cần chọn theo nghĩa của câu.
@@ -7054,75 +7157,6 @@ const PATH_WEEKS=[
 ];
 let pathView=null;
 let pathNotice='';
-let grammarLevelFilter='all';
-let grammarQuery='';
-
-// Thư viện ngữ pháp hiển thị như nội dung tham khảo, không yêu cầu làm bài tập.
-// Mỗi bài: mã, nhãn CEFR, cấp độ dùng để lọc, tên, mục tiêu, quy tắc, cấu trúc,
-// lỗi người Việt hay gặp, rồi hai ví dụ Anh - Việt.
-const GRAMMAR_GROUPS=[
- {id:'tenses',title:'Thì động từ',en:'Verb Tenses',lessons:[
-  ['TENSE-01','A1–A2','A1 A2','Thì hiện tại đơn (Present Simple)','Dùng cho thói quen, sự thật hiển nhiên, lịch trình và trạng thái ổn định.','Thêm -s/-es với he, she, it; dùng do/does trong câu hỏi và phủ định.','S + V(s/es) · do/does + not + V · Do/Does + S + V?','Không thêm -s sau does; phân biệt động từ trạng thái như know, like với hành động.','I usually review new words after class.','Tôi thường ôn từ mới sau giờ học.','The campus library opens at eight.','Thư viện trường mở cửa lúc tám giờ.'],
-  ['TENSE-02','A1–A2','A1 A2','Thì hiện tại tiếp diễn (Present Continuous)','Diễn tả việc đang xảy ra, tình huống tạm thời hoặc kế hoạch đã sắp xếp.','am/is/are + V-ing; thêm not để phủ định, đảo am/is/are lên trước chủ ngữ để hỏi.','S + am/is/are + V-ing','Không bỏ be; không thường dùng dạng tiếp diễn với know, want, believe khi nói trạng thái.','I am preparing for my speaking test this week.','Tuần này tôi đang chuẩn bị cho bài thi nói.','We are meeting our tutor tomorrow.','Ngày mai chúng tôi sẽ gặp gia sư.'],
-  ['TENSE-03','A1–A2','A1 A2','Thì quá khứ đơn (Past Simple)','Dùng cho hành động đã kết thúc tại một thời điểm quá khứ xác định.','Động từ có quy tắc thêm -ed; động từ bất quy tắc dùng dạng cột hai; câu phủ định dùng did not + V.','S + V2/ed · did not + V · Did + S + V?','Sau did/did not, động từ trở về nguyên mẫu; tránh dùng đồng thời did và V2.','I joined an English club last semester.','Tôi tham gia câu lạc bộ tiếng Anh vào học kỳ trước.','We visited the engineering workshop yesterday.','Hôm qua chúng tôi đã thăm xưởng kỹ thuật.'],
-  ['TENSE-04','A2–B1','A2 B1','Thì quá khứ tiếp diễn (Past Continuous)','Nhấn mạnh hành động đang diễn ra tại một thời điểm quá khứ hoặc bị một việc khác xen vào.','was/were + V-ing; thường phối hợp với when cho hành động xen vào và while cho hai hành động song song.','S + was/were + V-ing · while + Past Continuous','Dùng Past Simple cho hành động đang kéo dài mà không nêu việc xen vào có thể làm mất ý đang diễn ra.','I was walking to class when it started to rain.','Tôi đang đi bộ tới lớp thì trời bắt đầu mưa.','While my friend was studying, I was making dinner.','Trong khi bạn tôi học bài, tôi đang chuẩn bị bữa tối.'],
-  ['TENSE-05','A2–B1','A2 B1','Thì hiện tại hoàn thành (Present Perfect)','Nối trải nghiệm hoặc kết quả quá khứ với hiện tại; thường đi với ever, never, just, already, yet, since và for.','have/has + V3; since đi với mốc bắt đầu, for đi với khoảng thời gian.','S + have/has + V3','Không dùng với mốc quá khứ đã kết thúc như yesterday; khi có mốc đó thường dùng Past Simple.','I have tried several ways to improve my pronunciation.','Tôi đã thử vài cách để cải thiện phát âm.','She has lived near the university for three years.','Cô ấy đã sống gần trường đại học được ba năm.'],
-  ['TENSE-06','B1–B2','B1 B2','Thì hiện tại hoàn thành tiếp diễn (Present Perfect Continuous)','Nhấn mạnh quá trình kéo dài đến hiện tại, đặc biệt khi kết quả còn nhìn thấy hoặc hành động chưa dừng.','have/has been + V-ing; dùng for với khoảng thời gian và since với thời điểm bắt đầu.','S + have/has been + V-ing','Động từ chỉ trạng thái thường dùng Present Perfect; không cần nhấn quá trình nếu chỉ nói kết quả.','I have been practising pronunciation for twenty minutes.','Tôi đã luyện phát âm được hai mươi phút rồi.','It has been raining, so the court is still wet.','Trời đã mưa nên sân vẫn còn ướt.'],
-  ['TENSE-07','B1–B2','B1 B2','Thì quá khứ hoàn thành (Past Perfect)','Cho biết một việc xảy ra trước một mốc hoặc một hành động khác trong quá khứ.','had + V3 cho việc xảy ra trước; Past Simple cho sự kiện sau.','S + had + V3 before + Past Simple','Chỉ dùng Past Perfect khi cần làm rõ thứ tự trước-sau, không cần áp vào mọi câu kể quá khứ.','The lecture had started before I reached the hall.','Bài giảng đã bắt đầu trước khi tôi tới hội trường.','I had never used a 3D printer until I joined the project.','Trước khi tham gia dự án, tôi chưa từng dùng máy in 3D.'],
-  ['TENSE-08','B2–C1','B2 C1','Thì quá khứ hoàn thành tiếp diễn (Past Perfect Continuous)','Nhấn mạnh khoảng thời gian một việc diễn ra trước một mốc quá khứ, thường giải thích nguyên nhân hoặc trạng thái lúc đó.','had been + V-ing; for nhấn độ dài, before/by the time chỉ mốc sau.','S + had been + V-ing + for + duration','Không dùng thay Past Perfect nếu chỉ cần nêu kết quả hoàn tất; động từ trạng thái thường không ở dạng tiếp diễn.','She had been waiting for an hour when the bus arrived.','Cô ấy đã đợi một tiếng thì xe buýt tới.','The team was tired because they had been testing the device all night.','Cả nhóm mệt vì đã thử thiết bị suốt đêm.'],
-  ['TENSE-09','A2–B1','A2 B1','Dự định tương lai: be going to và hiện tại tiếp diễn','Be going to nói dự định hoặc dự đoán có dấu hiệu; hiện tại tiếp diễn thường nói lịch đã sắp xếp.','am/is/are going to + V; lịch cá nhân đã chốt có thể dùng am/is/are + V-ing.','S + be going to + V · S + be + V-ing + future time','Không chọn cấu trúc chỉ theo từ tomorrow; hãy xác định đó là dự định, dự đoán hay lịch đã chốt.','I am going to apply for an internship this summer.','Tôi dự định ứng tuyển thực tập vào mùa hè này.','We are visiting the power station on Friday.','Thứ Sáu chúng tôi sẽ tham quan nhà máy điện.'],
-  ['TENSE-10','A2–B1','A2 B1','Thì tương lai đơn với will','Will thường dùng cho quyết định ngay lúc nói, lời hứa, đề nghị và dự đoán theo quan điểm.','will + động từ nguyên mẫu; phủ định will not/won’t; câu hỏi đảo will lên trước chủ ngữ.','S + will + V · Will + S + V?','Không thêm to hoặc -s sau will; dự đoán có bằng chứng rõ thường hợp với be going to hơn.','I will help you carry those books.','Tôi sẽ giúp bạn mang những quyển sách đó.','I think renewable energy will become more affordable.','Tôi nghĩ năng lượng tái tạo sẽ trở nên dễ tiếp cận hơn.'],
-  ['TENSE-11','B1–B2','B1 B2','Thì tương lai tiếp diễn (Future Continuous)','Diễn tả việc sẽ đang diễn ra tại một thời điểm tương lai hoặc hỏi lịch trình một cách nhẹ nhàng.','will be + V-ing; nêu mốc với at this time tomorrow, at 9 a.m. next Monday.','S + will be + V-ing','Không dùng cho quyết định tức thời; nhớ giữ đủ be trước V-ing.','This time tomorrow, I will be taking my speaking test.','Giờ này ngày mai, tôi sẽ đang làm bài thi nói.','Will you be using the laboratory this afternoon?','Chiều nay bạn có dùng phòng thí nghiệm không?'],
-  ['TENSE-12','B2–C1','B2 C1','Thì tương lai hoàn thành (Future Perfect)','Diễn tả việc sẽ hoàn tất trước một mốc tương lai, thường kết hợp by hoặc by the time.','will have + V3; by + mốc thời gian tương lai.','S + will have + V3 + by + future time','Không dùng will trong mệnh đề thời gian bắt đầu bằng by the time; mệnh đề đó dùng hiện tại đơn.','By June, I will have completed my final-year project.','Đến tháng Sáu, tôi sẽ hoàn thành đồ án năm cuối.','The team will have installed the new system by Friday.','Nhóm sẽ lắp đặt hệ thống mới trước thứ Sáu.'],
-  ['TENSE-13','C1–C2','C1 C2','Thì tương lai hoàn thành tiếp diễn (Future Perfect Continuous)','Nhấn mạnh quá trình sẽ kéo dài bao lâu tính đến một mốc trong tương lai.','will have been + V-ing; for + khoảng thời gian, by + mốc kết thúc.','S + will have been + V-ing + for + duration + by + time','Chỉ dùng khi thời lượng/quá trình là trọng tâm; nếu nhấn việc hoàn tất, chọn Future Perfect.','By July, I will have been studying English for two years.','Đến tháng Bảy, tôi sẽ học tiếng Anh được hai năm.','By noon, the engineers will have been monitoring the grid for six hours.','Đến trưa, các kỹ sư sẽ theo dõi lưới điện được sáu tiếng.'],
-  ['TENSE-14','B1–B2','B1 B2','Thì hiện tại trong mệnh đề thời gian chỉ tương lai','Sau when, as soon as, before, after và until, dùng hiện tại đơn để nói về tương lai.','Mệnh đề thời gian: Present Simple; mệnh đề chính: will + V hoặc câu mệnh lệnh.','When/As soon as + Present Simple, S + will + V','Không đặt will ngay sau when/as soon as khi mệnh đề đó chỉ thời gian tương lai.','I will call you when I arrive at the dormitory.','Tôi sẽ gọi bạn khi tới ký túc xá.','As soon as the class ends, we will review the new words.','Ngay khi lớp học kết thúc, chúng tôi sẽ ôn từ mới.'],
-  ['TENSE-15','B1–B2','B1 B2','Phối hợp thì trong câu phức (Sequence of Tenses)','Chọn thì theo quan hệ thời gian giữa mệnh đề chính và mệnh đề phụ, không phải theo một công thức máy móc.','Dùng Past Simple cho sự kiện kể; Past Perfect cho việc xảy ra sớm hơn; giữ sự thật hiện tại ở Present Simple khi còn đúng.','Past event → Past Simple · earlier event → Past Perfect · current fact → Present Simple','Không lùi thì sự thật khoa học hoặc điều vẫn đúng ở hiện tại chỉ vì động từ tường thuật ở quá khứ.','I realised that I had left my notebook in the laboratory.','Tôi nhận ra mình đã để quên sổ ở phòng thí nghiệm.','The lecturer explained that electricity travels through conductors.','Giảng viên giải thích rằng điện truyền qua vật dẫn.'],
-  ['TENSE-16','B1–B2','B1 B2','Used to, would và be/get used to','Used to nói thói quen/trạng thái cũ nay đã đổi; would kể hành động lặp lại; be/get used to diễn tả quen với điều gì.','used to + V; would + V cho hành động lặp lại; be/get used to + danh từ hoặc V-ing.','S + used to + V · S + be/get used to + V-ing','Sau be used to, to là giới từ nên theo sau bằng danh từ hoặc V-ing, không phải động từ nguyên mẫu.','I used to feel nervous, but I am used to speaking in class now.','Tôi từng thấy lo lắng, nhưng giờ đã quen nói trước lớp.','During the summer, we would study together in the library.','Mỗi mùa hè, chúng tôi thường học cùng nhau ở thư viện.']
- ]},
- {id:'pronouns',title:'Đại từ',en:'Pronouns',lessons:[
-  ['PRON-01','A1','A1','Đại từ nhân xưng chủ ngữ và tân ngữ','Dùng đại từ chủ ngữ trước động từ và đại từ tân ngữ sau động từ hoặc giới từ.','I/me, you/you, he/him, she/her, it/it, we/us, they/them.','Subject + verb · verb/preposition + object pronoun','Không dùng me/us/them làm chủ ngữ trong câu chuẩn; xác định vai trò của đại từ trong câu.','She studies electrical engineering with me.','Cô ấy học kỹ thuật điện cùng tôi.','The tutor gave us useful advice.','Gia sư đã cho chúng tôi lời khuyên hữu ích.'],
-  ['PRON-02','A1–A2','A1 A2','Tính từ sở hữu và đại từ sở hữu','Tính từ sở hữu đứng trước danh từ; đại từ sở hữu thay cả cụm danh từ để tránh lặp.','my/your/his/her/its/our/their + noun; mine/yours/his/hers/ours/theirs đứng độc lập.','possessive adjective + noun · noun + be + possessive pronoun','Không viết mine book hoặc the book is my; its là sở hữu, it’s là it is.','This is my notebook; that one is yours.','Đây là sổ của tôi; quyển kia là của bạn.','Their dormitory is closer than ours.','Ký túc xá của họ gần hơn ký túc xá của chúng tôi.'],
-  ['PRON-03','A2–B1','A2 B1','Đại từ phản thân (Reflexive Pronouns)','Dùng khi chủ ngữ và tân ngữ là cùng một người/vật, hoặc để nhấn mạnh chính ai làm việc đó.','myself, yourself, himself, herself, itself, ourselves, yourselves, themselves.','S + verb + reflexive · by + reflexive = tự mình','Không thêm đại từ phản thân sau động từ khi động từ không cần tân ngữ; avoid myself thay cho I trong vai trò chủ ngữ.','I taught myself how to use the design software.','Tôi tự học cách sử dụng phần mềm thiết kế.','The students organised the event themselves.','Các sinh viên tự tổ chức sự kiện.'],
-  ['PRON-04','A2–B1','A2 B1','Đại từ bất định','Các từ như someone, anything, nobody, everything nói về người/vật không xác định.','some- thường dùng câu khẳng định/lời mời; any- phổ biến trong câu hỏi/phủ định; đại từ bất định thường đi với động từ số ít.','someone/anyone/no one/everyone · something/anything/nothing/everything','Không dùng động từ số nhiều chỉ vì từ mang nghĩa nhiều người; everyone đi với động từ số ít.','Everyone in my group has a different idea.','Mọi người trong nhóm tôi đều có một ý tưởng khác nhau.','Is there anything you would change about the campus?','Có điều gì bạn muốn thay đổi ở khuôn viên trường không?'],
-  ['PRON-05','A1–B1','A1 A2 B1','Đại từ chỉ định và one/ones','This/these chỉ vật gần, that/those chỉ vật xa; one/ones thay danh từ đếm được đã nhắc.','this/that + danh từ số ít; these/those + danh từ số nhiều; one/ones dùng thay danh từ.','this/that + singular · these/those + plural · adjective + one(s)','Không dùng one để thay danh từ không đếm được; chú ý one hay ones theo số ít/số nhiều.','These labs are newer than those in the old building.','Những phòng thí nghiệm này mới hơn các phòng ở tòa nhà cũ.','I need a charger. Do you have one?','Tôi cần một bộ sạc. Bạn có cái nào không?'],
-  ['PRON-06','B1–B2','B1 B2','Chủ ngữ giả it và there','It mở đầu câu nói về thời tiết, thời gian, khoảng cách hoặc đánh giá; there + be giới thiệu sự tồn tại/số lượng.','It is + adjective + to V/that-clause; There is/are + noun; There seems to be...','It + be + adjective · There + be + subject','Không nhầm there is với they are; chia be theo danh từ theo sau trong cấu trúc there is/are.','It is convenient to study near the library.','Học gần thư viện rất thuận tiện.','There are several study rooms on the second floor.','Có một vài phòng học ở tầng hai.'],
-  ['PRON-07','B2–C1','B2 C1','Đại từ quan hệ và mệnh đề quan hệ','Who/that thay người, which/that thay vật; whose chỉ sở hữu; where chỉ nơi chốn.','Danh từ + who/which/that + mệnh đề; mệnh đề không xác định dùng dấu phẩy và thường không dùng that.','person + who · thing + which/that · possession + whose · place + where','Không lược bỏ đại từ quan hệ khi nó làm chủ ngữ; dùng dấu phẩy với thông tin bổ sung không thiết yếu.','The lecturer who leads our project is very supportive.','Giảng viên hướng dẫn dự án của chúng tôi rất tận tâm.','The library, which was renovated last year, stays open late.','Thư viện, nơi được cải tạo năm ngoái, mở cửa muộn.']
- ]},
- {id:'adjectives',title:'Tính từ và trạng từ',en:'Adjectives & Adverbs',lessons:[
-  ['ADJ-01','A2–B1','A2 B1','Vị trí và trật tự của tính từ','Tính từ thường đứng trước danh từ hoặc sau động từ nối; khi có nhiều tính từ, dùng trật tự tự nhiên về ý kiến, kích thước, tuổi, màu sắc và loại.','adjective + noun · be/seem/look/feel + adjective.','opinion → size/age → colour → origin/material → noun','Không đặt trạng từ thay cho tính từ sau be, seem, look; tránh xếp quá nhiều tính từ không cần thiết.','The campus has a modern engineering laboratory.','Khuôn viên có một phòng thí nghiệm kỹ thuật hiện đại.','The library looks quiet and welcoming.','Thư viện trông yên tĩnh và thân thiện.'],
-  ['ADJ-02','A2–B1','A2 B1','Tính từ đuôi -ed và -ing','-ed mô tả cảm nhận của người; -ing mô tả thứ gây ra cảm nhận đó.','interested person / interesting topic; bored listener / boring lecture.','person feels -ed · thing causes -ing','I am interesting thường có nghĩa tôi là người thú vị; nếu muốn nói tôi thấy hứng thú, dùng interested.','I was surprised by how practical the workshop was.','Tôi ngạc nhiên vì buổi thực hành thiết thực đến vậy.','The renewable-energy project is exciting for first-year students.','Dự án năng lượng tái tạo rất thú vị với sinh viên năm nhất.'],
-  ['ADJ-03','A2–B1','A2 B1','Trạng từ: cách thành lập và vị trí trong câu','Nhiều trạng từ cách thức được tạo bằng adjective + -ly; trạng từ bổ nghĩa động từ, tính từ hoặc cả câu.','slow → slowly; careful → carefully; good → well; đứng sau động từ/tân ngữ hoặc trước tính từ.','verb + adverb · adverb + adjective · sentence adverb, comma','Không phải từ nào có -ly cũng là trạng từ; hard và fast có thể là trạng từ không thêm -ly.','The technician carefully checked the electrical panel.','Kỹ thuật viên kiểm tra bảng điện cẩn thận.','Our team worked hard to finish the prototype.','Nhóm chúng tôi đã làm việc chăm chỉ để hoàn thành mẫu thử.'],
-  ['ADJ-04','A1–A2','A1 A2','Trạng từ chỉ tần suất','Always, usually, often, sometimes, rarely, never cho biết mức độ thường xuyên.','Đứng trước động từ thường; sau be; sau trợ động từ đầu tiên trong cụm động từ.','subject + frequency adverb + main verb · be + frequency adverb','Đặt trạng từ sai vị trí có thể làm câu thiếu tự nhiên; never đã mang nghĩa phủ định, không thêm not.','I usually take the bus to university.','Tôi thường đi xe buýt đến trường đại học.','My classmates are sometimes busy in the evening.','Các bạn cùng lớp của tôi đôi khi bận vào buổi tối.'],
-  ['ADJ-05','A2–B1','A2 B1','So sánh hơn và so sánh nhất','Tính từ ngắn thường thêm -er/-est; tính từ dài dùng more/most; một số dạng bất quy tắc như good–better–best.','than theo sau so sánh hơn; the + superlative; có thể nhấn mạnh bằng much/far.','short adj + -er than · more + long adj + than · the + -est/most','Không dùng đồng thời more và -er; nhớ the trước so sánh nhất khi nói trong một nhóm xác định.','The new study area is quieter than the cafeteria.','Khu tự học mới yên tĩnh hơn căng tin.','This is the most useful app I have tried.','Đây là ứng dụng hữu ích nhất mà tôi từng thử.'],
-  ['ADJ-06','B1–B2','B1 B2','So sánh bằng, so sánh kép và cấu trúc liên quan','So sánh mức độ bằng as...as; diễn tả thay đổi song song bằng the more..., the more...','as + adjective/adverb + as; not as...as; the + comparative, the + comparative; twice as...as.','as + adj + as · the more X, the better Y','Không dùng than trong as...as; với số lần gấp đôi, dùng twice as large as thay vì twice larger.','The speaking club is as welcoming as people say.','Câu lạc bộ nói thân thiện đúng như mọi người nói.','The more often I practise, the more confident I become.','Tôi càng luyện tập thường xuyên thì càng tự tin.'],
-  ['ADJ-07','B1–B2','B1 B2','So, such, too và enough','So/such nhấn mạnh mức độ; too diễn tả vượt mức cần thiết; enough diễn tả đủ mức.','so + adjective/adverb; such + (a/an) + adjective + noun; too + adjective + to V; adjective + enough + to V.','so + adj · such + a/an + adj + noun · adj + enough · too + adj','Enough đứng sau tính từ nhưng đứng trước danh từ; phân biệt too = quá mức với very = rất.','The lab was so crowded that we had to wait.','Phòng thí nghiệm đông đến mức chúng tôi phải chờ.','The instructions were clear enough for beginners to follow.','Hướng dẫn đủ rõ để người mới có thể làm theo.'],
-  ['ADJ-08','B2–C1','B2 C1','Tính từ đi với giới từ và động từ nguyên mẫu','Một số tính từ thường kết hợp với giới từ cố định; nhiều tính từ theo sau bằng to-infinitive để nêu phản ứng, khả năng hoặc mục đích.','interested in, responsible for, good at; happy to, difficult to, ready to.','adjective + preposition + noun/V-ing · adjective + to V','Học cả cụm thay vì dịch từng giới từ; sau giới từ dùng danh từ hoặc V-ing, không dùng to V.','I am interested in working with smart-grid technology.','Tôi quan tâm đến việc làm với công nghệ lưới điện thông minh.','It is difficult to explain the design without a diagram.','Thật khó giải thích thiết kế nếu không có sơ đồ.']
- ]},
- {id:'word-forms',title:'Từ loại và cấu tạo từ',en:'Word Forms & Word Formation',lessons:[
-  ['WORD-01','A2–B1','A2 B1','Các loại từ và vị trí trong câu','Nhận biết danh từ, động từ, tính từ, trạng từ qua chức năng và vị trí để xây câu rõ nghĩa.','adjective + noun; subject + verb; linking verb + adjective; verb + adverb.','determiner + noun · subject + verb · be/seem + adjective','Không chọn từ chỉ vì nghĩa đúng; kiểm tra từ loại mà vị trí đang cần.','The efficient system reduces energy use.','Hệ thống hiệu quả làm giảm mức tiêu thụ năng lượng.','The engineers tested the system efficiently.','Các kỹ sư đã kiểm tra hệ thống một cách hiệu quả.'],
-  ['WORD-02','B1–B2','B1 B2','Hậu tố tạo danh từ','Các hậu tố thường gặp: -tion, -ment, -ness, -ity, -ance/-ence, -er/-or, -ee, -ist.','inform → information; develop → development; active → activity; employ → employee/employer.','verb/adjective + noun-forming suffix','Chú ý thay đổi chính tả và nghĩa vai trò: employer là người tuyển dụng, employee là người được tuyển.','The development of solar power has created new jobs.','Sự phát triển của điện mặt trời đã tạo ra việc làm mới.','Good communication helps engineering teams work safely.','Giao tiếp tốt giúp các nhóm kỹ thuật làm việc an toàn.'],
-  ['WORD-03','B1–B2','B1 B2','Hậu tố tạo tính từ và trạng từ','Nhận diện -able, -ive, -ful, -less, -ous, -al, -ic và -ly để diễn đạt đặc điểm chính xác.','rely → reliable; care → careful/carefully; danger → dangerous; electricity → electrical.','noun/verb + adjective suffix · adjective + -ly → adverb','Không thêm -ly máy móc; friendly là tính từ, còn hard có thể là trạng từ.','Reliable public transport makes commuting easier.','Giao thông công cộng đáng tin cậy giúp việc đi lại dễ hơn.','The technician responded quickly and carefully.','Kỹ thuật viên phản hồi nhanh chóng và cẩn thận.'],
-  ['WORD-04','B1–B2','B1 B2','Hậu tố tạo động từ','Các hậu tố -ize/-ise, -en, -ify và -ate có thể biến danh từ/tính từ thành động từ.','modern → modernise; wide → widen; simple → simplify; active → activate.','base word + verb-forming suffix','Không nhầm danh từ với động từ sau chủ ngữ; kiểm tra dạng chia thì và tân ngữ đi kèm.','The university plans to modernise its laboratory equipment.','Trường đại học dự định hiện đại hóa thiết bị phòng thí nghiệm.','This feature simplifies the process of reviewing vocabulary.','Tính năng này đơn giản hóa quá trình ôn từ vựng.'],
-  ['WORD-05','B1–B2','B1 B2','Tiền tố (Prefixes)','Tiền tố thay đổi nghĩa gốc: un-, in-/im-, dis-, re-, mis-, over-, under-, pre- và co-.','rebuild = build again; misread = read incorrectly; preheat = heat beforehand.','prefix + base word','Không suy ra nghĩa tuyệt đối chỉ từ tiền tố; một số từ có dạng cố định cần học theo cụm.','We rebuilt the prototype after the first test.','Chúng tôi chế tạo lại mẫu thử sau lần kiểm tra đầu tiên.','Miscommunication can cause delays in a group project.','Giao tiếp nhầm có thể gây chậm trễ cho dự án nhóm.']
- ]},
- {id:'modals',title:'Động từ khuyết thiếu',en:'Modal Verbs',lessons:[
-  ['MODAL-01','A1–B1','A1 A2 B1','Can, could và be able to','Diễn tả khả năng ở hiện tại, khả năng chung trong quá khứ hoặc năng lực đạt được trong tình huống cụ thể.','can/could + V; be able to chia theo thì; was/were able to thường nhấn mạnh đã làm được việc cụ thể.','modal + bare infinitive · be able to + V','Sau can/could không có to; không dùng could đơn thuần cho một lần thành công cụ thể đã hoàn tất.','I can explain the basic circuit in English.','Tôi có thể giải thích mạch điện cơ bản bằng tiếng Anh.','After several attempts, we were able to fix the device.','Sau vài lần thử, chúng tôi đã sửa được thiết bị.'],
-  ['MODAL-02','A2–B1','A2 B1','Xin phép, yêu cầu và đề nghị lịch sự','Can/could/may dùng để xin phép; would you mind và could you dùng cho yêu cầu lịch sự.','Could I...? / May I...? / Could you...? / Would you mind + V-ing?','Could you + V? · Would you mind + V-ing?','Sau would you mind dùng V-ing; câu trả lời No, not at all có nghĩa là đồng ý giúp.','Could I borrow your charger for a moment?','Tôi có thể mượn bộ sạc của bạn một lát không?','Would you mind explaining that formula again?','Bạn có phiền giải thích lại công thức đó không?'],
-  ['MODAL-03','A2–B1','A2 B1','Bắt buộc, không cần thiết và cấm đoán','Phân biệt nghĩa vụ, điều không bắt buộc và điều bị cấm.','must/have to = cần phải; do not have to = không cần; must not = không được phép.','must/have to + V · do not have to + V · must not + V','Mustn’t không có nghĩa là không cần; không cần là don’t have to.','Students have to wear safety glasses in the workshop.','Sinh viên phải đeo kính bảo hộ trong xưởng.','You do not have to print the report; a digital copy is enough.','Bạn không cần in báo cáo; bản điện tử là đủ.'],
-  ['MODAL-04','A2–B1','A2 B1','Lời khuyên: should, ought to và had better','Should/ought to đưa lời khuyên; had better thường mạnh hơn và hàm ý nên làm để tránh kết quả xấu.','should/ought to + V; had better + V; phủ định had better not + V.','S + should/ought to + V · S + had better + V','Sau ought thường cần to; sau should và had better không có to.','You should practise your opening sentence before the presentation.','Bạn nên luyện câu mở đầu trước buổi thuyết trình.','We had better leave now to avoid missing the bus.','Tốt hơn chúng ta nên đi ngay để khỏi lỡ xe buýt.'],
-  ['MODAL-05','B1–B2','B1 B2','Suy đoán hiện tại với must, might, may, could và can’t','Dùng modal verbs để thể hiện mức độ chắc chắn dựa trên bằng chứng hiện tại.','must = gần như chắc; may/might/could = có thể; can’t = chắc không thể; theo sau là V nguyên mẫu hoặc be + adjective/noun.','modal + V · modal + be + complement','Can’t trong suy đoán không giống mustn’t mang nghĩa cấm; tránh dùng must nếu bằng chứng yếu.','The lights are on, so someone must be in the laboratory.','Đèn đang bật nên chắc có người trong phòng thí nghiệm.','The room is locked; the lecturer might be in another building.','Phòng đang khóa; có thể giảng viên ở tòa nhà khác.'],
-  ['MODAL-06','B2–C1','B2 C1','Động từ khuyết thiếu hoàn thành','Dùng modal + have + V3 để suy đoán, tiếc nuối, phê bình hoặc nêu khả năng trong quá khứ.','must have = hẳn đã; might/could have = có thể đã; should have = lẽ ra nên; can’t have = chắc chắn không.','modal + have + V3','Sau have dùng V3; should have không tự động có nghĩa việc đó đã xảy ra.','The team must have left the sensor in the storage room.','Chắc nhóm đã để cảm biến trong phòng kho.','I should have backed up my presentation before editing it.','Lẽ ra tôi nên sao lưu bài thuyết trình trước khi chỉnh sửa.'],
-  ['MODAL-07','C1–C2','C1 C2','Need, dare và các cấu trúc gần với modal','Need và dare có thể hoạt động như modal trong một số câu phủ định/câu hỏi; các cấu trúc như would rather mang sắc thái lựa chọn.','need not + V; dare + V; would rather + V; need to/dare to + V khi dùng như động từ thường.','would rather + bare infinitive · need not + bare infinitive','Không dùng đồng thời hai cách: needn’t go hoặc don’t need to go; tránh needn’t to go.','You need not bring printed notes to the seminar.','Bạn không cần mang ghi chú in tới buổi chuyên đề.','I would rather discuss the design after the test.','Tôi muốn thảo luận thiết kế sau khi thử nghiệm hơn.']
- ]},
- {id:'passive',title:'Câu bị động',en:'Passive Voice',lessons:[
-  ['PASS-01','A2–B1','A2 B1','Câu bị động ở các thì cơ bản','Dùng bị động khi hành động/kết quả quan trọng hơn người thực hiện hoặc không biết người đó là ai.','be chia theo thì + V3; thêm by + người thực hiện khi cần nêu rõ tác nhân.','object + be + V3 (+ by + agent)','Giữ đúng thì ở be; không dùng V2 thay V3; chỉ chuyển được động từ có tân ngữ.','The equipment is checked every morning.','Thiết bị được kiểm tra mỗi sáng.','The bridge was repaired last year.','Cây cầu đã được sửa vào năm ngoái.'],
-  ['PASS-02','B1–B2','B1 B2','Bị động với động từ khuyết thiếu và thì hoàn thành','Kết hợp be + V3 với modal hoặc have để diễn tả khả năng, nghĩa vụ, kết quả đã hoàn tất.','modal + be + V3; have/has been + V3; will have been + V3.','modal + be + past participle · have + been + past participle','Sau modal dùng be nguyên mẫu; sau have dùng been; động từ chính luôn ở V3.','Safety rules must be followed in the workshop.','Quy tắc an toàn phải được tuân thủ trong xưởng.','The new control system has been installed.','Hệ thống điều khiển mới đã được lắp đặt.'],
-  ['PASS-03','B1–B2','B1 B2','Bị động với động từ có hai tân ngữ','Một số động từ như give, send, teach có thể có hai cách chuyển bị động tùy tân ngữ muốn nhấn mạnh.','They gave me a certificate → I was given a certificate / A certificate was given to me.','indirect object + be + V3 · direct object + be + V3 + to/for + person','Khi đưa vật lên làm chủ ngữ, giữ giới từ phù hợp như to hoặc for.','We were given a tour of the power station.','Chúng tôi được dẫn đi tham quan nhà máy điện.','A new access card was issued to every student.','Thẻ ra vào mới được cấp cho mỗi sinh viên.'],
-  ['PASS-04','B2–C1','B2 C1','Bị động tường thuật: it is said that và is believed to','Dùng để truyền đạt nhận định chung hoặc nguồn tin khi không muốn nêu người nói cụ thể.','It is said/believed/reported that + clause; subject + is said/believed to + infinitive.','It + passive reporting verb + that-clause · subject + passive reporting verb + to V','Chọn to have + V3 nếu sự việc xảy ra trước nhận định; không dùng to V cho sự việc quá khứ đã xong.','It is believed that the building was designed to save energy.','Người ta tin rằng tòa nhà được thiết kế để tiết kiệm năng lượng.','The new system is expected to reduce power loss.','Hệ thống mới được kỳ vọng sẽ giảm tổn thất điện năng.'],
-  ['PASS-05','B1–B2','B1 B2','Thể sai khiến: have/get something done','Dùng khi nhờ, thuê hoặc sắp xếp để người khác làm việc gì cho mình.','have + object + V3; get + object + V3 thân mật hơn; có thể dùng quá khứ/tương lai bằng cách chia have/get.','S + have/get + object + past participle','Không nhầm với have someone do something: cấu trúc đó theo sau bằng người thực hiện + động từ nguyên mẫu.','I had my laptop repaired near the campus.','Tôi đã đem sửa máy tính xách tay ở gần trường.','We are getting the laboratory windows cleaned next week.','Tuần tới chúng tôi sẽ thuê người vệ sinh cửa sổ phòng thí nghiệm.'],
-  ['PASS-06','B2–C1','B2 C1','Bị động với V-ing, to-infinitive và need doing','Dùng các dạng bị động rút gọn khi động từ theo sau một động từ khác hoặc sau need/want/require.','being + V3; to be + V3; need/want/require + V-ing có nghĩa cần được làm.','enjoy + being + V3 · expect + to be + V3 · need + V-ing','Sau giới từ dùng being + V3; need repairing tương đương need to be repaired.','The device needs testing before it is used.','Thiết bị cần được kiểm tra trước khi sử dụng.','The data is expected to be published next month.','Dữ liệu dự kiến sẽ được công bố vào tháng tới.']
- ]}
-];
 
 function cleanLearningPath(input){
  const src=input&&typeof input==='object'&&!Array.isArray(input)?input:{};
@@ -7269,40 +7303,8 @@ function pathMap(){
     return `<li${part?' id="lesson-part-'+part+'"':''} class="${done?'is-done':open?'is-open':'is-locked'}"><span aria-hidden="true">${done?'✓':open?'○':'🔒'}</span>
      <button type="button" class="g" onclick="openPathLesson(${item.id})"${open?'':' disabled'}>${esc(LS[item.id][1])}</button>
      <small>${done?'Đã hoàn thành':open?(next?.id===item.id?'Bài tiếp theo':'Có thể học lại'):'Hoàn thành bài trước'}</small></li>`;
-   }).join('')}</ol>${week===3&&pathAllowed(PATH_LESSONS.find(item=>item.week===4).id)?'<button type="button" class="g" onclick="startExam(123)">Luyện thi thử 3 phần</button>':''}</section>`).join('')}</div>
-  ${grammarLibrary()}`;
+   }).join('')}</ol>${week===3&&pathAllowed(PATH_LESSONS.find(item=>item.week===4).id)?'<button type="button" class="g" onclick="startExam(123)">Luyện thi thử 3 phần</button>':''}</section>`).join('')}</div>`;
 }
-function grammarNormalize(value){return String(value||'').toLocaleLowerCase('vi').normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
-function grammarVisibleLessons(){
- const query=grammarNormalize(grammarQuery.trim());
- return GRAMMAR_GROUPS.map(group=>({group,lessons:group.lessons.filter(item=>{
-  const levelMatch=grammarLevelFilter==='all'||item[2].split(' ').includes(grammarLevelFilter);
-  const queryMatch=!query||grammarNormalize([group.title,group.en,...item].join(' ')).includes(query);
-  return levelMatch&&queryMatch;
- })})).filter(entry=>entry.lessons.length);
-}
-function grammarExample(en,vi){return `<li class="grammar-example"><div><p lang="en">${esc(en)}</p><p class="mu" lang="vi">${esc(vi)}</p></div><button type="button" class="g" data-example="${esc(en)}" aria-label="Nghe ví dụ: ${esc(en)}" onclick="say(this.dataset.example,.9)">Nghe mẫu</button></li>`}
-function grammarLessonCard(item){
- const [code,label,levels,title,summary,rule,form,mistake,en1,vi1,en2,vi2]=item;
- return `<details class="grammar-card"><summary><span class="grammar-card-title"><span class="grammar-code">${esc(code)}</span><span class="grammar-level">${esc(label)}</span><strong>${esc(title)}</strong></span><p class="grammar-card-summary">${esc(summary)}</p></summary>
-  <div class="grammar-detail"><div><h4>Cách dùng</h4><p>${esc(rule)}</p></div><div><h4>Cấu trúc cần nhớ</h4><p class="grammar-formula">${esc(form)}</p></div><div><h4>Lỗi người Việt hay gặp</h4><p class="grammar-warning">${esc(mistake)}</p></div><div><h4>Ví dụ song ngữ</h4><ul class="grammar-examples">${grammarExample(en1,vi1)}${grammarExample(en2,vi2)}</ul></div></div></details>`;
-}
-function grammarResults(){
- const entries=grammarVisibleLessons(),total=entries.reduce((sum,entry)=>sum+entry.lessons.length,0);
- if(!total)return `<p class="grammar-empty" role="status" aria-live="polite">Không tìm thấy bài phù hợp. Hãy thử từ khóa khác hoặc chọn “Tất cả”.</p>`;
- return `<p id="grammar-count" class="grammar-count" role="status" aria-live="polite">${total} bài ngữ pháp${grammarLevelFilter==='all'?'':' · cấp '+grammarLevelFilter}</p><div class="grammar-groups">${entries.map(({group,lessons})=>`<section class="grammar-group" aria-labelledby="grammar-${esc(group.id)}"><div class="grammar-group-head"><h3 id="grammar-${esc(group.id)}">${esc(group.title)}</h3><span>${esc(group.en)} · ${lessons.length} bài</span></div><div class="grammar-cards">${lessons.map(grammarLessonCard).join('')}</div></section>`).join('')}</div>`;
-}
-function grammarLibrary(){
- const levels=['all','A1','A2','B1','B2','C1','C2'];
- return `<section class="c grammar-library" aria-labelledby="grammar-library-title"><div class="grammar-library-head"><div><p class="eyebrow">NỘI DUNG BÀI HỌC</p><h2 id="grammar-library-title">Grammar · Ngữ pháp</h2><p class="mu">Tra cứu theo trình độ CEFR. Mỗi mục có cách dùng, cấu trúc, lỗi thường gặp và ví dụ Anh–Việt; không bắt làm bài tập.</p></div></div>
-  <div class="grammar-filter" role="group" aria-label="Lọc bài ngữ pháp theo trình độ">${levels.map(level=>{const active=level===grammarLevelFilter;return `<button type="button" class="g" data-grammar-level="${level}" aria-pressed="${active}" onclick="setGrammarLevel('${level}')">${level==='all'?'Tất cả':level}</button>`}).join('')}</div>
-  <form class="grammar-search" role="search" onsubmit="filterGrammar(event)"><label class="sr-only" for="grammar-search-input">Tìm bài ngữ pháp</label><input id="grammar-search-input" type="search" maxlength="80" value="${esc(grammarQuery)}" placeholder="Tìm theo tên, mã bài hoặc chủ đề..."><button type="submit" class="g">Tìm bài</button><button type="button" class="g" onclick="clearGrammarSearch()">Xóa lọc</button></form>
-  <div id="grammar-results">${grammarResults()}</div></section>`;
-}
-function refreshGrammarResults(){const root=$('#grammar-results');if(root)root.innerHTML=grammarResults()}
-function setGrammarLevel(level){if(!['all','A1','A2','B1','B2','C1','C2'].includes(level))return;grammarLevelFilter=level;document.querySelectorAll('[data-grammar-level]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.grammarLevel===level)));refreshGrammarResults()}
-function filterGrammar(event){event?.preventDefault();grammarQuery=$('#grammar-search-input')?.value?.slice(0,80)||'';refreshGrammarResults()}
-function clearGrammarSearch(){grammarQuery='';const input=$('#grammar-search-input');if(input)input.value='';setGrammarLevel('all')}
 function pathLesson(){
  const item=PATH_LESSONS.find(entry=>entry.id===pathView);
  if(!item||!pathAllowed(item.id)){pathView=null;return pathMap()}
