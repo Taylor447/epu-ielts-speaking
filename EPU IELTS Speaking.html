@@ -594,6 +594,8 @@ nav svg { width: 18px; height: 18px; }
 .trend-empty { padding: 10px 0; color: var(--mu); }
 .flashcard { overflow-wrap: anywhere; }
 .flash-face { display: grid; gap: 4px; padding: clamp(16px,4vw,28px); text-align: center; border: 1px solid var(--bd); border-radius: 17px; background: var(--glass-soft); }
+.flash-face-flipping { animation: flashcard-turn .42s cubic-bezier(.22,1,.36,1) both; transform-origin: center; backface-visibility: hidden; }
+@keyframes flashcard-turn { 0% { opacity:.35; transform: perspective(900px) rotateY(72deg) scale(.97); } 58% { opacity:1; transform: perspective(900px) rotateY(-7deg) scale(1.01); } 100% { opacity:1; transform: perspective(900px) rotateY(0) scale(1); } }
 .flash-face > strong { font-size: clamp(23px,5vw,34px); color: var(--pr); }
 .flash-face p { margin: 3px 0; }
 .flash-answer { padding-top: 10px; margin-top: 8px; border-top: 1px solid var(--bd); }
@@ -1088,7 +1090,8 @@ body.page-hidden::before,body.page-hidden .theme-bg { animation-play-state:pause
 .collection-vocab > h2 { margin:3px 0 4px; }
 .collection-vocab-stats { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:9px; margin:16px 0 22px; }
 .collection-vocab-stats article { display:grid; gap:3px; min-height:102px; align-content:start; padding:13px; border:1px solid var(--bd); border-radius:17px; background:var(--sf); }
-.collection-vocab-stats article span { color:var(--pr); font-size:20px; }
+.collection-vocab-stats article span { display:grid; width:34px; height:34px; place-items:center; border:1px solid var(--bd); border-radius:11px; background:var(--cd); color:var(--pr); }
+.collection-vocab-stats article span svg { width:19px; height:19px; }
 .collection-vocab-stats strong { font-size:22px; line-height:1.1; }
 .collection-vocab-stats small { color:var(--mu); }
 .collection-vocab-head,.collection-vocab-head .section-head { display:flex; align-items:baseline; justify-content:space-between; gap:10px; }
@@ -1096,7 +1099,8 @@ body.page-hidden::before,body.page-hidden .theme-bg { animation-play-state:pause
 .collection-topic-card { position:relative; display:grid; min-height:112px; justify-items:start; align-content:start; gap:5px; padding:14px; border-color:var(--bd); border-radius:17px; background:linear-gradient(135deg,var(--sf),var(--cd)); color:var(--tx); text-align:left; }
 .collection-topic-card strong { max-width:calc(100% - 26px); }
 .collection-topic-card small { color:var(--mu); }
-.collection-topic-icon { display:grid; width:31px; height:31px; place-items:center; border:1px solid var(--bd); border-radius:11px; background:var(--cd); color:var(--pr); font-size:18px; }
+.collection-topic-icon { display:grid; width:36px; height:36px; place-items:center; border:1px solid var(--bd); border-radius:12px; background:var(--cd); color:var(--pr); }
+.collection-topic-icon svg { width:20px; height:20px; }
 .collection-topic-arrow { position:absolute; right:14px; bottom:12px; color:var(--pr); font-size:20px; }
 .collection-topic-detail { margin-top:16px; padding-top:14px; border-top:1px solid var(--bd); }
 .collection-word-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
@@ -1120,7 +1124,7 @@ body.page-hidden::before,body.page-hidden .theme-bg { animation-play-state:pause
   .collection-word-grid,.collection-story { grid-template-columns:1fr; }
 }
 @media(prefers-reduced-motion:reduce) {
-  .arcade-panel { animation:none; }
+  .arcade-panel,.flash-face-flipping { animation:none; }
   .arcade-entry button:active,.arcade-tile button:active,.arcade-panel button:active { transform:none; }
 }
 .campus3d-entry{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;background:linear-gradient(125deg,var(--cd),var(--sf))}
@@ -2469,6 +2473,28 @@ window.addEventListener('message',event=>{
  }
 });
 function collectionTopicGroups(){return [...new Set(D.map(row=>String(row[5]||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'vi'))}
+const COLLECTION_ICON_PATHS={
+ saved:'<path d="M6 4.75A1.75 1.75 0 0 1 7.75 3h8.5A1.75 1.75 0 0 1 18 4.75V21l-6-3.6L6 21z"/>',
+ due:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.2 2"/>',
+ mastered:'<circle cx="12" cy="12" r="8.5"/><path d="m8.5 12.2 2.3 2.3 4.8-5"/>',
+ topics:'<rect x="4" y="4" width="6" height="6" rx="1.2"/><rect x="14" y="4" width="6" height="6" rx="1.2"/><rect x="4" y="14" width="6" height="6" rx="1.2"/><rect x="14" y="14" width="6" height="6" rx="1.2"/>',
+ food:'<path d="M5 3v7a3 3 0 0 0 6 0V3M8 3v18M17 3v18M17 3c2.5 2.1 3.5 4.7 3.5 8H17"/>',
+ technology:'<rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 9h6v6H9zM9 2v4m6-4v4M9 18v4m6-4v4M2 9h4m-4 6h4m12-6h4m-4 6h4"/>',
+ work:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18m-11 0v2h4v-2"/>',
+ engineering:'<path d="m13.2 2.8-8 10.1a.8.8 0 0 0 .6 1.3h5.1l-.7 7 8.6-11a.8.8 0 0 0-.6-1.3h-5.1z"/>',
+ student:'<path d="m2.5 9 9.5-5 9.5 5-9.5 5zM6.5 11.2v5.1c3.5 2.3 7.5 2.3 11 0v-5.1M21.5 9v6"/>',
+ travel:'<path d="m3 11 18-8-6.5 18-3.1-7.2zM11.4 13.8l4.1-4.1"/>',
+ family:'<circle cx="9" cy="8" r="3"/><path d="M3.5 20v-1.5a5.5 5.5 0 0 1 11 0V20z"/><circle cx="17" cy="9" r="2.3"/><path d="M16.3 14.2a4.6 4.6 0 0 1 4.2 4.6V20h-3"/>',
+ transport:'<path d="M5 18.5h14V6.8A2.8 2.8 0 0 0 16.2 4H7.8A2.8 2.8 0 0 0 5 6.8zM5 11h14M8 15h.1m7.8 0h.1M7.5 18.5v2m9-2v2M8 7.5h8"/>',
+ study:'<path d="M3 5.5A2.5 2.5 0 0 1 5.5 3H11v17H5.5A2.5 2.5 0 0 0 3 22zM21 5.5A2.5 2.5 0 0 0 18.5 3H13v17h5.5A2.5 2.5 0 0 1 21 22z"/>',
+ environment:'<path d="M20.5 3.5c-8.8 0-14.8 3.5-14.8 10.1a6.2 6.2 0 0 0 6.2 6.2c6.6 0 10.1-6 10.1-14.8zM3.5 21c3.5-5.7 7.1-8.7 12.4-11.6"/>',
+ hobbies:'<path d="M10 18V5l10-2v13"/><ellipse cx="6.5" cy="18.5" rx="3.5" ry="2.5"/><ellipse cx="16.5" cy="16.5" rx="3.5" ry="2.5"/>',
+ health:'<path d="M20.5 8.8c0 5-8.5 11-8.5 11s-8.5-6-8.5-11a4.7 4.7 0 0 1 8.5-2.7 4.7 4.7 0 0 1 8.5 2.7z"/><path d="M3 12h4l2-3 3 6 2-3h7"/>',
+ nature:'<path d="M7.5 18.5h10a4 4 0 0 0 .3-8 6.2 6.2 0 0 0-11.9 1.3 3.4 3.4 0 0 0 1.6 6.7z"/><path d="M8 3v2m-5 1.5 1.5 1M18 4l-1 1.7"/>',
+ other:'<path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/>'
+};
+function collectionIcon(name){return '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+(COLLECTION_ICON_PATHS[name]||COLLECTION_ICON_PATHS.other)+'</svg>'}
+function collectionTopicIcon(group){const topic=String(group||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();let icon='other';if(/am thuc|food|mua sam|shopping/.test(topic))icon='food';else if(/cong nghe|technology|digital|\bai\b/.test(topic))icon='technology';else if(/cong viec|nghe nghiep|work|career/.test(topic))icon='work';else if(/dien|electric|engineering|ky thuat/.test(topic))icon='engineering';else if(/sinh vien|student|campus/.test(topic))icon='student';else if(/du lich|travel|trip/.test(topic))icon='travel';else if(/gia dinh|ban be|family|friend/.test(topic))icon='family';else if(/giao thong|transport|traffic|do thi/.test(topic))icon='transport';else if(/hoc tap|study|education|school/.test(topic))icon='study';else if(/nang luong|moi truong|environment|eco/.test(topic))icon='environment';else if(/so thich|giao tiep|hobby|music|entertainment/.test(topic))icon='hobbies';else if(/suc khoe|van dong|health|sport|fitness/.test(topic))icon='health';else if(/thien nhien|thoi tiet|nature|weather/.test(topic))icon='nature';return collectionIcon(icon)}
 function collectionVocabularyPanel(){
  const due=typeof dueCards==='function'?dueCards().length:0,learned=st.c.filter(card=>Number(card.interval)>=21).length;
  const groups=collectionTopicGroups();
@@ -2476,13 +2502,13 @@ function collectionVocabularyPanel(){
   <p class="eyebrow">IELTS SPEAKING · HỌC THEO CHỦ ĐỀ</p><h2 id="collection-vocab-title">Học từ vựng</h2>
   <p>Khám phá từ theo nhóm, lưu từ có ví dụ vào bộ sưu tập và ôn lại đúng lịch. Từ vựng chọn lọc hoạt động ngoại tuyến.</p>
   <div class="collection-vocab-stats" id="collection-vocab-stats">
-   <article><span>▤</span><strong data-collection-stat="saved">${st.c.length}</strong><small>Từ đã lưu</small></article>
-   <article><span>◷</span><strong data-collection-stat="due">${due}</strong><small>Cần ôn</small></article>
-   <article><span>✓</span><strong data-collection-stat="mastered">${learned}</strong><small>Đã thuộc · 21 ngày</small></article>
-   <article><span>◎</span><strong>${groups.length}</strong><small>Nhóm chủ đề</small></article>
+    <article><span>${collectionIcon('saved')}</span><strong data-collection-stat="saved">${st.c.length}</strong><small>Từ đã lưu</small></article>
+    <article><span>${collectionIcon('due')}</span><strong data-collection-stat="due">${due}</strong><small>Cần ôn</small></article>
+    <article><span>${collectionIcon('mastered')}</span><strong data-collection-stat="mastered">${learned}</strong><small>Đã thuộc · 21 ngày</small></article>
+    <article><span>${collectionIcon('topics')}</span><strong>${groups.length}</strong><small>Nhóm chủ đề</small></article>
   </div>
   <div class="collection-vocab-head"><h3>Chủ đề từ vựng</h3><small>${D.length.toLocaleString('vi-VN')} mục chọn lọc</small></div>
-  <div class="collection-topic-grid">${groups.map((group,index)=>{const rows=D.filter(row=>row[5]===group);return `<button class="c collection-topic-card" type="button" onclick="collectionOpenTopic(${index})"><span class="collection-topic-icon" aria-hidden="true">${['⌂','▧','✦','◉','♧','↗','◌'][index%7]}</span><strong>${esc(group)}</strong><small>${rows.length} từ · xem ví dụ</small><span class="collection-topic-arrow" aria-hidden="true">→</span></button>`}).join('')}</div>
+   <div class="collection-topic-grid">${groups.map((group,index)=>{const rows=D.filter(row=>row[5]===group);return `<button class="c collection-topic-card" type="button" onclick="collectionOpenTopic(${index})"><span class="collection-topic-icon">${collectionTopicIcon(group)}</span><strong>${esc(group)}</strong><small>${rows.length} từ · xem ví dụ</small><span class="collection-topic-arrow" aria-hidden="true">→</span></button>`}).join('')}</div>
   <div id="collection-topic-results" aria-live="polite"></div>
   <section class="collection-story"><div><h3>Ôn từ qua ví dụ</h3><p>Dùng câu ví dụ của những từ bạn đã lưu để luyện đọc thành tiếng.</p></div><button class="g" type="button" onclick="collectionBuildStory()">Tạo lượt ôn</button><div id="collection-story-result" class="collection-story-result" aria-live="polite"></div></section>
  </section>`;
@@ -7708,6 +7734,8 @@ function flipFlashcard(){
  if(!review?.queue.length||review.finished||review.revealed)return;
  review.recall=($('#learning-recall')?.value||'').trim().slice(0,160);
  review.revealed=true;updateFlashcards();
+ const face=$('#flashcards .flash-face');
+ if(face&&!reduceMotion.matches){face.classList.add('flash-face-flipping');face.addEventListener('animationend',()=>face.classList.remove('flash-face-flipping'),{once:true})}
  $('#flashcards .review-grades button')?.focus();
 }
 function speakFlashcard(){const card=review?.queue[0];if(card&&!review.finished)say(card.w)}
