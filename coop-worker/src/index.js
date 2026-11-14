@@ -1,3 +1,5 @@
+import { GAME_IDS, applyGameAction, filterRoomText, gameAlarmTime, makeGame, removeGamePlayer, updateGameClock, validGameTopic, visibleGame } from './arcade.js';
+
 const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const ROOM_TTL_MS = 2 * 60 * 60 * 1000;
 const MAX_NAME = 32;
@@ -7,6 +9,9 @@ const MAX_NOTE = 240;
 const MAX_CHAT_MESSAGE = 500;
 const MAX_SOCKET_MESSAGE = 2 * 1024 * 1024;
 const MAX_COOP_AUDIO_BYTES = 550 * 1024;
+const MAX_GAME_MESSAGE = 1600;
+const GAME_ACTION_INTERVAL = 250;
+const HOST_GRACE = 20_000;
 
 const json = (body, status = 200, headers = {}) => new Response(JSON.stringify(body), {
   status,
@@ -32,7 +37,7 @@ async function digest(value) {
 }
 
 function cleanName(value) {
-  return typeof value === 'string' ? value.replace(/[<>\u0000-\u001f]/g, '').trim().slice(0, MAX_NAME) : '';
+  return typeof value === 'string' ? filterRoomText(value.replace(/[<>\u0000-\u001f]/g, '').trim().slice(0, MAX_NAME)) : '';
 }
 
 function cleanChatMessage(value) {
@@ -74,9 +79,15 @@ function cleanPrompts(value) {
   return prompts.every(Boolean) ? prompts : null;
 }
 
-function publicState(state, onlineIds = new Set()) {
+function publicState(state, onlineIds = new Set(), viewer = null) {
+  const now = Date.now();
   return {
     code: state.code,
+    mode: state.mode || 'speaking',
+    game: visibleGame(state.game, viewer, now),
+    hostId: state.hostId || state.players[0]?.id || null,
+    gameOptions: state.mode === 'game' ? { id: state.gameId, topic: state.gameTopic, seconds: state.gameSeconds ?? null } : null,
+    serverNow: now,
     part: state.part,
     topic: state.topic,
     prompts: state.prompts,
@@ -127,7 +138,7 @@ export default {
 
     const url = new URL(request.url);
     if (request.method === 'GET' && url.pathname === '/health') {
-      return withCors(request, json({ ok: true, service: 'epu-speaking-coop', turnConfigured: Boolean(env.TURN_KEY_ID && env.TURN_API_TOKEN) }), env);
+      return withCors(request, json({ ok: true, service: 'epu-speaking-coop', games: GAME_IDS, turnConfigured: Boolean(env.TURN_KEY_ID && env.TURN_API_TOKEN) }), env);
     }
 
     if (request.method === 'POST' && url.pathname === '/api/rooms') {
@@ -137,14 +148,22 @@ export default {
       const prompts = cleanPrompts(input?.prompts);
       const part = Number(input?.part);
       const topic = typeof input?.topic === 'string' ? input.topic.trim().slice(0, 80) : '';
-      if (!name || !prompts || ![1, 2, 3].includes(part) || !topic) {
+      const mode = input?.mode ?? 'speaking';
+      const gameId = input?.gameId, gameTopic = input?.gameTopic;
+      const gameSeconds = input?.gameSeconds == null ? null : Number(input.gameSeconds);
+      const validSeconds = gameSeconds === null || Number.isInteger(gameSeconds) && gameSeconds >= 5 && gameSeconds <= 60;
+      const validMode = mode === 'game' ? GAME_IDS.includes(gameId) && (gameId !== 'letter-link' || validGameTopic(gameTopic)) && validSeconds
+        : mode === 'speaking' && prompts && [1, 2, 3].includes(part) && topic;
+      if (!name || !validMode) {
         return withCors(request, json({ error: 'Hãy nhập tên, chủ đề và câu hỏi hợp lệ.' }, 400), env);
       }
       for (let attempt = 0; attempt < 4; attempt++) {
         const code = makeCode();
         const id = makeSecret(8);
         const token = makeSecret();
-        const result = await callRoom(env, code, '/create', { code, part, topic, prompts, host: { id, token, name } });
+        const config = mode === 'game' ? { mode, gameId, gameTopic: validGameTopic(gameTopic) ? gameTopic : 'Hometown', gameSeconds, prompts: [] }
+          : { mode, part, topic, prompts };
+        const result = await callRoom(env, code, '/create', { code, ...config, host: { id, token, name } });
         if (result.status === 409) continue;
         const payload = await result.json().catch(() => ({ error: 'Backend chưa tạo được phòng.' }));
         if (!result.ok) return withCors(request, json(payload, result.status), env);
@@ -159,9 +178,10 @@ export default {
       try { input = await request.json(); } catch { return withCors(request, json({ error: 'Dữ liệu tham gia không hợp lệ.' }, 400), env); }
       const name = cleanName(input?.displayName);
       if (!name) return withCors(request, json({ error: 'Hãy nhập tên hiển thị.' }, 400), env);
+      if (input?.mode !== undefined && !['speaking', 'game'].includes(input.mode)) return withCors(request, json({ error: 'Chế độ phòng không hợp lệ.' }, 400), env);
       const id = makeSecret(8);
       const token = makeSecret();
-      const result = await callRoom(env, joinMatch[1].toUpperCase(), '/join', { id, token, name });
+      const result = await callRoom(env, joinMatch[1].toUpperCase(), '/join', { id, token, name, mode: input?.mode });
       return withCors(request, new Response(result.body, { status: result.status, headers: result.headers }), env);
     }
 
@@ -216,14 +236,22 @@ export class CoopRoom {
   constructor(ctx, env) {
     this.ctx = ctx;
     this.env = env;
+    this.pending = Promise.resolve();
+  }
+
+  // Serialize changes that cross awaits so a join, alarm, and socket action cannot overwrite one another.
+  enqueue(operation) {
+    const result = this.pending.then(operation);
+    this.pending = result.catch(() => {});
+    return result;
   }
 
   async fetch(request) {
     const url = new URL(request.url);
-    if (request.method === 'POST' && url.pathname === '/create') return this.create(request);
-    if (request.method === 'POST' && url.pathname === '/join') return this.join(request);
-    if (request.method === 'POST' && url.pathname === '/authorize-turn') return this.authorizeTurn(request);
-    if (request.method === 'GET' && (url.pathname === '/socket' || /^\/api\/rooms\/[A-HJ-NP-Z2-9]{7}\/socket$/i.test(url.pathname))) return this.connect(request);
+    if (request.method === 'POST' && url.pathname === '/create') return this.enqueue(() => this.create(request));
+    if (request.method === 'POST' && url.pathname === '/join') return this.enqueue(() => this.join(request));
+    if (request.method === 'POST' && url.pathname === '/authorize-turn') return this.enqueue(() => this.authorizeTurn(request));
+    if (request.method === 'GET' && (url.pathname === '/socket' || /^\/api\/rooms\/[A-HJ-NP-Z2-9]{7}\/socket$/i.test(url.pathname))) return this.enqueue(() => this.connect(request));
     return json({ error: 'Không tìm thấy phòng.' }, 404);
   }
 
@@ -237,8 +265,14 @@ export class CoopRoom {
     const now = Date.now();
     const state = {
       code: input.code,
-      part: input.part,
-      topic: input.topic,
+      mode: input.mode || 'speaking',
+      hostId: input.host.id,
+      game: null,
+      gameId: input.gameId ?? null,
+      gameTopic: input.gameTopic ?? null,
+      gameSeconds: input.gameSeconds ?? null,
+      part: input.part ?? null,
+      topic: input.topic ?? '',
       prompts: input.prompts,
       phase: 'waiting',
       turn: 0,
@@ -260,10 +294,14 @@ export class CoopRoom {
     const input = await request.json();
     const state = await this.readState();
     if (!state || state.expiresAt <= Date.now()) return json({ error: 'Không tìm thấy phòng hoặc phòng đã hết hạn.' }, 404);
+    const roomMode = state.mode || 'speaking';
+    if (input.mode && input.mode !== roomMode) return json({ error: roomMode === 'game' ? 'Mã này thuộc phòng trò chơi. Hãy mở một trò rồi chọn “Chơi cùng bạn”.' : 'Mã này thuộc phòng luyện Speaking, không phải phòng trò chơi.' }, 409);
     if (state.players.some(player => player.id === input.id)) return json({ error: 'Bạn đã ở trong phòng.' }, 409);
-    if (state.players.length >= 2) return json({ error: 'Phòng đã đủ hai người.' }, 409);
+    const isGame = roomMode === 'game';
+    if (isGame && state.game?.turn) return json({ error: 'Ván đang diễn ra. Hãy chờ ván sau để tham gia.' }, 409);
+    if (state.players.length >= (isGame ? 4 : 2)) return json({ error: isGame ? 'Phòng đã đủ bốn người.' : 'Phòng đã đủ hai người.' }, 409);
     state.players.push({ id: input.id, tokenHash: await digest(input.token), name: input.name });
-    state.phase = 'answer';
+    if (!isGame) state.phase = 'answer';
     state.updatedAt = Date.now();
     await this.ctx.storage.put('room', state);
     await this.broadcast(state);
@@ -301,11 +339,16 @@ export class CoopRoom {
     }
     this.ctx.acceptWebSocket(server, [id]);
     server.serializeAttachment({ playerId: id });
+    if (state.mode === 'game') await this.refreshGameRoom(state);
     await this.broadcast(state);
     return new Response(null, { status: 101, webSocket: client });
   }
 
-  async webSocketMessage(socket, message) {
+  webSocketMessage(socket, message) {
+    return this.enqueue(() => this.handleSocketMessage(socket, message));
+  }
+
+  async handleSocketMessage(socket, message) {
     const attachment = socket.deserializeAttachment();
     const playerId = attachment?.playerId;
     const raw = typeof message === 'string' ? message : new TextDecoder().decode(message);
@@ -319,11 +362,23 @@ export class CoopRoom {
 
     const state = await this.readState();
     if (!state || state.expiresAt <= Date.now()) {
-      socket.send(JSON.stringify({ type: 'error', error: 'Phòng đã hết hạn.' }));
+      socket.send(JSON.stringify({ type: 'expired', message: 'Phòng đã hết hạn.' }));
       return;
     }
     if (!state.players.some(player => player.id === playerId)) {
       socket.send(JSON.stringify({ type: 'error', error: 'Bạn không còn trong phòng.' }));
+      return;
+    }
+    if (socket.readyState !== 1) return;
+    if (input?.type === 'game') {
+      if (raw.length > MAX_GAME_MESSAGE) {
+        this.socketError(socket, 'Thao tác trò chơi vượt quá giới hạn.');
+        return;
+      }
+      return this.handleGameMessage(state, socket, playerId, input);
+    }
+    if (state.mode === 'game' && input?.type !== 'chat') {
+      this.socketError(socket, 'Thao tác này chỉ dùng trong phòng luyện nói.');
       return;
     }
 
@@ -343,7 +398,11 @@ export class CoopRoom {
       if (!delivered) socket.send(JSON.stringify({ type: 'error', error: 'Bạn học chưa kết nối. Hãy đợi bạn ấy vào phòng rồi thử gọi lại.' }));
       return;
     } else if (input?.type === 'chat') {
-      const text = cleanChatMessage(input.text);
+      if (typeof input.text !== 'string' || input.text.length > MAX_CHAT_MESSAGE) {
+        this.socketError(socket, 'Tin nhắn tối đa 500 ký tự.');
+        return;
+      }
+      const text = filterRoomText(cleanChatMessage(input.text));
       const now = Date.now();
       state.chat ||= [];
       state.chatLastSentAt ||= {};
@@ -376,7 +435,7 @@ export class CoopRoom {
         socket.send(JSON.stringify({ type: 'error', error: 'Chưa đến lượt bạn hoặc câu trả lời quá ngắn.' }));
         return;
       }
-      state.currentAnswer = { playerId, text: answer, question: state.prompts[state.turn], submittedAt: Date.now() };
+      state.currentAnswer = { playerId, text: filterRoomText(answer), question: state.prompts[state.turn], submittedAt: Date.now() };
       state.phase = 'review';
     } else if (input?.type === 'review') {
       const reviewer = state.players[(state.turn + 1) % 2];
@@ -391,7 +450,7 @@ export class CoopRoom {
         onTopic: checks.onTopic === true,
         reasonExample: checks.reasonExample === true,
         clear: checks.clear === true,
-        note: typeof input.note === 'string' ? input.note.replace(/[<>\u0000-\u001f]/g, '').trim().slice(0, MAX_NOTE) : '',
+        note: typeof input.note === 'string' ? filterRoomText(input.note.replace(/[<>\u0000-\u001f]/g, '').trim().slice(0, MAX_NOTE)) : '',
         submittedAt: Date.now()
       };
       state.answers.push(current);
@@ -409,14 +468,107 @@ export class CoopRoom {
     if (outgoingAudio) await this.broadcastAudio(state.turn, playerId, outgoingAudio);
   }
 
-  async onlineIds() {
-    return new Set(this.ctx.getWebSockets().map(socket => socket.deserializeAttachment()?.playerId).filter(Boolean));
+  socketError(socket, error) {
+    socket.send(JSON.stringify({ type: 'error', error }));
   }
 
-  async broadcast(state) {
-    const payload = JSON.stringify({ type: 'state', state: publicState(state, await this.onlineIds()) });
+  onlineIds(excluded = null) {
+    return new Set(this.ctx.getWebSockets().filter(socket => socket !== excluded && socket.readyState === 1)
+      .map(socket => socket.deserializeAttachment()?.playerId).filter(Boolean));
+  }
+
+  async saveGameRoom(state) {
+    state.updatedAt = Date.now();
+    await this.ctx.storage.put('room', state);
+    await this.ctx.storage.setAlarm(Math.min(state.expiresAt, state.hostAwayUntil || Infinity, gameAlarmTime(state.game)));
+  }
+
+  async refreshGameRoom(state, online = this.onlineIds()) {
+    const now = Date.now(), hostOnline = online.has(state.hostId);
+    const replacement = state.players.find(player => online.has(player.id) && player.id !== state.hostId);
+    let changed = updateGameClock(state.game, online, now);
+    if (hostOnline || !replacement) {
+      if (state.hostAwayUntil) { state.hostAwayUntil = null; changed = true; }
+    } else if (!state.hostAwayUntil) {
+      state.hostAwayUntil = now + HOST_GRACE;
+      changed = true;
+    } else if (state.hostAwayUntil <= now) {
+      state.hostId = replacement.id;
+      state.hostAwayUntil = null;
+      changed = true;
+    }
+    if (state.game) state.phase = state.game.turn ? 'playing' : 'complete';
+    if (changed) await this.saveGameRoom(state);
+    return changed;
+  }
+
+  async handleGameMessage(state, socket, playerId, input) {
+    if (state.mode !== 'game') return this.socketError(socket, 'Đây là phòng luyện nói. Hãy tạo phòng trò chơi riêng.');
+    const now = Date.now(), online = this.onlineIds();
+    const session = socket.deserializeAttachment();
+    if (now - (session.gameActionAt || 0) < GAME_ACTION_INTERVAL) {
+      return this.socketError(socket, 'Bạn gửi hơi nhanh. Hãy thử lại sau một nhịp.');
+    }
+    socket.serializeAttachment({ ...session, gameActionAt: now });
+    const changed = await this.refreshGameRoom(state, online);
+    const reject = async error => {
+      if (changed) await this.broadcast(state);
+      this.socketError(socket, error);
+    };
+    const payload = input.payload;
+    if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return reject('Dữ liệu trò chơi không hợp lệ.');
+    const allowedKeys = {
+      leave: [], start: ['id', 'topic'], hint: ['runId', 'step'], skip: ['runId', 'step'], submit: ['runId', 'step', 'text']
+    };
+    if (!Object.hasOwn(allowedKeys, input.action) || Object.keys(payload).some(key => !allowedKeys[input.action].includes(key))) {
+      return reject('Thao tác trò chơi không hợp lệ.');
+    }
+    if (input.action === 'leave') {
+      removeGamePlayer(state.game, playerId, now);
+      state.players = state.players.filter(player => player.id !== playerId);
+      delete state.chatLastSentAt?.[playerId];
+      if (state.hostId === playerId) {
+        state.hostId = state.players.find(player => online.has(player.id))?.id || state.players[0]?.id || null;
+        state.hostAwayUntil = null;
+      }
+      state.phase = state.game ? (state.game.turn ? 'playing' : 'complete') : 'waiting';
+      await this.refreshGameRoom(state);
+      await this.saveGameRoom(state);
+      await this.broadcast(state);
+      // Acknowledge on the existing connection before closing it.
+      socket.send(JSON.stringify({ type: 'state', state: publicState(state, online, playerId) }));
+      socket.close(1000, 'Left room');
+      return;
+    }
+    if (input.action === 'start') {
+      if (state.hostId !== playerId || state.game?.turn) return reject('Chỉ chủ phòng có thể mở ván mới khi ván cũ đã kết thúc.');
+      const players = state.players.filter(player => online.has(player.id));
+      if (players.length < 2) return reject('Cần ít nhất hai người đang kết nối.');
+      const id = payload.id ?? state.gameId;
+      const topic = payload.topic ?? state.gameTopic;
+      if (!GAME_IDS.includes(id) || (id === 'letter-link' && !validGameTopic(topic))) return reject('Trò hoặc chủ đề chưa hợp lệ.');
+      state.gameId = id;
+      state.gameTopic = validGameTopic(topic) ? topic : 'Hometown';
+      const seconds = payload.seconds ?? state.gameSeconds;
+      if (seconds != null && (!Number.isInteger(seconds) || seconds < 5 || seconds > 60)) return reject('Thời gian mỗi lượt phải từ 5 đến 60 giây.');
+      if (seconds != null) state.gameSeconds = seconds;
+      state.game = makeGame(id, state.gameTopic, 'arcade_' + makeSecret(12), players, now, state.gameSeconds);
+    } else {
+      if (!state.game) return reject('Chủ phòng chưa bắt đầu ván.');
+      const error = applyGameAction(state.game, playerId, input.action, payload, now);
+      if (error) return reject(error);
+    }
+    state.phase = state.game.turn ? 'playing' : 'complete';
+    await this.refreshGameRoom(state);
+    await this.saveGameRoom(state);
+    await this.broadcast(state);
+  }
+
+  async broadcast(state, online = this.onlineIds()) {
     for (const socket of this.ctx.getWebSockets()) {
-      try { socket.send(payload); } catch {}
+      const viewer = socket.deserializeAttachment()?.playerId;
+      if (!state.players.some(player => player.id === viewer) || socket.readyState !== 1) continue;
+      try { socket.send(JSON.stringify({ type: 'state', state: publicState(state, online, viewer) })); } catch {}
     }
   }
 
@@ -428,17 +580,36 @@ export class CoopRoom {
     }
   }
 
-  async webSocketClose() {
-    const state = await this.readState();
-    if (state) await this.broadcast(state);
+  webSocketClose(socket) {
+    return this.enqueue(() => this.handleDisconnect(socket));
   }
 
-  async webSocketError() {
-    const state = await this.readState();
-    if (state) await this.broadcast(state);
+  webSocketError(socket) {
+    return this.enqueue(() => this.handleDisconnect(socket));
   }
 
-  async alarm() {
+  async handleDisconnect(socket) {
+    const state = await this.readState();
+    if (!state) return;
+    const online = this.onlineIds(socket);
+    if (state.mode === 'game') await this.refreshGameRoom(state, online);
+    await this.broadcast(state, online);
+  }
+
+  alarm() {
+    return this.enqueue(() => this.handleAlarm());
+  }
+
+  async handleAlarm() {
+    const state = await this.readState();
+    if (!state) return;
+    if (state.expiresAt > Date.now()) {
+      if (state.mode === 'game') {
+        if (await this.refreshGameRoom(state)) await this.broadcast(state);
+        else await this.saveGameRoom(state);
+      } else await this.ctx.storage.setAlarm(state.expiresAt);
+      return;
+    }
     for (const socket of this.ctx.getWebSockets()) {
       try { socket.send(JSON.stringify({ type: 'expired', message: 'Phòng coop đã hết hạn.' })); socket.close(1000, 'Room expired'); } catch {}
     }

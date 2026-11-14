@@ -4,6 +4,8 @@ const ASSET_CACHE='epu-pwa-assets-'+VERSION;
 const SCOPE=self.registration.scope;
 const APP_URL=new URL('./EPU%20IELTS%20Speaking.html',SCOPE).href;
 const APP_PATH=new URL(APP_URL).pathname;
+const CAMPUS_URL=new URL('./assets/campus3d/index.html',SCOPE).href;
+const CAMPUS_PATH=new URL(CAMPUS_URL).pathname;
 const CORE_URLS=[
  new URL('./manifest.webmanifest',SCOPE).href,
  new URL('./assets/pwa/icon-192.png',SCOPE).href,
@@ -25,9 +27,25 @@ self.addEventListener('fetch',event=>{
   event.respondWith((async()=>{
    try{
     const response=await fetch(request);
-    if(response.ok&&url.pathname===APP_PATH){const cache=await caches.open(SHELL_CACHE);event.waitUntil(cache.put(APP_URL,response.clone()).catch(()=>{}))}
+    if(response.ok&&(url.pathname===APP_PATH||url.pathname===CAMPUS_PATH)){
+      const cache=await caches.open(SHELL_CACHE);
+      event.waitUntil(cache.put(url.pathname===CAMPUS_PATH?CAMPUS_URL:APP_URL,response.clone()).catch(()=>{}));
+    }
     return response;
-   }catch{return await caches.match(request)||await caches.match(APP_URL)||Response.error()}
+   }catch{return await caches.match(request)||await caches.match(url.pathname===CAMPUS_PATH?CAMPUS_URL:APP_URL)||Response.error()}
+  })());
+  return;
+ }
+ const campusRoot=new URL('./assets/campus3d/',SCOPE).pathname;
+ if(url.pathname.startsWith(campusRoot)){
+  event.respondWith((async()=>{
+   const cache=await caches.open(ASSET_CACHE);
+   try{
+    const response=await fetch(request);
+    if(response.ok)await cache.put(request,response.clone()).catch(()=>{});
+    if(response.ok)return response;
+    return await cache.match(request)||response;
+   }catch{return await cache.match(request)||Response.error()}
   })());
   return;
  }

@@ -39,3 +39,14 @@ Không dán TURN API token vào mã HTML, GitHub hoặc ô địa chỉ Worker. 
 ## Ghi chú cho người phát triển
 
 Worker dùng Cloudflare Durable Objects với SQLite. Có thể triển khai thủ công từ thư mục này bằng `npm install`, đăng nhập Wrangler bằng `npx wrangler login`, rồi chạy `npm run deploy`. Chỉ cần cách này nếu bạn muốn quản lý Worker bằng dòng lệnh.
+
+## Cập nhật phòng trò chơi
+
+1. Kiểm tra Worker hiện có là `epu-speaking-coop`, binding là `COOP_ROOMS` trỏ đến lớp `CoopRoom`, và `ALLOWED_ORIGIN` khớp nguồn của trang EPU. Giữ cấu hình riêng của Worker đang chạy nếu khác với cấu hình mặc định trong repo.
+2. Trong thư mục `coop-worker`, chạy `npm install`, `npx wrangler login` và `npm run deploy`. Bản này dùng tiếp Durable Object và migration `v1` hiện có.
+3. Mở `/health` trên địa chỉ Worker. Phản hồi phải có `"games":["letter-link","word-lock","story-relay"]`. Sau đó cập nhật trang EPU và tải lại trên cả hai trình duyệt.
+4. Vào **Góc chơi**, chọn trò rồi bấm **Chơi cùng bạn**. Tạo phòng, mời tối đa ba bạn bằng mã 7 ký tự. Chủ phòng bắt đầu khi có ít nhất hai người đang kết nối.
+
+Phòng luyện nói vẫn dùng hai người và giữ các thông điệp `state`, `audio`, `signal`, `error` và `expired`. Phòng trò chơi dùng thêm `{type:"game",action,payload}`. Worker giữ trạng thái, deadline, điểm và lọc từ tục cơ bản. Người chơi có thể kết nối lại bằng phiên đã lưu trong cùng thẻ trình duyệt. Khi người đến lượt mất kết nối, Worker tạm dừng lượt một lần, tối đa 20 giây. Chủ phòng rời bằng nút **Rời phòng** sẽ chuyển quyền ngay. Nếu mất kết nối, Worker chờ 20 giây trước khi chuyển quyền sang thành viên còn kết nối.
+
+Trong trò nối từ, máy gửi kiểm tra từ điển và nhóm chủ đề. Worker chỉ kiểm tra dạng từ, chữ cái đầu và trùng lặp, nên không thể xác thực nghĩa hoặc độ đúng chủ đề của dữ liệu từ client đã chỉnh sửa. Nút **Tắt tiếng** ẩn chat và lời chơi của người đó ở trình duyệt người bấm. Phòng trò chơi gửi văn bản, còn bản ghi được dùng để chép lời trên thiết bị.

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Khuôn viên EPU 3D</title>
+  <link rel="stylesheet" href="campus.css">
+  <script defer src="three.min.js"></script>
+  <script defer src="data.js"></script>
+  <script defer src="world.js"></script>
+  <script defer src="campus.js"></script>
+</head>
+<body>
+  <header class="mast">
+    <div class="heading">
+      <span class="eyebrow">EPU IELTS SPEAKING / CƠ SỞ 1</span>
+      <h1>Khuôn viên EPU 3D</h1>
+      <p>235 Hoàng Quốc Việt, Hà Nội · Đang tập trung hoàn thiện khuôn viên bên ngoài</p>
+    </div>
+    <div class="controls">
+      <button id="camera" type="button" aria-pressed="false">Đi bộ</button>
+      <button id="night" type="button" aria-pressed="false">Bật cảnh đêm</button>
+      <button id="full" type="button">Toàn màn hình</button>
+    </div>
+  </header>
+  <main class="explorer">
+    <section class="stage" id="stage" aria-label="Mô hình 3D khuôn viên">
+      <div id="world"></div>
+      <p class="location" id="location">Cổng chính</p>
+      <div id="marker" aria-hidden="true" hidden>+</div>
+      <div class="touch" aria-label="Điều khiển di chuyển" hidden>
+        <button data-key="w" type="button" aria-label="Đi tới">↑</button>
+        <button data-key="a" type="button" aria-label="Đi trái">←</button>
+        <button data-key="s" type="button" aria-label="Đi lùi">↓</button>
+        <button data-key="d" type="button" aria-label="Đi phải">→</button>
+      </div>
+      <div class="stage-footer">
+        <p id="hint">Chọn một tòa trên mô hình hoặc bản đồ để xem thông tin bên ngoài.</p>
+      </div>
+    </section>
+    <aside class="sidebar" aria-label="Địa điểm và nội dung học">
+      <section class="map-panel">
+        <div class="panel-head"><h2>Bản đồ</h2><span>↑ Bắc</span></div>
+        <div id="map" aria-label="Địa điểm trong khuôn viên"></div>
+        <label for="destination" class="sr-only">Chọn địa điểm</label>
+        <select id="destination"></select>
+      </section>
+      <section class="info" id="info" aria-labelledby="place-title">
+        <div id="place-content"></div>
+      </section>
+    </aside>
+  </main>
+  <p id="status" class="sr-only" role="status"></p>
+  <noscript>Cần bật JavaScript để sử dụng mô phỏng.</noscript>
+</body>
+</html>
