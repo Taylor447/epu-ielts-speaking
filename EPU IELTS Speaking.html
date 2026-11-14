@@ -1037,6 +1037,12 @@ body.page-hidden::before,body.page-hidden .theme-bg { animation-play-state:pause
 
 /* Sảnh trò chơi */
 .arcade-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:clamp(8px,2vw,16px); }
+.arcade-overview { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin:14px 0 18px; }
+.arcade-overview-card { display:grid; grid-template-columns:auto minmax(0,1fr); align-items:center; gap:10px; min-height:90px; padding:15px; border:1px solid var(--bd); border-radius:22px; background:linear-gradient(135deg,var(--cd),var(--sf)); }
+.arcade-overview-icon { display:grid; place-items:center; width:44px; height:44px; border:1px solid var(--bd); border-radius:15px; background:var(--sf); color:var(--pr); }
+.arcade-overview-icon svg { width:23px; height:23px; }
+.arcade-overview-card small { display:block; color:var(--mu); font-weight:650; }
+.arcade-overview-card strong { display:block; margin-top:2px; font-size:clamp(22px,3vw,30px); line-height:1.05; font-variant-numeric:tabular-nums; }
 .arcade-tile { margin:0; display:flex; flex-direction:column; align-items:flex-start; gap:9px; }
 .arcade-tile > p { margin:0; }
 .arcade-tile > button { margin-top:auto; }
@@ -1071,15 +1077,47 @@ body.page-hidden::before,body.page-hidden .theme-bg { animation-play-state:pause
 .arcade-answer audio { width:100%; max-width:28rem; }
 .arcade-feedback { overflow-wrap:anywhere; }
 .arcade-feedback:empty { margin:0; }
+.arcade-quiz-options { display:flex; flex-wrap:wrap; gap:8px; margin-top:4px; }
+.arcade-quiz-options button { min-width:min(170px,100%); }
+.arcade-word-bank { padding:10px 13px; border:1px solid var(--bd); border-radius:13px; background:var(--cd); color:var(--pr); font-weight:700; line-height:1.8; }
 .arcade-story { display:grid; gap:7px; padding-inline-start:23px; }
 .arcade-story li { overflow-wrap:anywhere; }
 .arcade-panel { animation:arcade-appear .22s ease-out both; }
 @keyframes arcade-appear { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
+.collection-vocab { margin-block:14px; }
+.collection-vocab > h2 { margin:3px 0 4px; }
+.collection-vocab-stats { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:9px; margin:16px 0 22px; }
+.collection-vocab-stats article { display:grid; gap:3px; min-height:102px; align-content:start; padding:13px; border:1px solid var(--bd); border-radius:17px; background:var(--sf); }
+.collection-vocab-stats article span { color:var(--pr); font-size:20px; }
+.collection-vocab-stats strong { font-size:22px; line-height:1.1; }
+.collection-vocab-stats small { color:var(--mu); }
+.collection-vocab-head,.collection-vocab-head .section-head { display:flex; align-items:baseline; justify-content:space-between; gap:10px; }
+.collection-topic-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; margin:10px 0 18px; }
+.collection-topic-card { position:relative; display:grid; min-height:112px; justify-items:start; align-content:start; gap:5px; padding:14px; border-color:var(--bd); border-radius:17px; background:linear-gradient(135deg,var(--sf),var(--cd)); color:var(--tx); text-align:left; }
+.collection-topic-card strong { max-width:calc(100% - 26px); }
+.collection-topic-card small { color:var(--mu); }
+.collection-topic-icon { display:grid; width:31px; height:31px; place-items:center; border:1px solid var(--bd); border-radius:11px; background:var(--cd); color:var(--pr); font-size:18px; }
+.collection-topic-arrow { position:absolute; right:14px; bottom:12px; color:var(--pr); font-size:20px; }
+.collection-topic-detail { margin-top:16px; padding-top:14px; border-top:1px solid var(--bd); }
+.collection-word-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
+.collection-word-card { margin:0; }
+.collection-word-card h4 { margin:0 0 3px; font-size:17px; }
+.collection-word-card p { margin:7px 0; }
+.collection-story { display:grid; grid-template-columns:1fr auto; align-items:center; gap:8px 14px; padding:15px; border:1px solid var(--bd); border-radius:17px; background:var(--sf); }
+.collection-story h3,.collection-story p { margin:0; }
+.collection-story p { color:var(--mu); }
+.collection-story-result { grid-column:1/-1; }
+.collection-story-result:empty { display:none; }
+.collection-story-result li { margin-block:7px; }
 @media(max-width:460px) {
+  .arcade-overview { grid-template-columns:1fr; gap:8px; }
+  .arcade-overview-card { min-height:70px; padding:11px 13px; }
   .arcade-entry { grid-template-columns:auto minmax(0,1fr); }
   .arcade-entry > button { grid-column:1/-1; justify-self:start; }
   .arcade-tile { padding:10px; }
   .arcade-tile > button { width:100%; padding-inline:6px; }
+  .collection-topic-grid,.collection-vocab-stats { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .collection-word-grid,.collection-story { grid-template-columns:1fr; }
 }
 @media(prefers-reduced-motion:reduce) {
   .arcade-panel { animation:none; }
@@ -1090,6 +1128,22 @@ body.page-hidden::before,body.page-hidden .theme-bg { animation-play-state:pause
 .campus3d-entry p{color:var(--mu);margin-top:.3rem}
 .campus3d-view{display:grid;gap:10px}
 .campus3d-frame{width:100%;height:950px;display:block;border:1px solid var(--bd);border-radius:14px;background:#11202d}
+.idea-coach{margin:14px 0;border:1px solid var(--bd);border-radius:18px;background:linear-gradient(135deg,color-mix(in srgb,var(--cd) 86%,transparent),color-mix(in srgb,var(--sf) 76%,transparent));overflow:hidden}
+.idea-coach>summary{padding:15px 18px;color:var(--pr);font-weight:750;cursor:pointer;list-style:none}
+.idea-coach>summary::-webkit-details-marker{display:none}
+.idea-coach>summary::after{content:'＋';float:right;color:var(--mu)}
+.idea-coach[open]>summary::after{content:'−'}
+.idea-coach-body{padding:0 18px 18px}
+.idea-coach-body>p{margin:0 0 10px;color:var(--mu);font-size:.92em}
+.idea-coach-body textarea{min-height:86px;margin:4px 0 8px}
+.idea-coach-results{display:grid;gap:9px;margin-top:12px}
+.idea-coach-note{margin:0;color:var(--mu);font-size:.9em}
+.idea-suggestion{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px;padding:12px;border:1px solid var(--bd);border-radius:13px;background:var(--cd)}
+.idea-suggestion p{margin:0}
+.idea-suggestion [lang="en"]{font-weight:700}
+.idea-suggestion small{display:block;margin-top:4px;color:var(--mu)}
+.idea-suggestion button{white-space:nowrap}
+@media(max-width:600px){.idea-suggestion{grid-template-columns:1fr}.idea-suggestion button{width:100%}}
 </style>
 <script type="application/json" id="offline-dictionary-meta">{"shards":["_","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"],"count":195393,"bilingual":119032}</script>
 <script type="text/plain" id="offline-dictionary-_" data-src="assets/dictionary/other.bin"></script>
@@ -2375,7 +2429,7 @@ const bars=m=>K.map(([key,label])=>{
 
 let campus3dOrigin='home',campus3dPlace='gate';
 function campus3dEntry(origin){
- return `<section class="c campus3d-entry"><div><h2>Khuôn viên EPU 3D</h2><p>Khám phá mô hình khuôn viên ngoài trời, di chuyển quanh các tòa và xem từng khu vực.</p></div><button type="button" onclick="openCampus3d('${origin}')">Mở khuôn viên ${icon('arrow')}</button></section>`;
+ return `<section class="c campus3d-entry"><div><p class="eyebrow">SẮP RA MẮT</p><h2>Khuôn viên EPU 3D</h2><p>Đang chờ ảnh khuôn viên thực tế để hoàn thiện mô hình bên ngoài chính xác hơn.</p></div><button type="button" class="g" disabled aria-label="Khuôn viên EPU 3D sắp ra mắt">Sắp ra mắt</button></section>`;
 }
 function campus3dView(){
  return `<section class="campus3d-view"><div class="row"><button type="button" class="g" onclick="go(campus3dOrigin)">← Quay lại</button></div><iframe class="campus3d-frame" id="campus3d-frame" title="Khuôn viên EPU 3D" src="./assets/campus3d/index.html?place=${encodeURIComponent(campus3dPlace)}" allowfullscreen></iframe></section>`;
@@ -2414,6 +2468,51 @@ window.addEventListener('message',event=>{
   startCampus3dPractice(topic,part,scenario);
  }
 });
+function collectionTopicGroups(){return [...new Set(D.map(row=>String(row[5]||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'vi'))}
+function collectionVocabularyPanel(){
+ const due=typeof dueCards==='function'?dueCards().length:0,learned=st.c.filter(card=>Number(card.interval)>=21).length;
+ const groups=collectionTopicGroups();
+ return `<section class="c collection-vocab" aria-labelledby="collection-vocab-title">
+  <p class="eyebrow">IELTS SPEAKING · HỌC THEO CHỦ ĐỀ</p><h2 id="collection-vocab-title">Học từ vựng</h2>
+  <p>Khám phá từ theo nhóm, lưu từ có ví dụ vào bộ sưu tập và ôn lại đúng lịch. Từ vựng chọn lọc hoạt động ngoại tuyến.</p>
+  <div class="collection-vocab-stats" id="collection-vocab-stats">
+   <article><span>▤</span><strong data-collection-stat="saved">${st.c.length}</strong><small>Từ đã lưu</small></article>
+   <article><span>◷</span><strong data-collection-stat="due">${due}</strong><small>Cần ôn</small></article>
+   <article><span>✓</span><strong data-collection-stat="mastered">${learned}</strong><small>Đã thuộc · 21 ngày</small></article>
+   <article><span>◎</span><strong>${groups.length}</strong><small>Nhóm chủ đề</small></article>
+  </div>
+  <div class="collection-vocab-head"><h3>Chủ đề từ vựng</h3><small>${D.length.toLocaleString('vi-VN')} mục chọn lọc</small></div>
+  <div class="collection-topic-grid">${groups.map((group,index)=>{const rows=D.filter(row=>row[5]===group);return `<button class="c collection-topic-card" type="button" onclick="collectionOpenTopic(${index})"><span class="collection-topic-icon" aria-hidden="true">${['⌂','▧','✦','◉','♧','↗','◌'][index%7]}</span><strong>${esc(group)}</strong><small>${rows.length} từ · xem ví dụ</small><span class="collection-topic-arrow" aria-hidden="true">→</span></button>`}).join('')}</div>
+  <div id="collection-topic-results" aria-live="polite"></div>
+  <section class="collection-story"><div><h3>Ôn từ qua ví dụ</h3><p>Dùng câu ví dụ của những từ bạn đã lưu để luyện đọc thành tiếng.</p></div><button class="g" type="button" onclick="collectionBuildStory()">Tạo lượt ôn</button><div id="collection-story-result" class="collection-story-result" aria-live="polite"></div></section>
+ </section>`;
+}
+function collectionOpenTopic(index){
+ const groups=collectionTopicGroups(),group=groups[Number(index)];if(!group)return;
+ const target=$('#collection-topic-results');if(!target)return;
+ const rows=D.map((row,i)=>({row,index:i})).filter(item=>item.row[5]===group).slice(0,18),saved=new Set(st.c.map(card=>String(card.w).toLowerCase()));
+ target.innerHTML=`<section class="collection-topic-detail"><div class="section-head"><div><p class="eyebrow">NHÓM TỪ</p><h3>${esc(group)}</h3></div><button class="g" type="button" onclick="collectionCloseTopic()">Đóng</button></div><div class="collection-word-grid">${rows.map(({row,index})=>`<article class="c collection-word-card"><div><h4 lang="en">${esc(row[0])}</h4><small>${esc(row[1])}</small></div><p>${esc(row[2])}</p><p lang="en"><i>${esc(row[3])}</i></p><p><b>Cụm từ:</b> <span lang="en">${esc(row[4])}</span></p><div class="row"><button class="g" type="button" onclick="say(D[${index}][0])">Nghe</button><button class="g" id="collection-save-${index}" type="button" onclick="collectionSaveWord(${index})"${saved.has(String(row[0]).toLowerCase())?' disabled':''}>${saved.has(String(row[0]).toLowerCase())?'✓ Đã lưu':'Lưu từ'}</button></div></article>`).join('')}</div></section>`;
+ target.scrollIntoView({behavior:reduceMotion.matches?'auto':'smooth',block:'nearest'});
+}
+function collectionCloseTopic(){const target=$('#collection-topic-results');if(target)target.replaceChildren()}
+function collectionRefreshStats(){
+ const stats=$('#collection-vocab-stats');if(!stats)return;
+ const saved=stats.querySelector('[data-collection-stat="saved"]'),due=stats.querySelector('[data-collection-stat="due"]'),mastered=stats.querySelector('[data-collection-stat="mastered"]');
+ if(saved)saved.textContent=String(st.c.length);if(due)due.textContent=String(dueCards().length);if(mastered)mastered.textContent=String(st.c.filter(card=>Number(card.interval)>=21).length);
+}
+function collectionSaveWord(index){
+ const row=D[Number(index)];if(!row)return;
+ if(!st.c.some(card=>String(card.w).toLowerCase()===String(row[0]).toLowerCase())){st.c.unshift({w:row[0],m:row[2],e:row[3],k:0});sv()}
+ const button=$('#collection-save-'+index);if(button){button.textContent='✓ Đã lưu';button.disabled=true}collectionRefreshStats();
+}
+function collectionBuildStory(){
+ const target=$('#collection-story-result');if(!target)return;
+ const words=st.c.slice(0,4);if(words.length<2){target.textContent='Hãy lưu ít nhất 2 từ có câu ví dụ để tạo lượt ôn.';return}
+ const lines=words.map(card=>card.e||D.find(row=>String(row[0]).toLowerCase()===String(card.w).toLowerCase())?.[3]).filter(Boolean).slice(0,4);
+ if(lines.length<2){target.textContent='Thêm câu ví dụ cho ít nhất 2 từ đã lưu rồi thử lại.';return}
+ target.replaceChildren();const list=document.createElement('ol');for(const line of lines){const item=document.createElement('li');item.lang='en';item.textContent=line;list.append(item)}target.append(list);
+ const listen=document.createElement('button');listen.type='button';listen.className='g';listen.textContent='Nghe lượt ôn';listen.addEventListener('click',()=>say(lines.join(' ')));target.append(listen);
+}
 const V={
  campus3d:campus3dView,
  onboarding:onboardingPage,
@@ -2451,6 +2550,7 @@ const V={
  PART_NAMES.map((title,i)=>`<article class="c part-card part-${i+1}">${partMotif(i)}<span class="part-index">PART 0${i+1}</span><h2>${title}</h2><p>${PI[i]}</p><div class="chips">${TP.map(([name],t)=>`<button class="g topic-badge topic-${t}" onclick="start([${i+1}],${t})" title="${TOPIC_LABELS[t]}">${icon(TOPIC_ICONS[t],'topic-icon')} ${name}</button>`).join('')}</div></article>`).join('')+freq(),
  les:pathLessonsPage,
  col:()=>`${pageIntro('BỘ SƯU TẬP','Từ vựng đã lưu','Lưu từ và cụm từ bạn muốn dùng trong bài nói. Đánh dấu khi bạn đã nhớ.')}
+ ${collectionVocabularyPanel()}
  <div id="flashcards">${flashcards()}</div>
  <form class="c" onsubmit="event.preventDefault();addW()"><h2>Thêm từ mới</h2><div class="field-grid"><label>Từ hoặc cụm từ<input id="w" required placeholder="Ví dụ: make progress"></label><label>Nghĩa<input id="mn" placeholder="Ví dụ: tiến bộ"></label></div><label>Câu ví dụ<input id="ex" placeholder="Viết một câu bạn có thể dùng khi nói"></label><button type="submit">Lưu từ</button></form>
  <div class="section-head"><h2>Danh sách của bạn</h2><small>Đã nhớ ${st.c.filter(x=>x.k).length}/${st.c.length} từ</small></div>`+
@@ -2543,7 +2643,13 @@ const GAMES=[
   icon:'<path d="M12 6c-3-2-6-2-9-1v13c3-1 6-1 9 1m0-13c3-2 6-2 9-1v13c-3-1-6-1-9 1m0-13v13M6 9c1-.1 2 0 3 .5M6 13c1-.1 2 0 3 .5m6-4c1-.5 2-.6 3-.5m-3 4.5c1-.5 2-.6 3-.5"/>',
   start:arcadeStoryStart,act:arcadeStoryAct,view:arcadeStoryView,score:arcadeRoundScore,
   summary:arcadeStorySummary
- }
+ },
+ {id:'grammar-snap',name:'Sửa câu trong nháy mắt',desc:'Chọn dạng từ đúng để hoàn thiện câu tiếng Anh.',difficulty:'Khởi động',duration:'1–2 phút',defaultSeconds:18,modes:['solo'],icon:'<path d="M4 5h16M4 10h10M4 15h7m6-2 1.5 1.5L22 11"/>',start:arcadeQuizStart,act:arcadeQuizAct,view:arcadeQuizView,score:arcadeRoundScore},
+ {id:'listen-type',name:'Nghe rồi gõ',desc:'Nghe câu mẫu bằng giọng đọc của trình duyệt rồi chép lại.',difficulty:'Vừa sức',duration:'2–3 phút',defaultSeconds:25,modes:['solo'],icon:'<path d="M3 10v4m4-7v10m4-12v14m4-11v8m4-6v4m3-3v2"/>',start:arcadeQuizStart,act:arcadeQuizAct,view:arcadeQuizView,score:arcadeRoundScore},
+ {id:'meaning-pick',name:'Chọn nghĩa chuẩn',desc:'Ghép từ vựng IELTS với nghĩa tiếng Việt phù hợp.',difficulty:'Khởi động',duration:'1–2 phút',defaultSeconds:18,modes:['solo'],icon:'<path d="M4 5h16v14H4zM8 9h8M8 12h5m-5 4h8"/>',start:arcadeQuizStart,act:arcadeQuizAct,view:arcadeQuizView,score:arcadeRoundScore},
+ {id:'collocation-fit',name:'Ghép cụm tự nhiên',desc:'Chọn từ thường đi cùng để câu nghe tự nhiên hơn.',difficulty:'Vừa sức',duration:'2 phút',defaultSeconds:20,modes:['solo'],icon:'<path d="M5 7h5m4 0h5M5 17h5m4 0h5M10 7l4 10"/>',start:arcadeQuizStart,act:arcadeQuizAct,view:arcadeQuizView,score:arcadeRoundScore},
+ {id:'sentence-build',name:'Xếp câu mạch lạc',desc:'Sắp xếp các từ thành một câu hoàn chỉnh.',difficulty:'Vừa sức',duration:'2 phút',defaultSeconds:25,modes:['solo'],icon:'<path d="M4 6h16M4 12h11M4 18h7m5-2 2 2 4-5"/>',start:arcadeQuizStart,act:arcadeQuizAct,view:arcadeQuizView,score:arcadeRoundScore},
+ {id:'word-family',name:'Chọn từ gần nghĩa',desc:'Tìm cách diễn đạt gần nghĩa để mở rộng vốn từ.',difficulty:'Thử thách nhẹ',duration:'2 phút',defaultSeconds:20,modes:['solo'],icon:'<path d="M12 3v5m0 8v5M3 12h5m8 0h5M5.6 5.6l3.5 3.5m5.8 5.8 3.5 3.5m0-12.8-3.5 3.5m-5.8 5.8-3.5 3.5"/>',start:arcadeQuizStart,act:arcadeQuizAct,view:arcadeQuizView,score:arcadeRoundScore}
 ];
 const arcadeDictionaryCache=new Map();
 const arcadeAssetFiles=new Map();
@@ -2765,6 +2871,75 @@ function arcadeStorySummary(session){
   <details><summary>Đọc toàn bộ truyện</summary><ol class="arcade-story">${[{author:'Mở truyện',text:opening},...lines].map(storyLine).join('')}</ol></details></section>`;
 }
 
+// Bộ câu hỏi mini-game EPU chạy hoàn toàn ngoại tuyến.
+const ARCADE_QUIZZES={
+ 'grammar-snap':[
+  {prompt:'The new study room is ____ for group work.',answer:'suitable',choices:['suit','suitable','suitably','suitability'],why:'Sau “is” ở đây cần tính từ “suitable”.'},
+  {prompt:'My classmates ____ on the project every Friday.',answer:'work',choices:['works','working','work','worked'],why:'Chủ ngữ số nhiều “classmates” đi với “work”.'},
+  {prompt:'The campus has become ____ crowded than before.',answer:'less',choices:['few','less','least','little'],why:'Cấu trúc so sánh hơn dùng “less … than”.'},
+  {prompt:'If I have time, I ____ the library after class.',answer:'will visit',choices:['visited','will visit','visiting','have visit'],why:'Câu điều kiện loại một: If + hiện tại, will + động từ.'},
+  {prompt:'She enjoys ____ new vocabulary with flashcards.',answer:'learning',choices:['learn','learned','learning','to learning'],why:'Sau “enjoy” dùng động từ thêm -ing.'},
+  {prompt:'There ____ several useful books on energy.',answer:'are',choices:['is','are','was','be'],why:'“Books” là danh từ số nhiều nên dùng “are”.'}
+ ],
+ 'listen-type':[
+  {prompt:'Listen, then type the sentence you hear.',answer:'I usually review my notes after class.',why:'Chú ý nghe cụm “review my notes” và âm cuối trong “notes”.'},
+  {prompt:'Listen, then type the sentence you hear.',answer:'Public transport can reduce traffic in the city.',why:'Nghe rõ âm cuối trong “transport” và “reduce”.'},
+  {prompt:'Listen, then type the sentence you hear.',answer:'My friends and I often cook dinner together.',why:'Chú ý nối âm trong “friends and I”.'},
+  {prompt:'Listen, then type the sentence you hear.',answer:'Solar power is a clean source of energy.',why:'Nghe cụm “source of energy”.'},
+  {prompt:'Listen, then type the sentence you hear.',answer:'A quiet place helps me concentrate on reading.',why:'Phân biệt “quiet” và “quite”, đồng thời nghe cụm “concentrate on”.'}
+ ],
+ 'meaning-pick':[
+  {prompt:'“A convenient location” nghĩa là gì?',answer:'một vị trí thuận tiện',choices:['một vị trí thuận tiện','một vị trí đông đúc','một nơi yên tĩnh','một chuyến đi đáng nhớ'],why:'“Convenient” có nghĩa là thuận tiện.'},
+  {prompt:'“Renewable energy” nghĩa là gì?',answer:'năng lượng tái tạo',choices:['năng lượng tái tạo','năng lượng hạt nhân','thiết bị điện tử','mức tiêu thụ năng lượng'],why:'“Renewable” là có thể được tái tạo.'},
+  {prompt:'“A tight schedule” nghĩa là gì?',answer:'lịch trình kín',choices:['lịch trình kín','một kế hoạch dài hạn','một kỳ nghỉ ngắn','một cuộc họp trực tuyến'],why:'“Tight” trong cụm này chỉ lịch trình bận, ít thời gian trống.'},
+  {prompt:'“Nutritious food” nghĩa là gì?',answer:'thức ăn bổ dưỡng',choices:['thức ăn bổ dưỡng','thức ăn nhanh','món ăn cay','đồ uống có ga'],why:'“Nutritious” nghĩa là có nhiều chất dinh dưỡng.'},
+  {prompt:'“To keep in touch” nghĩa là gì?',answer:'giữ liên lạc',choices:['giữ liên lạc','đến đúng giờ','đưa ra quyết định','chăm sóc sức khỏe'],why:'Cụm “keep in touch” có nghĩa là giữ liên lạc.'}
+ ],
+ 'collocation-fit':[
+  {prompt:'The university plans to ____ awareness of energy saving.',answer:'raise',choices:['raise','grow','lift','put'],why:'Cụm tự nhiên là “raise awareness”.'},
+  {prompt:'I like to ____ a short break after a long lecture.',answer:'take',choices:['do','make','take','get'],why:'Cụm thường dùng là “take a break”.'},
+  {prompt:'Good public transport can ____ traffic congestion.',answer:'reduce',choices:['reduce','make','put','bring'],why:'“Reduce congestion” là kết hợp từ tự nhiên.'},
+  {prompt:'My team needs to ____ a decision before Friday.',answer:'make',choices:['do','make','take','set'],why:'Ta nói “make a decision”.'},
+  {prompt:'Students can ____ practical experience in the laboratory.',answer:'gain',choices:['win','earn','gain','catch'],why:'Cụm phổ biến là “gain experience”.'}
+ ],
+ 'sentence-build':[
+  {prompt:'Sắp xếp các từ thành câu đúng:',answer:'I usually study in the library after class.',words:['after','usually','library','I','class','in','study','the']},
+  {prompt:'Sắp xếp các từ thành câu đúng:',answer:'Public transport helps reduce air pollution.',words:['air','helps','transport','reduce','public','pollution']},
+  {prompt:'Sắp xếp các từ thành câu đúng:',answer:'My friends often share useful study tips.',words:['useful','often','my','tips','friends','share','study']},
+  {prompt:'Sắp xếp các từ thành câu đúng:',answer:'Solar panels can produce clean electricity.',words:['clean','produce','can','electricity','solar','panels']},
+  {prompt:'Sắp xếp các từ thành câu đúng:',answer:'I feel more relaxed when I exercise outdoors.',words:['when','relaxed','outdoors','I','exercise','more','feel','I']}
+ ],
+ 'word-family':[
+  {prompt:'Chọn từ gần nghĩa nhất với “important”.',answer:'essential',choices:['ordinary','essential','distant','temporary'],why:'“Essential” gần nghĩa với “important” trong ngữ cảnh này.'},
+  {prompt:'Chọn từ gần nghĩa nhất với “help”.',answer:'support',choices:['support','avoid','remove','delay'],why:'“Support” có thể dùng với nghĩa hỗ trợ, giúp đỡ.'},
+  {prompt:'Chọn từ gần nghĩa nhất với “a lot of”.',answer:'numerous',choices:['rare','numerous','narrow','recent'],why:'“Numerous” diễn đạt số lượng nhiều với danh từ đếm được.'},
+  {prompt:'Chọn từ gần nghĩa nhất với “make better”.',answer:'improve',choices:['improve','replace','separate','predict'],why:'“Improve” nghĩa là cải thiện, làm tốt hơn.'},
+  {prompt:'Chọn từ gần nghĩa nhất với “calm”.',answer:'peaceful',choices:['peaceful','crowded','complicated','expensive'],why:'“Peaceful” gần nghĩa với “calm”, đặc biệt khi nói về nơi chốn.'}
+ ]
+};
+function arcadeQuizStart(session,options){
+ const bank=ARCADE_QUIZZES[session.game.id]||[];
+ const deck=bank.slice().sort(()=>Math.random()-.5).slice(0,Math.min(5,bank.length));
+ return {rounds:deck.length,seconds:options.seconds||session.game.defaultSeconds,data:{deck}};
+}
+function arcadeQuizView(session){
+ const row=session.data.deck[session.turn];
+ if(!row)return {tag:'LUYỆN NHANH',title:'Không có câu hỏi trong lượt này.',hint:'Về sảnh và chọn trò khác.'};
+ const choices=row.choices?`<div class="arcade-quiz-options" role="group" aria-label="Các lựa chọn">${row.choices.map((choice,index)=>`<button class="g" type="button" onclick="arcadeChoose(${index})">${esc(choice)}</button>`).join('')}</div>`:'';
+ const words=row.words?`<p class="arcade-word-bank" lang="en">${esc(row.words.slice().sort(()=>Math.random()-.5).join(' · '))}</p>`:'';
+ const listen=session.game.id==='listen-type'?'<div class="row"><button class="g" type="button" onclick="arcadeSpeakPrompt()">▶ Nghe câu mẫu</button></div>':'';
+ return {tag:'THỬ THÁCH '+(session.turn+1)+'/'+session.rounds,title:row.prompt,extra:`${listen}${choices}${words}`,hint:row.words?'Gõ cả câu theo đúng thứ tự từ.':session.game.id==='listen-type'?'Nghe một hoặc vài lần rồi gõ lại câu tiếng Anh. Dấu câu và chữ hoa không ảnh hưởng kết quả.':'Chọn đáp án hoặc gõ câu trả lời vào ô bên dưới.'};
+}
+function arcadeQuizAct(session,text,action){
+ const row=session.data.deck[session.turn];
+ if(action==='next')return;
+ if(action==='skip')return {points:0,message:`Lượt này chưa đúng. Đáp án: “${row.answer}”.`};
+ const normalize=value=>String(value??'').toLocaleLowerCase().normalize('NFD').replace(/\p{M}/gu,'').replace(/[^\p{L}\p{N}]+/gu,' ').trim(),supplied=normalize(text),answer=normalize(row.answer);
+ if(!supplied)return {retry:'Chọn một đáp án hoặc nhập câu trả lời trước.'};
+ if(supplied!==answer)return {retry:row.choices?'Chưa đúng. Hãy thử lựa chọn khác.':'Chưa khớp. Hãy kiểm tra thứ tự từ và thử lại.'};
+ return {accepted:true,points:10,message:'Chính xác! '+(row.why||'Câu nghe khớp với mẫu.'),detail:row.answer};
+}
+
 // Phiên chơi, giao diện và kết quả
 let arcadeOrigin='prac',arcadeSelection=null,arcadeSession=null,arcadeClock=null,arcadeCapture=null;
 const arcadeIcon=game=>`<span class="arcade-icon">${arcadeSvg(game.icon)}</span>`;
@@ -2791,6 +2966,11 @@ function mergeArcadeHistory(local,other){
 function arcadeRecords(game,mode){
  const runs=st.games.runs.filter(row=>row.game===game&&(!mode||row.mode===mode));
  return {count:runs.length,best:runs.reduce((best,row)=>Math.max(best,row.points),0)};
+}
+function arcadeOverview(){
+ const runs=Array.isArray(st.games?.runs)?st.games.runs:[],played=new Set(runs.map(row=>row.game)),best=runs.reduce((top,row)=>Math.max(top,Number(row.points)||0),0);
+ const pad='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 8h10a4 4 0 0 1 3.8 2.8l1.1 3.8a2.5 2.5 0 0 1-4.1 2.5L15 15H9l-2.8 2.1a2.5 2.5 0 0 1-4.1-2.5l1.1-3.8A4 4 0 0 1 7 8Z"/><path d="M7 11v4m-2-2h4m7-1h.01M18 14h.01"/></svg>',play='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.8c0-1.1 1.2-1.8 2.2-1.2l11.1 6.4a2.3 2.3 0 0 1 0 4L9.2 20.4A1.5 1.5 0 0 1 7 19.1z"/></svg>',medal='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 3 2 6-4 2 1 9 5-3 5 3 1-9-4-2 2-6M8 3h8M6 11h12"/></svg>';
+ return `<section class="arcade-overview" aria-label="Thống kê sảnh trò chơi"><article class="arcade-overview-card"><span class="arcade-overview-icon">${pad}</span><div><small>Trò chơi</small><strong>${GAMES.length}</strong></div></article><article class="arcade-overview-card"><span class="arcade-overview-icon">${play}</span><div><small>Đã chơi</small><strong>${played.size}/${GAMES.length}</strong></div></article><article class="arcade-overview-card"><span class="arcade-overview-icon">${medal}</span><div><small>Kỷ lục cao nhất</small><strong>${best?best.toLocaleString('vi-VN'):'—'}</strong></div></article></section>`;
 }
 
 function arcadeEntry(origin){
@@ -2824,6 +3004,7 @@ function arcadeLobby(){
  return `<section class="arcade-panel">
   <button class="g" type="button" onclick="go(arcadeOrigin)">← ${arcadeOrigin==='home'?'Trang chủ':'Luyện tập'}</button>
   ${pageIntro('GÓC CHƠI · EPU','Sảnh trò chơi','Chọn một trò và luyện tiếng Anh trong vài phút.')}
+  ${arcadeOverview()}
   <div class="arcade-grid">${cards}</div>
   <details class="c"><summary>Dữ liệu chép lời và từ điển ngoại tuyến</summary>
    <p>Nếu bản này có thư mục <code>assets</code> riêng, bạn có thể chọn thư mục đó để sảnh đọc tệp ngay trên thiết bị. Chọn lại sau khi tải lại trang. Bạn luôn có thể chơi bằng cách gõ tay.</p>
@@ -2955,6 +3136,18 @@ function arcadeRevealHint(){
  for(const node of document.querySelectorAll('[data-arcade-clue]'))node.hidden=Number(node.dataset.arcadeClue)>session.data.hints;
  const button=$('#arcade-hint');if(button)button.disabled=session.data.hints===3;
  arcadeFeedback('Đã mở manh mối '+session.data.hints+'/3.');
+}
+function arcadeChoose(index){
+ const session=arcadeSession,row=session?.data?.deck?.[session.turn],choice=row?.choices?.[Number(index)];
+ if(session?.phase!=='active'||!choice)return;
+ const answer=$('#arcade-answer');if(answer)answer.value=choice;
+ void arcadeSubmit();
+}
+function arcadeSpeakPrompt(){
+ const session=arcadeSession,row=session?.data?.deck?.[session.turn];
+ if(tab!=='games'||session?.phase!=='active'||session.game.id!=='listen-type'||!row)return;
+ if(!('speechSynthesis'in window)){arcadeFeedback('Trình duyệt này chưa có giọng đọc. Hãy thử trò khác hoặc dùng bàn phím.');return}
+ say(row.answer,.88);
 }
 function arcadeFeedback(message){
  const node=$('#arcade-feedback');if(node)node.textContent=message;
@@ -3728,6 +3921,7 @@ function showAfter(blob, transcript = '', message = '') {
     <label class="transcript-label" for="tx">Câu trả lời bằng tiếng Anh</label>
     <textarea id="tx" rows="5" lang="en" aria-describedby="transcript-status" oninput="resetPronunciationConfirmation()" placeholder="Type what you said in English…"></textarea>
     <p class="transcript-status mu" id="transcript-status" role="status">${transcript ? 'Kiểm tra và sửa lại bản chép lời nếu cần.' : ''}</p>
+    ${S?.ideaDraft?.questionIndex===S?.i ? '<button type="button" class="g" onclick="insertSavedIdea()">Chèn gợi ý tiếng Anh đã chọn</button>' : ''}
     ${lb ? `<label class="pron-confirm" for="pron-confirm"><input id="pron-confirm" type="checkbox"> Tôi đã kiểm tra bản chép lời; dùng văn bản này để đối chiếu Pronunciation.</label>` : ''}
     <button class="w" id="evaluate-answer" onclick="${S?.mode==='exam'?'submitExam()':'ev()'}">${S?.mode==='exam'?'Nộp câu trả lời':'Chấm điểm câu trả lời'}</button>
   </div>`;
@@ -4717,6 +4911,160 @@ function start(parts,topic){
  S={it:items,i:0,res:[],result:null};tab='prac';openView();
 }
 
+let ideaRequestId=0;
+const IDEA_EXPRESSION_MAP=[
+ [['theo toi','theo y kien cua toi','toi nghi rang'],'In my opinion','Mở đầu để nêu quan điểm'],
+ [['toi nghi','minh nghi','toi cho rang'],'I think','Nêu suy nghĩ'],
+ [['toi thich','minh thich','toi yeu thich'],'I enjoy','Nói về sở thích'],
+ [['toi thuong','minh thuong','toi hay'],'I usually','Nói về thói quen'],
+ [['vi','boi vi','ly do la'],'because','Nối với lý do'],
+ [['vi du','chang han'],'for example','Dẫn một ví dụ'],
+ [['vi vay','do do','ket qua la'],'as a result','Nêu kết quả'],
+ [['mat khac','nguoc lai'],'on the other hand','Chuyển sang ý đối lập'],
+ [['ngoai ra','ben canh do'],'in addition','Bổ sung ý'],
+ [['quan trong','rat quan trong'],'important','Nói về mức độ quan trọng'],
+ [['tien loi','thuan tien'],'convenient','Thuận tiện'],
+ [['dong duc','chen chuc'],'crowded','Đông đúc'],
+ [['yen binh','yen tinh'],'peaceful','Yên bình'],
+ [['soi dong','nhon nhip'],'lively','Sôi động'],
+ [['giao thong'],'traffic','Giao thông'],
+ [['co hoi viec lam','viec lam'],'job opportunities','Cơ hội việc làm'],
+ [['chi phi sinh hoat'],'cost of living','Chi phí sinh hoạt'],
+ [['que huong'],'hometown','Quê hương'],
+ [['khu pho','khu dan cu'],'neighbourhood','Khu phố/khu dân cư'],
+ [['chuyen nganh'],'major','Chuyên ngành'],
+ [['bai tap lon','bai tap'],'assignment','Bài tập'],
+ [['lam viec nhom'],'teamwork','Làm việc nhóm'],
+ [['thuc hanh'],'hands-on practice','Thực hành'],
+ [['ap luc'],'pressure','Áp lực'],
+ [['dien thoai'],'smartphone','Điện thoại thông minh'],
+ [['may tinh xach tay'],'laptop','Máy tính xách tay'],
+ [['mang xa hoi'],'social media','Mạng xã hội'],
+ [['tri tue nhan tao','ai'],'artificial intelligence','Trí tuệ nhân tạo'],
+ [['quyen rieng tu'],'privacy','Quyền riêng tư'],
+ [['tu dong hoa'],'automation','Tự động hóa'],
+ [['mon an'],'dish','Món ăn'],
+ [['tu nau','nau o nha'],'home-cooked','Tự nấu ở nhà'],
+ [['bo duong'],'nutritious','Bổ dưỡng'],
+ [['re'],'affordable','Giá phải chăng'],
+ [['du lich'],'travel','Du lịch'],
+ [['chuyen di'],'trip','Chuyến đi'],
+ [['van hoa dia phuong'],'local culture','Văn hóa địa phương'],
+ [['phong canh'],'scenery','Phong cảnh'],
+ [['dang nho'],'memorable','Đáng nhớ'],
+ [['o nhiem'],'pollution','Ô nhiễm'],
+ [['tai che'],'recycle','Tái chế'],
+ [['phuong tien cong cong','xe buyt'],'public transport','Phương tiện công cộng'],
+ [['nang luong tai tao'],'renewable energy','Năng lượng tái tạo'],
+ [['giam rac thai'],'reduce waste','Giảm rác thải'],
+ [['suc khoe'],'health','Sức khỏe'],
+ [['tap the duc'],'exercise','Tập thể dục'],
+ [['thu gian'],'relax','Thư giãn'],
+ [['tiet kiem thoi gian'],'save time','Tiết kiệm thời gian'],
+ [['di xe buyt','di bang xe buyt'],'take the bus','Đi xe buýt'],
+ [['ton kem'],'expensive','Đắt đỏ'],
+ [['cai thien'],'improve','Cải thiện'],
+ [['giup toi'],'helps me','Giúp tôi'],
+ [['hoc tieng anh'],'study English','Học tiếng Anh'],
+ [['hoc tu vung'],'learn vocabulary','Học từ vựng'],
+ [['de hieu'],'easy to understand','Dễ hiểu'],
+ [['kho hieu'],'difficult to understand','Khó hiểu'],
+ [['than thien voi moi truong'],'eco-friendly','Thân thiện với môi trường']
+];
+function ideaNormalizeVi(value){return String(value??'').toLocaleLowerCase('vi').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim()}
+function offlineIdeaSuggestions(input,topic){
+ const normalized=ideaNormalizeVi(input),found=[];
+ const add=(variants,english,note)=>{for(const variant of variants){const key=ideaNormalizeVi(variant);if(key.length>=4&&normalized.includes(key)){found.push({english,note,matchLength:key.length});break}}};
+ IDEA_EXPRESSION_MAP.forEach(([variants,english,note])=>add(variants,english,note));
+ (VT?.[topic]||[]).forEach(entry=>{const [english,vietnamese]=String(entry).split('|');if(english&&vietnamese)add([vietnamese],english,`Từ vựng chủ đề ${topic}`)});
+ (D||[]).forEach(row=>{const [english,,vietnamese]=row;if(!english||!vietnamese)return;add(String(vietnamese).split(/[;,]/).map(part=>part.trim()),english,'Từ trong từ điển ngoại tuyến')});
+ const unique=[...new Map(found.sort((a,b)=>b.matchLength-a.matchLength).map(item=>[item.english.toLocaleLowerCase(),item])).values()].slice(0,3);
+ const sentence=offlineIdeaSentence(normalized,topic);if(sentence)unique.unshift(sentence);
+ if(unique.length<3){
+  const frames=[['One reason is that …','Nêu một lý do cụ thể'],['For example, …','Thêm một ví dụ ngắn'],['This is useful because …','Giải thích vì sao điều đó hữu ích']];
+  for(const [english,note] of frames){if(unique.length>=3)break;if(!unique.some(item=>item.english===english))unique.push({english,note,matchLength:0})}
+ }
+ return unique.slice(0,3);
+}
+function ideaExactPhrase(value,topic){
+ const key=ideaNormalizeVi(value),slots=[
+  [['que huong'],'my hometown'],[['dien thoai'],'my phone'],[['may tinh xach tay'],'my laptop'],
+  [['hoc tieng anh'],'learning English'],[['hoc tu vung'],'learn vocabulary'],[['di xe buyt','di bang xe buyt'],'take the bus'],
+  [['yen binh','yen tinh'],'it is peaceful'],[['tien loi','thuan tien'],'it is convenient'],
+  [['do an ngon','mon an ngon'],'the food is delicious'],[['co hoi viec lam'],'many job opportunities'],
+  [['tap the duc'],'exercise'],[['thu gian'],'relax'],[['tiet kiem thoi gian'],'save time']
+ ];
+ for(const [variants,english] of slots)if(variants.some(variant=>ideaNormalizeVi(variant)===key))return english;
+ for(const [variants,english] of IDEA_EXPRESSION_MAP)if(variants.some(variant=>ideaNormalizeVi(variant)===key))return english;
+ for(const entry of VT?.[topic]||[]){const [english,vietnamese]=String(entry).split('|');if(vietnamese&&ideaNormalizeVi(vietnamese)===key)return english}
+ return '';
+}
+function offlineIdeaSentence(normalized,topic){
+ let match=normalized.match(/^(?:toi|minh|em) (thuong )?(?:dung|su dung) (.+?) de (.+?)(?: khi (.+))?$/);
+ if(match){
+  const object=ideaExactPhrase(match[2],topic),purpose=ideaExactPhrase(match[3],topic),when=match[4]?ideaExactPhrase(match[4],topic):'';
+  if(object&&purpose&&(!match[4]||when))return {english:`I ${match[1]?'usually ':''}use ${object} to ${purpose}${when?` when I ${when}`:''}.`,note:'Câu ghép từ các cụm ngoại tuyến đã nhận ra.',matchLength:normalized.length};
+ }
+ match=normalized.match(/^(?:toi|minh|em) (?:rat )?(?:thich|yeu thich) (.+?) vi (.+)$/);
+ if(match){
+  let subject=ideaExactPhrase(match[1],topic),reason=ideaExactPhrase(match[2],topic);
+  if(subject==='hometown')subject='my hometown';if(subject==='study English')subject='learning English';if(subject==='dish')subject='local food';
+  if(reason&&!/^(?:it is|the food is|many )/.test(reason))reason=`it is ${reason}`;
+  if(subject&&reason)return {english:`I really enjoy ${subject} because ${reason}.`,note:'Câu ghép từ các cụm ngoại tuyến đã nhận ra.',matchLength:normalized.length};
+ }
+ return null;
+}
+function ideaCoachMarkup(){return `<details class="idea-coach"><summary>💡 Bí ý? Nhập bằng tiếng Việt để tìm cách nói tiếng Anh</summary><div class="idea-coach-body"><p>Gõ ý ngắn của bạn. App sẽ đưa tối đa 3 cách diễn đạt; hãy chọn câu đúng với điều bạn muốn nói.</p><label for="idea-vi">Ý của bạn bằng tiếng Việt</label><textarea id="idea-vi" rows="3" maxlength="500" placeholder="Ví dụ: điện thoại giúp em học từ vựng khi đi xe buýt"></textarea><div class="row"><button type="button" onclick="expressIdea()">Gợi ý cách nói</button></div><p class="idea-coach-note">Khi dịch vụ AI đang kết nối, app chỉ gửi ý này và câu hỏi hiện tại sau khi bạn bấm nút. Nếu không có dịch vụ hoặc mất mạng, app dùng cụm từ ngoại tuyến.</p><div id="idea-output" class="idea-coach-results" role="status" aria-live="polite"></div><p id="idea-use-status" class="idea-coach-note" aria-live="polite"></p></div></details>`}
+function renderIdeaSuggestions(target,suggestions,note){
+ if(!target?.isConnected)return;
+ target.replaceChildren();
+ const message=document.createElement('p');message.className='idea-coach-note';message.textContent=note;target.appendChild(message);
+ suggestions.forEach((item,index)=>{
+  const card=document.createElement('article');card.className='idea-suggestion';
+  const copy=document.createElement('div'),english=document.createElement('p');english.lang='en';english.textContent=item.english;copy.appendChild(english);
+  if(item.note){const hint=document.createElement('small');hint.textContent=item.note;copy.appendChild(hint)}
+  const button=document.createElement('button');button.type='button';button.className='g';button.textContent='Dùng câu này';button.addEventListener('click',()=>useIdeaSuggestion(index));
+  card.append(copy,button);target.appendChild(card);
+ });
+}
+function parseIdeaAiSuggestions(response){
+ const source=String(response??'').trim(),match=source.match(/\{[\s\S]*\}/);if(!match)throw Error('idea_json');
+ const data=JSON.parse(match[0]),list=Array.isArray(data.suggestions)?data.suggestions:[];
+ const suggestions=list.slice(0,3).map(item=>({english:String(item?.english??'').trim().slice(0,220),note:String(item?.note??'').trim().slice(0,120)})).filter(item=>/[a-z]/i.test(item.english)&&!/[ăâđêôơưĂÂĐÊÔƠƯ]/.test(item.english));
+ if(!suggestions.length)throw Error('idea_empty');return suggestions;
+}
+async function expressIdea(){
+ const input=$('#idea-vi'),target=$('#idea-output'),useStatus=$('#idea-use-status');if(!input||!target)return;
+ const text=input.value.trim().slice(0,500);if(!text){renderIdeaSuggestions(target,[], 'Hãy nhập một ý ngắn bằng tiếng Việt trước.');return}
+ const request=++ideaRequestId,owner=S,suggestions=offlineIdeaSuggestions(text,S?.it?.[S.i]?.t||'');
+ if(owner)owner.ideaOptions=suggestions;
+ renderIdeaSuggestions(target,suggestions,'Đang có gợi ý ngoại tuyến. Nếu AI khả dụng, app sẽ bổ sung cách diễn đạt tự nhiên hơn.');
+ if(useStatus)useStatus.textContent='';
+ if(typeof window.claude?.use!=='function'){
+  renderIdeaSuggestions(target,suggestions,'Dịch vụ AI chưa khả dụng; đây là cụm từ khớp trong kho ngoại tuyến và câu khung. Hãy hoàn thiện chúng theo đúng ý mình.');return;
+ }
+ try{
+  const sample=await window.claude.use('sample');if(!sample||request!==ideaRequestId||owner!==S||!target.isConnected)return;
+  const current=owner?.it?.[owner.i],prompt=`Bạn là trợ lý diễn đạt ý IELTS Speaking. Hãy chuyển đúng ý tiếng Việt thành 3 cách nói tiếng Anh tự nhiên, phù hợp trình độ người học; không thêm dữ kiện cá nhân, không chấm band. Có thể dùng một câu ngắn, một câu tự nhiên hơn và một mẫu có thể mở rộng. Giải thích ngắn bằng tiếng Việt. Chỉ trả JSON hợp lệ dạng {"suggestions":[{"english":"...","note":"..."}]}, tối đa 3 mục.\nChủ đề: ${String(current?.t||'IELTS Speaking').slice(0,100)}\nCâu hỏi: ${String(current?.q||'').slice(0,240)}\nÝ người học: ${text}`;
+  const response=await Promise.race([sample(prompt,{modelTier:'default',cache:false}),new Promise((_,reject)=>setTimeout(()=>reject(Error('timeout')),18000))]);
+  if(request!==ideaRequestId||owner!==S||!target.isConnected)return;
+  const improved=parseIdeaAiSuggestions(response?.text);owner.ideaOptions=improved;
+  renderIdeaSuggestions(target,improved,'Gợi ý AI là bản nháp để tham khảo. Kiểm tra lại để câu tiếng Anh giữ đúng ý của bạn.');
+ }catch{
+  if(request===ideaRequestId&&owner===S&&target.isConnected)renderIdeaSuggestions(target,suggestions,'Chưa lấy được gợi ý AI. Bạn vẫn có thể dùng các cụm ngoại tuyến bên dưới và tự hoàn thiện câu.');
+ }
+}
+function useIdeaSuggestion(index){
+ const text=String(S?.ideaOptions?.[index]?.english||'').trim(),status=$('#idea-use-status');if(!text||!S)return;
+ const field=$('#tx');
+ if(field){const start=field.selectionStart??field.value.length,end=field.selectionEnd??field.value.length,prefix=start>0&&!/\s$/.test(field.value.slice(0,start))?' ':'';field.setRangeText(prefix+text,start,end,'end');field.dispatchEvent(new Event('input',{bubbles:true}));field.focus();if(status)status.textContent='Đã chèn gợi ý. Hãy sửa lại để khớp với điều bạn thật sự muốn nói.';return}
+ S.ideaDraft={text,questionIndex:S.i};if(status)status.textContent='Đã giữ câu này cho câu hỏi hiện tại. Sau khi mở ô transcript, bạn có thể chèn bằng nút bên dưới.';
+}
+function insertSavedIdea(){
+ const field=$('#tx'),draft=S?.ideaDraft,status=$('#transcript-status');if(!field||!draft||draft.questionIndex!==S.i)return;
+ const prefix=field.value&&!/\s$/.test(field.value)?' ':'';field.value+=prefix+draft.text;field.dispatchEvent(new Event('input',{bubbles:true}));field.focus();if(status)status.textContent='Đã chèn gợi ý. Hãy sửa lại theo đúng nội dung bạn đã nói.';
+}
+
 function sess(){
  const x=S.it[S.i];
  if(!x)return summary();
@@ -4726,6 +5074,7 @@ function sess(){
   <div class="session-meta"><span class="part-index">${x.pathChallenge?'BÀI NÓI THỬ ĐẦU VÀO':x.pairPractice?'LUYỆN CẶP ÂM':S.mode==='quick'?'NÓI NHANH 60 GIÂY':'PART 0'+x.p+' · CÂU '+(S.i+1)+'/'+S.it.length}</span>
  ${x.pathChallenge||x.pairPractice?'<span class="topic-badge">'+esc(x.t)+'</span>':x.forecast?'<span class="topic-badge">Forecast · '+esc(x.t)+'</span>':`<span class="topic-badge topic-${ti}">${icon(TOPIC_ICONS[ti]||'study','topic-icon')} ${esc(x.t)}</span>`}</div>
  <h1 lang="en"${x.forecast?' class="review-prompt"':''}>${esc(x.q)}</h1>
+  ${S.result||x.pathChallenge||x.pairPractice?'':ideaCoachMarkup()}
  ${S.mode==='quick'?'<p class="quick-timer" id="quick-timer" role="status" aria-live="polite">Đang mở micro…</p>':''}
  ${S.retake?'<aside class="retake-note" aria-live="polite"><p>Bạn đang thu lại câu này. Sau khi chấm, kết quả mới sẽ thay cho kết quả cũ.</p><button type="button" class="g" onclick="restorePreviousAnswer()">← Quay lại kết quả trước</button></aside>':''}
  ${S.result?'':`${x.p===2?'<button class="g" id="prep" onclick="prep()">Chuẩn bị 60 giây</button>':''}
